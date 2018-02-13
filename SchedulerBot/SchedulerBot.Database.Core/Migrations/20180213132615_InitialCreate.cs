@@ -11,8 +11,7 @@ namespace SchedulerBot.Database.Core.Migrations
                 name: "ScheduledMessages",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                    Id = table.Column<Guid>(nullable: false),
                     ConversationId = table.Column<string>(nullable: false),
                     Cron = table.Column<string>(nullable: false),
                     Text = table.Column<string>(nullable: false)
@@ -26,12 +25,13 @@ namespace SchedulerBot.Database.Core.Migrations
                 name: "ScheduledMessageRuns",
                 columns: table => new
                 {
-                    ScheduledMessageId = table.Column<int>(nullable: false),
-                    RanAt = table.Column<DateTime>(nullable: false)
+                    Id = table.Column<Guid>(nullable: false),
+                    CreatedOn = table.Column<DateTime>(nullable: false),
+                    ScheduledMessageId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ScheduledMessageRuns", x => new { x.ScheduledMessageId, x.RanAt });
+                    table.PrimaryKey("PK_ScheduledMessageRuns", x => x.Id);
                     table.ForeignKey(
                         name: "FK_ScheduledMessageRuns_ScheduledMessages_ScheduledMessageId",
                         column: x => x.ScheduledMessageId,
@@ -39,6 +39,11 @@ namespace SchedulerBot.Database.Core.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ScheduledMessageRuns_ScheduledMessageId",
+                table: "ScheduledMessageRuns",
+                column: "ScheduledMessageId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

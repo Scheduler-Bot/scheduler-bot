@@ -16,7 +16,7 @@ namespace SchedulerBot.Database.Core.Migrations
 
             modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessage", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("ConversationId")
@@ -35,11 +35,16 @@ namespace SchedulerBot.Database.Core.Migrations
 
             modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageLog", b =>
                 {
-                    b.Property<int>("ScheduledMessageId");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("CreatedOn");
 
-                    b.HasKey("ScheduledMessageId", "CreatedOn");
+                    b.Property<Guid>("ScheduledMessageId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScheduledMessageId");
 
                     b.ToTable("ScheduledMessageRuns");
                 });

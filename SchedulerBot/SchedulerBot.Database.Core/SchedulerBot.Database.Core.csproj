@@ -7,6 +7,7 @@
   <ItemGroup>
     <Compile Remove="Migrations\20180213104126_InitialCreation.cs" />
     <Compile Remove="Migrations\20180213124405_ScheduledMessageCron.cs" />
+    <Compile Remove="Migrations\20180213125922_InitialCreate.cs" />
   </ItemGroup>
 
   <ItemGroup>

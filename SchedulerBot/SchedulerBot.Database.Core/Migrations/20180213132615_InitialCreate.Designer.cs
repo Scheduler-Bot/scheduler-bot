@@ -7,7 +7,7 @@ using System;
 namespace SchedulerBot.Database.Core.Migrations
 {
 	[DbContext(typeof(SchedulerBotContext))]
-    [Migration("20180213125922_InitialCreate")]
+    [Migration("20180213132615_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -18,7 +18,7 @@ namespace SchedulerBot.Database.Core.Migrations
 
             modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessage", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("ConversationId")
@@ -37,11 +37,16 @@ namespace SchedulerBot.Database.Core.Migrations
 
             modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageLog", b =>
                 {
-                    b.Property<int>("ScheduledMessageId");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("CreatedOn");
 
-                    b.HasKey("ScheduledMessageId", "CreatedOn");
+                    b.Property<Guid>("ScheduledMessageId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScheduledMessageId");
 
                     b.ToTable("ScheduledMessageRuns");
                 });
