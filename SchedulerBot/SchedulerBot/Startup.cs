@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Authentication;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SchedulerBot.Database.Core;
 
 namespace SchedulerBot
 {
@@ -31,6 +33,10 @@ namespace SchedulerBot
 				})
 				.AddBotAuthentication(credentialProvider);
 			services.AddSingleton<ICredentialProvider>(credentialProvider);
+
+			string connectionString = Configuration.GetConnectionString("SchedulerBotDatabase");
+
+			services.AddDbContext<SchedulerBotContext>(builder => builder.UseSqlite(connectionString));
 			services.AddMvc(options => options.Filters.Add<TrustServiceUrlAttribute>());
 		}
 
