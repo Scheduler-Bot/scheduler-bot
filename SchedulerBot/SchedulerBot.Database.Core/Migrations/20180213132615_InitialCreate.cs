@@ -22,7 +22,7 @@ namespace SchedulerBot.Database.Core.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ScheduledMessageRuns",
+                name: "ScheduledMessageLogs",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
@@ -42,14 +42,14 @@ namespace SchedulerBot.Database.Core.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_ScheduledMessageRuns_ScheduledMessageId",
-                table: "ScheduledMessageRuns",
+                table: "ScheduledMessageLogs",
                 column: "ScheduledMessageId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ScheduledMessageRuns");
+                name: "ScheduledMessageLogs");
 
             migrationBuilder.DropTable(
                 name: "ScheduledMessages");

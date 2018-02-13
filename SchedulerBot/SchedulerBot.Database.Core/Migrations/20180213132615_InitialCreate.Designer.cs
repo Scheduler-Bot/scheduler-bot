@@ -48,7 +48,7 @@ namespace SchedulerBot.Database.Core.Migrations
 
                     b.HasIndex("ScheduledMessageId");
 
-                    b.ToTable("ScheduledMessageRuns");
+                    b.ToTable("ScheduledMessageLogs");
                 });
 
             modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageLog", b =>
