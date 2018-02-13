@@ -35,18 +35,18 @@ namespace SchedulerBot.Database.Core.Migrations
                     b.ToTable("ScheduledMessages");
                 });
 
-            modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageRun", b =>
+            modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageLog", b =>
                 {
                     b.Property<int>("ScheduledMessageId");
 
-                    b.Property<DateTime>("RanAt");
+                    b.Property<DateTime>("CreatedOn");
 
-                    b.HasKey("ScheduledMessageId", "RanAt");
+                    b.HasKey("ScheduledMessageId", "CreatedOn");
 
                     b.ToTable("ScheduledMessageRuns");
                 });
 
-            modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageRun", b =>
+            modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageLog", b =>
                 {
                     b.HasOne("SchedulerBot.Database.Entities.ScheduledMessage", "ScheduledMessage")
                         .WithMany("Runs")

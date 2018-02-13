@@ -12,7 +12,7 @@ namespace SchedulerBot.Database.Core
 
 		public DbSet<ScheduledMessage> ScheduledMessages { get; set; }
 
-		public DbSet<ScheduledMessageRun> ScheduledMessageRuns { get; set; }
+		public DbSet<ScheduledMessageLog> ScheduledMessageRuns { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{

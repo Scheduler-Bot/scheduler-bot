@@ -2,11 +2,11 @@
 
 namespace SchedulerBot.Database.Entities
 {
-	public class ScheduledMessageRun
+	public class ScheduledMessageLog
 	{
-		public int ScheduledMessageId { get; set; }
+		public DateTime CreatedOn { get; set; }
 
-		public DateTime RanAt { get; set; }
+		public int ScheduledMessageId { get; set; }
 
 		public ScheduledMessage ScheduledMessage { get; set; }
 	}
