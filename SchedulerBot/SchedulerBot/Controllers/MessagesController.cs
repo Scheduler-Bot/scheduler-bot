@@ -26,7 +26,9 @@ namespace SchedulerBot.Controllers
 			if (activity.Type == ActivityTypes.Message)
 			{
 				//MicrosoftAppCredentials.TrustServiceUrl(activity.ServiceUrl);
-				MicrosoftAppCredentials appCredentials = new MicrosoftAppCredentials(configuration[MicrosoftAppCredentials.MicrosoftAppIdKey], configuration[MicrosoftAppCredentials.MicrosoftAppPasswordKey]);
+				string appId = configuration[MicrosoftAppCredentials.MicrosoftAppIdKey];
+				string appPassword = configuration[MicrosoftAppCredentials.MicrosoftAppPasswordKey];
+				MicrosoftAppCredentials appCredentials = new MicrosoftAppCredentials(appId, appPassword);
 				ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl), appCredentials);
 
 				// return our reply to the user

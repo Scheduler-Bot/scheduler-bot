@@ -19,31 +19,23 @@ namespace SchedulerBot
 
 		public void ConfigureServices(IServiceCollection services)
 		{
-			SimpleCredentialProvider credentialProvider = new SimpleCredentialProvider(Configuration.GetSection(MicrosoftAppCredentials.MicrosoftAppIdKey)?.Value,
-				Configuration.GetSection(MicrosoftAppCredentials.MicrosoftAppPasswordKey)?.Value);
+			string appId = Configuration[MicrosoftAppCredentials.MicrosoftAppIdKey];
+			string appPassword = Configuration[MicrosoftAppCredentials.MicrosoftAppPasswordKey];
+			SimpleCredentialProvider credentialProvider = new SimpleCredentialProvider(appId, appPassword);
 
 			services.AddAuthentication(
 				options =>
 				{
 					options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 					options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-				}
-			)
-			.AddBotAuthentication(credentialProvider);
-			services.AddSingleton(typeof(ICredentialProvider), credentialProvider);
-			services.AddMvc(options =>
-			{
-				options.Filters.Add(typeof(TrustServiceUrlAttribute));
-			});
+				})
+				.AddBotAuthentication(credentialProvider);
+			services.AddSingleton<ICredentialProvider>(credentialProvider);
+			services.AddMvc(options => options.Filters.Add<TrustServiceUrlAttribute>());
 		}
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
-			if (env.IsDevelopment())
-			{
-				app.UseDeveloperExceptionPage();
-			}
-
 			app.UseStaticFiles();
 			app.UseAuthentication();
 			app.UseMvc();
