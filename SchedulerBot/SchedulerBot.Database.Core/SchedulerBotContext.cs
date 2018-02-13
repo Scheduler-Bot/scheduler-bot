@@ -10,5 +10,7 @@ namespace SchedulerBot.Database.Core
 		}
 
 		public DbSet<ScheduledMessage> ScheduledMessages { get; set; }
+
+		public DbSet<ScheduledMessageRun> ScheduledMessageRuns { get; set; }
 	}
 }
