@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SchedulerBot.Database.Core;
@@ -9,13 +11,15 @@ namespace SchedulerBot.Business.Services
 {
 	public sealed class ScheduledMessageProcessorService : IHostedService, IDisposable
 	{
+		private readonly IServiceScopeFactory scopeFactory;
+		private readonly TimeSpan pollingInterval;
 		private readonly CancellationTokenSource serviceCancellationTokenSource;
 		private readonly CancellationToken serviceCancellationToken;
-		private readonly IServiceScopeFactory scopeFactory;
 
-		public ScheduledMessageProcessorService(IServiceScopeFactory scopeFactory)
+		public ScheduledMessageProcessorService(IServiceScopeFactory scopeFactory, IConfiguration configuration)
 		{
 			this.scopeFactory = scopeFactory;
+			pollingInterval = TimeSpan.Parse(configuration["MessageProcessingInterval"], CultureInfo.InvariantCulture);
 			serviceCancellationTokenSource = new CancellationTokenSource();
 			serviceCancellationToken = serviceCancellationTokenSource.Token;
 		}
@@ -25,7 +29,7 @@ namespace SchedulerBot.Business.Services
 			while (!serviceCancellationTokenSource.IsCancellationRequested)
 			{
 				await ProcessScheduledMessagesAsync();
-				await WaitAsync(serviceCancellationToken);
+				await WaitAsync();
 			}
 		}
 
@@ -54,11 +58,11 @@ namespace SchedulerBot.Business.Services
 			}
 		}
 
-		private static async Task WaitAsync(CancellationToken cancellationToken)
+		private async Task WaitAsync()
 		{
 			try
 			{
-				await Task.Delay(1000, cancellationToken);
+				await Task.Delay(pollingInterval, serviceCancellationToken);
 			}
 			catch (TaskCanceledException)
 			{
