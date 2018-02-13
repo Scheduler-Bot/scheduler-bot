@@ -10,7 +10,7 @@ namespace SchedulerBot.Database.Entities
 
 		public string ConversationId { get; set; }
 
-		public string Message { get; set; }
+		public string Text { get; set; }
 
 		public ICollection<ScheduledMessageRun> Runs { get; set; }
 	}

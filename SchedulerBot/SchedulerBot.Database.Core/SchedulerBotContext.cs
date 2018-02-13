@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SchedulerBot.Database.Core.Configurations;
 using SchedulerBot.Database.Entities;
 
 namespace SchedulerBot.Database.Core
@@ -12,5 +13,13 @@ namespace SchedulerBot.Database.Core
 		public DbSet<ScheduledMessage> ScheduledMessages { get; set; }
 
 		public DbSet<ScheduledMessageRun> ScheduledMessageRuns { get; set; }
+
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
+		{
+			base.OnModelCreating(modelBuilder);
+
+			modelBuilder.ApplyConfiguration(new ScheduledMessageConfiguration());
+			modelBuilder.ApplyConfiguration(new ScheduledMessageRunConfiguration());
+		}
 	}
 }
