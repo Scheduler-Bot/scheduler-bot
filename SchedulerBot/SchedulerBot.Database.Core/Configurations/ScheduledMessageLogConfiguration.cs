@@ -4,11 +4,12 @@ using SchedulerBot.Database.Entities;
 
 namespace SchedulerBot.Database.Core.Configurations
 {
-	public class ScheduledMessageRunConfiguration : IEntityTypeConfiguration<ScheduledMessageLog>
+	public class ScheduledMessageLogConfiguration : IEntityTypeConfiguration<ScheduledMessageLog>
 	{
 		public void Configure(EntityTypeBuilder<ScheduledMessageLog> builder)
 		{
-			builder.HasKey(run => new { run.ScheduledMessageId, RanAt = run.CreatedOn });
+			builder.HasKey(run => run.Id);
+			builder.Property(run => run.Id).ValueGeneratedOnAdd();
 			builder
 				.HasOne(run => run.ScheduledMessage)
 				.WithMany(message => message.Runs)

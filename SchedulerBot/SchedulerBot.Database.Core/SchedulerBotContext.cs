@@ -19,7 +19,7 @@ namespace SchedulerBot.Database.Core
 			base.OnModelCreating(modelBuilder);
 
 			modelBuilder.ApplyConfiguration(new ScheduledMessageConfiguration());
-			modelBuilder.ApplyConfiguration(new ScheduledMessageRunConfiguration());
+			modelBuilder.ApplyConfiguration(new ScheduledMessageLogConfiguration());
 		}
 	}
 }

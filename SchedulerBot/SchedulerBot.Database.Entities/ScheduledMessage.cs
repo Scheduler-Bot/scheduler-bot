@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SchedulerBot.Database.Entities
 {
 	public class ScheduledMessage
 	{
-		public int Id { get; set; }
+		public Guid Id { get; set; }
 
 		public string Cron { get; set; }
 
