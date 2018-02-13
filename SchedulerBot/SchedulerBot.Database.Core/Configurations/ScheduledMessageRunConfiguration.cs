@@ -9,6 +9,10 @@ namespace SchedulerBot.Database.Core.Configurations
 		public void Configure(EntityTypeBuilder<ScheduledMessageRun> builder)
 		{
 			builder.HasKey(run => new { run.ScheduledMessageId, run.RanAt });
+			builder
+				.HasOne(run => run.ScheduledMessage)
+				.WithMany(message => message.Runs)
+				.HasForeignKey(run => run.ScheduledMessageId);
 		}
 	}
 }
