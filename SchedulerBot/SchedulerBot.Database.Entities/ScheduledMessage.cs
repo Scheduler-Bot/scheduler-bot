@@ -1,4 +1,6 @@
-﻿namespace SchedulerBot.Database.Entities
+﻿using System.Collections.Generic;
+
+namespace SchedulerBot.Database.Entities
 {
 	public class ScheduledMessage
 	{
@@ -9,5 +11,7 @@
 		public string ConversationId { get; set; }
 
 		public string Message { get; set; }
+
+		public ICollection<ScheduledMessageRun> Runs { get; set; }
 	}
 }
