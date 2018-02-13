@@ -8,12 +8,12 @@ namespace SchedulerBot.Database.Core.Configurations
 	{
 		public void Configure(EntityTypeBuilder<ScheduledMessageLog> builder)
 		{
-			builder.HasKey(run => run.Id);
-			builder.Property(run => run.Id).ValueGeneratedOnAdd();
+			builder.HasKey(log => log.Id);
+			builder.Property(log => log.Id).ValueGeneratedOnAdd();
 			builder
-				.HasOne(run => run.ScheduledMessage)
-				.WithMany(message => message.Runs)
-				.HasForeignKey(run => run.ScheduledMessageId);
+				.HasOne(log => log.ScheduledMessage)
+				.WithMany(message => message.Logs)
+				.HasForeignKey(log => log.ScheduledMessageId);
 		}
 	}
 }

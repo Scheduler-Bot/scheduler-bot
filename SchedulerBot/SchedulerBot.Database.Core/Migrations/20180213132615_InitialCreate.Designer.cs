@@ -54,7 +54,7 @@ namespace SchedulerBot.Database.Core.Migrations
             modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageLog", b =>
                 {
                     b.HasOne("SchedulerBot.Database.Entities.ScheduledMessage", "ScheduledMessage")
-                        .WithMany("Runs")
+                        .WithMany("Logs")
                         .HasForeignKey("ScheduledMessageId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
