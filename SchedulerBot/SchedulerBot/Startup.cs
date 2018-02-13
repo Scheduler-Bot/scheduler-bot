@@ -6,6 +6,8 @@ using Microsoft.Bot.Connector.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using SchedulerBot.Business.Services;
 using SchedulerBot.Database.Core;
 
 namespace SchedulerBot
@@ -38,6 +40,7 @@ namespace SchedulerBot
 
 			services.AddDbContext<SchedulerBotContext>(builder => builder.UseSqlite(connectionString));
 			services.AddMvc(options => options.Filters.Add<TrustServiceUrlAttribute>());
+			services.AddSingleton<IHostedService, ScheduledMessageProcessorService>();
 		}
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
