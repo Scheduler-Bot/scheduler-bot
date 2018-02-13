@@ -26,11 +26,12 @@ namespace SchedulerBot.Controllers
 			if (activity.Type == ActivityTypes.Message)
 			{
 				//MicrosoftAppCredentials.TrustServiceUrl(activity.ServiceUrl);
-				var appCredentials = new MicrosoftAppCredentials(configuration["MicrosoftAppId"], configuration["MicrosoftAppPassword"]);
-				var connector = new ConnectorClient(new Uri(activity.ServiceUrl), appCredentials);
+				MicrosoftAppCredentials appCredentials = new MicrosoftAppCredentials(configuration[MicrosoftAppCredentials.MicrosoftAppIdKey], configuration[MicrosoftAppCredentials.MicrosoftAppPasswordKey]);
+				ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl), appCredentials);
 
 				// return our reply to the user
-				var reply = activity.CreateReply("HelloWorld");
+				Activity reply = activity.CreateReply("HelloWorld");
+
 				await connector.Conversations.ReplyToActivityAsync(reply);
 			}
 			else
