@@ -10,6 +10,7 @@ namespace SchedulerBot.Database.Core.Configurations
 		{
 			builder.HasKey(message => message.Id);
 			builder.Property(message => message.Id).ValueGeneratedOnAdd();
+			builder.Property(message => message.Cron).IsRequired();
 			builder.Property(message => message.ConversationId).IsRequired();
 			builder.Property(message => message.Message).IsRequired();
 		}
