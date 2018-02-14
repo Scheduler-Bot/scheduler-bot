@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
 using SchedulerBot.Business.Interfaces;
+using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
 using SchedulerBot.Infrastructure.Interfaces;
@@ -11,21 +12,32 @@ namespace SchedulerBot.Business.Commands
 {
 	public class AddCommand : IBotCommand
 	{
+		private readonly SchedulerBotContext context;
+		private readonly IScheduleParser scheduleParser;
+		private readonly IScheduleDescriptionFormatter scheduleDescriptionFormatter;
+
+		public AddCommand(SchedulerBotContext context, IScheduleParser scheduleParser, IScheduleDescriptionFormatter scheduleDescriptionFormatter)
+		{
+			this.context = context;
+			this.scheduleParser = scheduleParser;
+			this.scheduleDescriptionFormatter = scheduleDescriptionFormatter;
+		}
+
 		public string Name { get; } = "add";
 
-		public async Task<CommandResult> ExecuteAsync(CommandExecutionContext context, string arguments)
+		public async Task<CommandResult> ExecuteAsync(Activity activity, string arguments)
 		{
 			CommandResult result;
 			string textSchedule = arguments;
 
-			if (context.ScheduleParser.TryParse(textSchedule, DateTime.UtcNow, out ISchedule schedule))
+			if (scheduleParser.TryParse(textSchedule, DateTime.UtcNow, out ISchedule schedule))
 			{
-				ScheduledMessage scheduledMessage = CreateScheduledMessageAsync(context.Activity, schedule);
+				ScheduledMessage scheduledMessage = CreateScheduledMessageAsync(activity, schedule);
 
-				await context.DbContext.ScheduledMessages.AddAsync(scheduledMessage);
-				await context.DbContext.SaveChangesAsync();
+				await context.ScheduledMessages.AddAsync(scheduledMessage);
+				await context.SaveChangesAsync();
 
-				string scheduleDescription = context.ScheduleDescriptionFormatter.Format(schedule, context.Activity.Locale);
+				string scheduleDescription = scheduleDescriptionFormatter.Format(schedule, activity.Locale);
 
 				result = new CommandResult($"Created an event with the following schedule: {scheduleDescription}", succeeded: true);
 			}
