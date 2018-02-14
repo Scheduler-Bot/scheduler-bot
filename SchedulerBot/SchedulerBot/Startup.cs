@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Bot.Connector;
-using Microsoft.Bot.Connector.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Bot.Connector;
+using Microsoft.Bot.Connector.Authentication;
 using SchedulerBot.Business.Services;
 using SchedulerBot.Database.Core;
 
@@ -34,6 +34,7 @@ namespace SchedulerBot
 					options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 				})
 				.AddBotAuthentication(credentialProvider);
+
 			services.AddSingleton<ICredentialProvider>(credentialProvider);
 
 			string connectionString = Configuration.GetConnectionString("SchedulerBotDatabase");
@@ -45,7 +46,9 @@ namespace SchedulerBot
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
+			app.UseDefaultFiles();
 			app.UseStaticFiles();
+
 			app.UseAuthentication();
 			app.UseMvc();
 		}

@@ -13,10 +13,12 @@ namespace SchedulerBot.Controllers
 	public class MessagesController : Controller
 	{
 		private readonly IConfiguration configuration;
+		private readonly ICredentialProvider credentialProvider;
 
-		public MessagesController(IConfiguration configuration)
+		public MessagesController(IConfiguration configuration, ICredentialProvider credentialProvider)
 		{
 			this.configuration = configuration;
+			this.credentialProvider = credentialProvider;
 		}
 
 		[Authorize(Roles = "Bot")]
@@ -29,10 +31,12 @@ namespace SchedulerBot.Controllers
 				string appId = configuration[MicrosoftAppCredentials.MicrosoftAppIdKey];
 				string appPassword = configuration[MicrosoftAppCredentials.MicrosoftAppPasswordKey];
 				MicrosoftAppCredentials appCredentials = new MicrosoftAppCredentials(appId, appPassword);
+				//var appCredentials = new MicrosoftAppCredentials();
+
 				ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl), appCredentials);
 
 				// return our reply to the user
-				Activity reply = activity.CreateReply("HelloWorld");
+				Activity reply = activity.CreateReply("Hello World");
 
 				await connector.Conversations.ReplyToActivityAsync(reply);
 			}
@@ -42,6 +46,12 @@ namespace SchedulerBot.Controllers
 			}
 
 			return Ok();
+		}
+
+		[HttpGet]
+		public IActionResult Get()
+		{
+			return Ok("MessagesController");
 		}
 	}
 }
