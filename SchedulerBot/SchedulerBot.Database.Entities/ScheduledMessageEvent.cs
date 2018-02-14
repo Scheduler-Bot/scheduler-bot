@@ -1,4 +1,5 @@
 ﻿using System;
+using SchedulerBot.Database.Entities.Enums;
 
 namespace SchedulerBot.Database.Entities
 {
@@ -7,6 +8,10 @@ namespace SchedulerBot.Database.Entities
 		public Guid Id { get; set; }
 
 		public DateTime CreatedOn { get; set; }
+
+		public DateTime NextOccurence { get; set; }
+
+		public ScheduledMessageEventState State { get; set; }
 
 		public Guid ScheduledMessageId { get; set; }
 
