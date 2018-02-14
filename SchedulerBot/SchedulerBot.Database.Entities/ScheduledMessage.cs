@@ -9,9 +9,9 @@ namespace SchedulerBot.Database.Entities
 
 		public string Schedule { get; set; }
 
-		public string ConversationId { get; set; }
-
 		public string Text { get; set; }
+
+		public ScheduledMessageDetails Details { get; set; }
 
 		public ICollection<ScheduledMessageLog> Logs { get; set; }
 	}

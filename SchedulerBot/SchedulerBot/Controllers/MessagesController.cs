@@ -69,7 +69,6 @@ namespace SchedulerBot.Controllers
 		{
 			ScheduledMessage scheduledMessage = new ScheduledMessage
 			{
-				ConversationId = activity.Conversation.Id,
 				Text = "Hello!",
 				Schedule = schedule.Text
 			};

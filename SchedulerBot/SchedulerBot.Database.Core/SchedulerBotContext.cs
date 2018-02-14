@@ -14,12 +14,15 @@ namespace SchedulerBot.Database.Core
 
 		public DbSet<ScheduledMessageLog> ScheduledMessageLogs { get; set; }
 
+		public DbSet<ScheduledMessageDetails> ScheduledMessageDetails { get; set; }
+
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
 
 			modelBuilder.ApplyConfiguration(new ScheduledMessageConfiguration());
 			modelBuilder.ApplyConfiguration(new ScheduledMessageLogConfiguration());
+			modelBuilder.ApplyConfiguration(new ScheduledMessageDetailsConfiguration());
 		}
 	}
 }
