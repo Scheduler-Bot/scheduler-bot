@@ -7,7 +7,7 @@ namespace SchedulerBot.Database.Entities
 	{
 		public Guid Id { get; set; }
 
-		public string Cron { get; set; }
+		public string Schedule { get; set; }
 
 		public string ConversationId { get; set; }
 

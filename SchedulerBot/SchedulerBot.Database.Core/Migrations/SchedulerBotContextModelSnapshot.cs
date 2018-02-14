@@ -22,7 +22,7 @@ namespace SchedulerBot.Database.Core.Migrations
                     b.Property<string>("ConversationId")
                         .IsRequired();
 
-                    b.Property<string>("Cron")
+                    b.Property<string>("Schedule")
                         .IsRequired();
 
                     b.Property<string>("Text")
