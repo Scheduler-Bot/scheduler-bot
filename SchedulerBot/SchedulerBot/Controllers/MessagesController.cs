@@ -65,10 +65,12 @@ namespace SchedulerBot.Controllers
 			string appId = configuration[MicrosoftAppCredentials.MicrosoftAppIdKey];
 			string appPassword = configuration[MicrosoftAppCredentials.MicrosoftAppPasswordKey];
 			MicrosoftAppCredentials appCredentials = new MicrosoftAppCredentials(appId, appPassword);
-			ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl), appCredentials);
 			Activity reply = activity.CreateReply(replyText);
 
-			return connector.Conversations.ReplyToActivityAsync(reply);
+			using (ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl), appCredentials))
+			{
+				return connector.Conversations.ReplyToActivityAsync(reply);
+			}
 		}
 
 		private async Task AddScheduledMessageAsync(Activity activity, ISchedule schedule)

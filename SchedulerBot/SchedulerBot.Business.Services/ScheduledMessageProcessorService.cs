@@ -106,10 +106,12 @@ namespace SchedulerBot.Business.Services
 		private static async Task SendMessageAsync(ScheduledMessage scheduledMessage, ServiceClientCredentials credentials)
 		{
 			Uri serviceUri = new Uri(scheduledMessage.Details.ServiceUrl);
-			ConnectorClient connector = new ConnectorClient(serviceUri, credentials);
 			Activity activity = CreateMessageActivity(scheduledMessage);
 
-			await connector.Conversations.SendToConversationAsync(activity);
+			using (ConnectorClient connector = new ConnectorClient(serviceUri, credentials))
+			{
+				await connector.Conversations.SendToConversationAsync(activity);
+			}
 
 			AddScheduledMessageLog(scheduledMessage);
 		}
