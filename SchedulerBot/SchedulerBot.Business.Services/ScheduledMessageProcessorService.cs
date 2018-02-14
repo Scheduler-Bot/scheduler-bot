@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Connector;
-using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -20,17 +19,17 @@ namespace SchedulerBot.Business.Services
 {
 	public sealed class ScheduledMessageProcessorService : IHostedService, IDisposable
 	{
+		private readonly ServiceClientCredentials credentials;
 		private readonly IServiceScopeFactory scopeFactory;
-		private readonly IConfiguration configuration;
 		private readonly IScheduleParser scheduleParser;
 		private readonly TimeSpan pollingInterval;
 		private readonly CancellationTokenSource serviceCancellationTokenSource;
 		private readonly CancellationToken serviceCancellationToken;
 
-		public ScheduledMessageProcessorService(IServiceScopeFactory scopeFactory, IConfiguration configuration, IScheduleParser scheduleParser)
+		public ScheduledMessageProcessorService(ServiceClientCredentials credentials, IServiceScopeFactory scopeFactory, IConfiguration configuration, IScheduleParser scheduleParser)
 		{
+			this.credentials = credentials;
 			this.scopeFactory = scopeFactory;
-			this.configuration = configuration;
 			this.scheduleParser = scheduleParser;
 			pollingInterval = TimeSpan.Parse(configuration["MessageProcessingInterval"], CultureInfo.InvariantCulture);
 			serviceCancellationTokenSource = new CancellationTokenSource();
@@ -70,11 +69,10 @@ namespace SchedulerBot.Business.Services
 					.Include(message => message.Logs)
 					.Include(message => message.Details)
 					.Where(message => ShouldSendMessage(message, currentTime));
-				ServiceClientCredentials credentials = CreateCredentials();
 
 				foreach (ScheduledMessage scheduledMessage in messagesToProcess)
 				{
-					await SendMessageAsync(scheduledMessage, credentials);
+					await SendMessageAsync(scheduledMessage);
 				}
 
 				await context.SaveChangesAsync(serviceCancellationToken);
@@ -103,7 +101,7 @@ namespace SchedulerBot.Business.Services
 			return nextOccurence >= lastOccurence && nextOccurence <= currentTime;
 		}
 
-		private static async Task SendMessageAsync(ScheduledMessage scheduledMessage, ServiceClientCredentials credentials)
+		private async Task SendMessageAsync(ScheduledMessage scheduledMessage)
 		{
 			Uri serviceUri = new Uri(scheduledMessage.Details.ServiceUrl);
 			Activity activity = CreateMessageActivity(scheduledMessage);
@@ -114,15 +112,6 @@ namespace SchedulerBot.Business.Services
 			}
 
 			AddScheduledMessageLog(scheduledMessage);
-		}
-
-		private ServiceClientCredentials CreateCredentials()
-		{
-			string appId = configuration[MicrosoftAppCredentials.MicrosoftAppIdKey];
-			string appPassword = configuration[MicrosoftAppCredentials.MicrosoftAppPasswordKey];
-			MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(appId, appPassword);
-
-			return credentials;
 		}
 
 		private static Activity CreateMessageActivity(ScheduledMessage scheduledMessage)

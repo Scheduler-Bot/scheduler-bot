@@ -3,9 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Bot.Connector;
-using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Rest;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Infrastructure.Interfaces;
@@ -16,15 +15,16 @@ namespace SchedulerBot.Controllers
 	public class MessagesController : Controller
 	{
 		private readonly SchedulerBotContext context;
-		private readonly IConfiguration configuration;
-		private readonly ICredentialProvider credentialProvider;
+		private readonly ServiceClientCredentials credentials;
 		private readonly IScheduleParser scheduleParser;
 
-		public MessagesController(SchedulerBotContext context, IConfiguration configuration, ICredentialProvider credentialProvider, IScheduleParser scheduleParser)
+		public MessagesController(
+			SchedulerBotContext context,
+			ServiceClientCredentials credentials,
+			IScheduleParser scheduleParser)
 		{
 			this.context = context;
-			this.configuration = configuration;
-			this.credentialProvider = credentialProvider;
+			this.credentials = credentials;
 			this.scheduleParser = scheduleParser;
 		}
 
@@ -62,12 +62,9 @@ namespace SchedulerBot.Controllers
 
 		private Task<ResourceResponse> ReplyAsync(Activity activity, string replyText)
 		{
-			string appId = configuration[MicrosoftAppCredentials.MicrosoftAppIdKey];
-			string appPassword = configuration[MicrosoftAppCredentials.MicrosoftAppPasswordKey];
-			MicrosoftAppCredentials appCredentials = new MicrosoftAppCredentials(appId, appPassword);
 			Activity reply = activity.CreateReply(replyText);
 
-			using (ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl), appCredentials))
+			using (ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl), credentials))
 			{
 				return connector.Conversations.ReplyToActivityAsync(reply);
 			}
