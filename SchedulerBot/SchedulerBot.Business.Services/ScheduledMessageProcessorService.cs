@@ -85,7 +85,8 @@ namespace SchedulerBot.Business.Services
 			return context
 				.ScheduledMessageEvents
 				.Where(@event => @event.State == ScheduledMessageEventState.Pending && @event.NextOccurence < currentTime)
-				.Include(@event => @event.ScheduledMessage);
+				.Include(@event => @event.ScheduledMessage)
+				.ThenInclude(message => message.Details);
 		}
 
 		private async Task WaitAsync()
