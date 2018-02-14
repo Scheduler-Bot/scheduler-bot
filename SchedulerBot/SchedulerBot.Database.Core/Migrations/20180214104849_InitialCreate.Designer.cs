@@ -7,7 +7,7 @@ using System;
 namespace SchedulerBot.Database.Core.Migrations
 {
 	[DbContext(typeof(SchedulerBotContext))]
-	[Migration("20180214082139_InitialCreate")]
+	[Migration("20180214104849_InitialCreate")]
 	partial class InitialCreate
 	{
 		protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,9 +21,6 @@ namespace SchedulerBot.Database.Core.Migrations
 					b.Property<Guid>("Id")
 						.ValueGeneratedOnAdd();
 
-					b.Property<string>("ConversationId")
-						.IsRequired();
-
 					b.Property<string>("Schedule")
 						.IsRequired();
 
@@ -33,6 +30,38 @@ namespace SchedulerBot.Database.Core.Migrations
 					b.HasKey("Id");
 
 					b.ToTable("ScheduledMessages");
+				});
+
+			modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageDetails", b =>
+				{
+					b.Property<Guid>("ScheduledMessageId");
+
+					b.Property<string>("ChannelId")
+						.IsRequired();
+
+					b.Property<string>("ConversationId")
+						.IsRequired();
+
+					b.Property<string>("FromId")
+						.IsRequired();
+
+					b.Property<string>("FromName")
+						.IsRequired();
+
+					b.Property<string>("Locale")
+						.IsRequired();
+
+					b.Property<string>("RecipientId")
+						.IsRequired();
+
+					b.Property<string>("RecipientName")
+						.IsRequired();
+
+					b.Property<string>("ServiceUrl");
+
+					b.HasKey("ScheduledMessageId");
+
+					b.ToTable("ScheduledMessageDetails");
 				});
 
 			modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageLog", b =>
@@ -49,6 +78,14 @@ namespace SchedulerBot.Database.Core.Migrations
 					b.HasIndex("ScheduledMessageId");
 
 					b.ToTable("ScheduledMessageLogs");
+				});
+
+			modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageDetails", b =>
+				{
+					b.HasOne("SchedulerBot.Database.Entities.ScheduledMessage", "ScheduledMessage")
+						.WithOne("Details")
+						.HasForeignKey("SchedulerBot.Database.Entities.ScheduledMessageDetails", "ScheduledMessageId")
+						.OnDelete(DeleteBehavior.Cascade);
 				});
 
 			modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageLog", b =>

@@ -12,13 +12,37 @@ namespace SchedulerBot.Database.Core.Migrations
 				columns: table => new
 				{
 					Id = table.Column<Guid>(nullable: false),
-					ConversationId = table.Column<string>(nullable: false),
 					Schedule = table.Column<string>(nullable: false),
 					Text = table.Column<string>(nullable: false)
 				},
 				constraints: table =>
 				{
 					table.PrimaryKey("PK_ScheduledMessages", x => x.Id);
+				});
+
+			migrationBuilder.CreateTable(
+				name: "ScheduledMessageDetails",
+				columns: table => new
+				{
+					ScheduledMessageId = table.Column<Guid>(nullable: false),
+					ChannelId = table.Column<string>(nullable: false),
+					ConversationId = table.Column<string>(nullable: false),
+					FromId = table.Column<string>(nullable: false),
+					FromName = table.Column<string>(nullable: false),
+					Locale = table.Column<string>(nullable: false),
+					RecipientId = table.Column<string>(nullable: false),
+					RecipientName = table.Column<string>(nullable: false),
+					ServiceUrl = table.Column<string>(nullable: true)
+				},
+				constraints: table =>
+				{
+					table.PrimaryKey("PK_ScheduledMessageDetails", x => x.ScheduledMessageId);
+					table.ForeignKey(
+						name: "FK_ScheduledMessageDetails_ScheduledMessages_ScheduledMessageId",
+						column: x => x.ScheduledMessageId,
+						principalTable: "ScheduledMessages",
+						principalColumn: "Id",
+						onDelete: ReferentialAction.Cascade);
 				});
 
 			migrationBuilder.CreateTable(
@@ -48,6 +72,9 @@ namespace SchedulerBot.Database.Core.Migrations
 
 		protected override void Down(MigrationBuilder migrationBuilder)
 		{
+			migrationBuilder.DropTable(
+				name: "ScheduledMessageDetails");
+
 			migrationBuilder.DropTable(
 				name: "ScheduledMessageLogs");
 
