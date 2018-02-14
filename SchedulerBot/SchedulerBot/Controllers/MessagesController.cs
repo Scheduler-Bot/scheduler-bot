@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +8,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.Rest;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
+using SchedulerBot.Database.Entities.Enums;
 using SchedulerBot.Infrastructure.Interfaces;
 
 namespace SchedulerBot.Controllers
@@ -76,7 +78,11 @@ namespace SchedulerBot.Controllers
 			{
 				Text = "Hello!",
 				Schedule = schedule.Text,
-				Details = CreateMessageDetails(activity)
+				Details = CreateMessageDetails(activity),
+				Events = new List<ScheduledMessageEvent>
+				{
+					CreateMessageEvent(schedule)
+				}
 			};
 
 			await context.ScheduledMessages.AddAsync(scheduledMessage);
@@ -95,6 +101,16 @@ namespace SchedulerBot.Controllers
 				ChannelId = activity.ChannelId,
 				ConversationId = activity.Conversation.Id,
 				Locale = activity.Locale
+			};
+		}
+
+		private static ScheduledMessageEvent CreateMessageEvent(ISchedule schedule)
+		{
+			return new ScheduledMessageEvent
+			{
+				CreatedOn = DateTime.UtcNow,
+				NextOccurence = schedule.NextOccurence,
+				State = ScheduledMessageEventState.Pending
 			};
 		}
 	}
