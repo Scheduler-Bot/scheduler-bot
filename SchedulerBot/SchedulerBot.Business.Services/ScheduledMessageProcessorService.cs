@@ -4,10 +4,14 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Bot.Connector;
+using Microsoft.Bot.Connector.Authentication;
+using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Rest;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Infrastructure.Interfaces;
@@ -17,6 +21,7 @@ namespace SchedulerBot.Business.Services
 	public sealed class ScheduledMessageProcessorService : IHostedService, IDisposable
 	{
 		private readonly IServiceScopeFactory scopeFactory;
+		private readonly IConfiguration configuration;
 		private readonly IScheduleParser scheduleParser;
 		private readonly TimeSpan pollingInterval;
 		private readonly CancellationTokenSource serviceCancellationTokenSource;
@@ -25,6 +30,7 @@ namespace SchedulerBot.Business.Services
 		public ScheduledMessageProcessorService(IServiceScopeFactory scopeFactory, IConfiguration configuration, IScheduleParser scheduleParser)
 		{
 			this.scopeFactory = scopeFactory;
+			this.configuration = configuration;
 			this.scheduleParser = scheduleParser;
 			pollingInterval = TimeSpan.Parse(configuration["MessageProcessingInterval"], CultureInfo.InvariantCulture);
 			serviceCancellationTokenSource = new CancellationTokenSource();
@@ -62,11 +68,13 @@ namespace SchedulerBot.Business.Services
 				IQueryable<ScheduledMessage> messagesToProcess = context
 					.ScheduledMessages
 					.Include(message => message.Logs)
+					.Include(message => message.Details)
 					.Where(message => ShouldSendMessage(message, currentTime));
+				ServiceClientCredentials credentials = CreateCredentials();
 
 				foreach (ScheduledMessage scheduledMessage in messagesToProcess)
 				{
-					// TODO: send message
+					await SendMessageAsync(scheduledMessage, credentials);
 				}
 
 				await context.SaveChangesAsync(serviceCancellationToken);
@@ -93,6 +101,55 @@ namespace SchedulerBot.Business.Services
 			DateTime nextOccurence = messageSchedule.NextOccurence;
 
 			return nextOccurence >= lastOccurence && nextOccurence <= currentTime;
+		}
+
+		private static async Task SendMessageAsync(ScheduledMessage scheduledMessage, ServiceClientCredentials credentials)
+		{
+			Uri serviceUri = new Uri(scheduledMessage.Details.ServiceUrl);
+			ConnectorClient connector = new ConnectorClient(serviceUri, credentials);
+			Activity activity = CreateMessageActivity(scheduledMessage);
+
+			await connector.Conversations.SendToConversationAsync(activity);
+
+			AddScheduledMessageLog(scheduledMessage);
+		}
+
+		private ServiceClientCredentials CreateCredentials()
+		{
+			string appId = configuration[MicrosoftAppCredentials.MicrosoftAppIdKey];
+			string appPassword = configuration[MicrosoftAppCredentials.MicrosoftAppPasswordKey];
+			MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(appId, appPassword);
+
+			return credentials;
+		}
+
+		private static Activity CreateMessageActivity(ScheduledMessage scheduledMessage)
+		{
+			ScheduledMessageDetails details = scheduledMessage.Details;
+			Activity activity = (Activity)Activity.CreateMessageActivity();
+
+			activity.ServiceUrl = details.ServiceUrl;
+			activity.From = new ChannelAccount(details.FromId, details.FromName);
+			activity.Recipient = new ChannelAccount(details.RecipientId, details.RecipientName);
+			activity.ChannelId = details.ChannelId;
+			activity.Conversation = new ConversationAccount(id: details.ConversationId);
+			activity.Locale = details.Locale;
+			activity.Text = scheduledMessage.Text;
+
+			return activity;
+		}
+
+		private static void AddScheduledMessageLog(ScheduledMessage scheduledMessage)
+		{
+			if (scheduledMessage.Logs == null)
+			{
+				scheduledMessage.Logs = new List<ScheduledMessageLog>();
+			}
+
+			scheduledMessage.Logs.Add(new ScheduledMessageLog
+			{
+				CreatedOn = DateTime.UtcNow
+			});
 		}
 	}
 }
