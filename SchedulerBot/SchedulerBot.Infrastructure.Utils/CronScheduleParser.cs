@@ -9,7 +9,7 @@ namespace SchedulerBot.Infrastructure.Utils
 		public ISchedule Parse(string textSchedule)
 		{
 			CrontabSchedule cronSchedule = CrontabSchedule.Parse(textSchedule);
-			Schedule schedule = CreateScheduleRelativeToNow(cronSchedule);
+			Schedule schedule = CreateScheduleRelativeToNow(textSchedule, cronSchedule);
 
 			return schedule;
 		}
@@ -17,15 +17,15 @@ namespace SchedulerBot.Infrastructure.Utils
 		public bool TryParse(string textSchedule, out ISchedule schedule)
 		{
 			CrontabSchedule cronSchedule = CrontabSchedule.TryParse(textSchedule);
-			schedule = cronSchedule != null ? CreateScheduleRelativeToNow(cronSchedule) : null;
+			schedule = cronSchedule != null ? CreateScheduleRelativeToNow(textSchedule, cronSchedule) : null;
 
 			return schedule != null;
 		}
 
-		private static Schedule CreateScheduleRelativeToNow(CrontabSchedule cronSchedule)
+		private static Schedule CreateScheduleRelativeToNow(string textSchedule, CrontabSchedule cronSchedule)
 		{
 			DateTime nextOccurence = cronSchedule.GetNextOccurrence(DateTime.UtcNow);
-			Schedule schedule = new Schedule(nextOccurence);
+			Schedule schedule = new Schedule(textSchedule, nextOccurence);
 
 			return schedule;
 		}

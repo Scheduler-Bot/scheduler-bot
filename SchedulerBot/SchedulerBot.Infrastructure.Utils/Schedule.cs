@@ -5,10 +5,13 @@ namespace SchedulerBot.Infrastructure.Utils
 {
 	public class Schedule : ISchedule
 	{
-		public Schedule(DateTime nextOccurence)
+		public Schedule(string text, DateTime nextOccurence)
 		{
+			Text = text;
 			NextOccurence = nextOccurence;
 		}
+
+		public string Text { get; }
 
 		public DateTime NextOccurence { get; }
 	}
