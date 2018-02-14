@@ -2,7 +2,7 @@
 
 namespace SchedulerBot.Database.Entities
 {
-	public class ScheduledMessageLog
+	public class ScheduledMessageEvent
 	{
 		public Guid Id { get; set; }
 

@@ -12,7 +12,7 @@ namespace SchedulerBot.Database.Core
 
 		public DbSet<ScheduledMessage> ScheduledMessages { get; set; }
 
-		public DbSet<ScheduledMessageLog> ScheduledMessageLogs { get; set; }
+		public DbSet<ScheduledMessageEvent> ScheduledMessageEvents { get; set; }
 
 		public DbSet<ScheduledMessageDetails> ScheduledMessageDetails { get; set; }
 
@@ -21,7 +21,7 @@ namespace SchedulerBot.Database.Core
 			base.OnModelCreating(modelBuilder);
 
 			modelBuilder.ApplyConfiguration(new ScheduledMessageConfiguration());
-			modelBuilder.ApplyConfiguration(new ScheduledMessageLogConfiguration());
+			modelBuilder.ApplyConfiguration(new ScheduledMessageEventConfiguration());
 			modelBuilder.ApplyConfiguration(new ScheduledMessageDetailsConfiguration());
 		}
 	}

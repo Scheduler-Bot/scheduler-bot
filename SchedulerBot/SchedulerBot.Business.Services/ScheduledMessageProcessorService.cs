@@ -66,7 +66,7 @@ namespace SchedulerBot.Business.Services
 				SchedulerBotContext context = scope.ServiceProvider.GetRequiredService<SchedulerBotContext>();
 				IQueryable<ScheduledMessage> messagesToProcess = context
 					.ScheduledMessages
-					.Include(message => message.Logs)
+					.Include(message => message.Events)
 					.Include(message => message.Details)
 					.Where(message => ShouldSendMessage(message, currentTime));
 
@@ -93,8 +93,8 @@ namespace SchedulerBot.Business.Services
 
 		private bool ShouldSendMessage(ScheduledMessage scheduledMessage, DateTime currentTime)
 		{
-			ICollection<ScheduledMessageLog> logs = scheduledMessage.Logs;
-			DateTime lastOccurence = logs?.Max(log => log.CreatedOn) ?? DateTime.MinValue;
+			ICollection<ScheduledMessageEvent> events = scheduledMessage.Events;
+			DateTime lastOccurence = events?.Max(@event => @event.CreatedOn) ?? DateTime.MinValue;
 			ISchedule messageSchedule = scheduleParser.Parse(scheduledMessage.Schedule, lastOccurence);
 			DateTime nextOccurence = messageSchedule.NextOccurence;
 
@@ -111,7 +111,7 @@ namespace SchedulerBot.Business.Services
 				await connector.Conversations.SendToConversationAsync(activity);
 			}
 
-			AddScheduledMessageLog(scheduledMessage);
+			AddScheduledMessageEvent(scheduledMessage);
 		}
 
 		private static Activity CreateMessageActivity(ScheduledMessage scheduledMessage)
@@ -130,14 +130,14 @@ namespace SchedulerBot.Business.Services
 			return activity;
 		}
 
-		private static void AddScheduledMessageLog(ScheduledMessage scheduledMessage)
+		private static void AddScheduledMessageEvent(ScheduledMessage scheduledMessage)
 		{
-			if (scheduledMessage.Logs == null)
+			if (scheduledMessage.Events == null)
 			{
-				scheduledMessage.Logs = new List<ScheduledMessageLog>();
+				scheduledMessage.Events = new List<ScheduledMessageEvent>();
 			}
 
-			scheduledMessage.Logs.Add(new ScheduledMessageLog
+			scheduledMessage.Events.Add(new ScheduledMessageEvent
 			{
 				CreatedOn = DateTime.UtcNow
 			});

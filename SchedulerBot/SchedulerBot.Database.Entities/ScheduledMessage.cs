@@ -13,6 +13,6 @@ namespace SchedulerBot.Database.Entities
 
 		public ScheduledMessageDetails Details { get; set; }
 
-		public ICollection<ScheduledMessageLog> Logs { get; set; }
+		public ICollection<ScheduledMessageEvent> Events { get; set; }
 	}
 }
