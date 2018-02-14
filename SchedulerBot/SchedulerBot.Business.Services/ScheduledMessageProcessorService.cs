@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -13,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Rest;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
+using SchedulerBot.Database.Entities.Enums;
 using SchedulerBot.Infrastructure.Interfaces;
 
 namespace SchedulerBot.Business.Services
@@ -62,21 +62,30 @@ namespace SchedulerBot.Business.Services
 		{
 			using (IServiceScope scope = scopeFactory.CreateScope())
 			{
-				DateTime currentTime = DateTime.UtcNow;
 				SchedulerBotContext context = scope.ServiceProvider.GetRequiredService<SchedulerBotContext>();
-				IQueryable<ScheduledMessage> messagesToProcess = context
-					.ScheduledMessages
-					.Include(message => message.Events)
-					.Include(message => message.Details)
-					.Where(message => ShouldSendMessage(message, currentTime));
 
-				foreach (ScheduledMessage scheduledMessage in messagesToProcess)
+				foreach (ScheduledMessageEvent scheduledMessageEvent in GetPendingEvents(context))
 				{
+					ScheduledMessage scheduledMessage = scheduledMessageEvent.ScheduledMessage;
+
 					await SendMessageAsync(scheduledMessage);
+
+					scheduledMessageEvent.State = ScheduledMessageEventState.Completed;
+					AddPendingEvent(scheduledMessage);
 				}
 
 				await context.SaveChangesAsync(serviceCancellationToken);
 			}
+		}
+
+		private static IQueryable<ScheduledMessageEvent> GetPendingEvents(SchedulerBotContext context)
+		{
+			DateTime currentTime = DateTime.UtcNow;
+
+			return context
+				.ScheduledMessageEvents
+				.Where(@event => @event.State == ScheduledMessageEventState.Pending && @event.NextOccurence < currentTime)
+				.Include(@event => @event.ScheduledMessage);
 		}
 
 		private async Task WaitAsync()
@@ -91,16 +100,6 @@ namespace SchedulerBot.Business.Services
 			}
 		}
 
-		private bool ShouldSendMessage(ScheduledMessage scheduledMessage, DateTime currentTime)
-		{
-			ICollection<ScheduledMessageEvent> events = scheduledMessage.Events;
-			DateTime lastOccurence = events?.Max(@event => @event.CreatedOn) ?? DateTime.MinValue;
-			ISchedule messageSchedule = scheduleParser.Parse(scheduledMessage.Schedule, lastOccurence);
-			DateTime nextOccurence = messageSchedule.NextOccurence;
-
-			return nextOccurence >= lastOccurence && nextOccurence <= currentTime;
-		}
-
 		private async Task SendMessageAsync(ScheduledMessage scheduledMessage)
 		{
 			Uri serviceUri = new Uri(scheduledMessage.Details.ServiceUrl);
@@ -108,10 +107,8 @@ namespace SchedulerBot.Business.Services
 
 			using (ConnectorClient connector = new ConnectorClient(serviceUri, credentials))
 			{
-				await connector.Conversations.SendToConversationAsync(activity);
+				await connector.Conversations.SendToConversationAsync(activity, serviceCancellationToken);
 			}
-
-			AddScheduledMessageEvent(scheduledMessage);
 		}
 
 		private static Activity CreateMessageActivity(ScheduledMessage scheduledMessage)
@@ -129,17 +126,17 @@ namespace SchedulerBot.Business.Services
 
 			return activity;
 		}
-
-		private static void AddScheduledMessageEvent(ScheduledMessage scheduledMessage)
+		
+		private void AddPendingEvent(ScheduledMessage scheduledMessage)
 		{
-			if (scheduledMessage.Events == null)
-			{
-				scheduledMessage.Events = new List<ScheduledMessageEvent>();
-			}
+			DateTime currentTime = DateTime.UtcNow;
+			ISchedule schedule = scheduleParser.Parse(scheduledMessage.Schedule, currentTime);
 
 			scheduledMessage.Events.Add(new ScheduledMessageEvent
 			{
-				CreatedOn = DateTime.UtcNow
+				CreatedOn = currentTime,
+				NextOccurence = schedule.NextOccurence,
+				State = ScheduledMessageEventState.Pending
 			});
 		}
 	}
