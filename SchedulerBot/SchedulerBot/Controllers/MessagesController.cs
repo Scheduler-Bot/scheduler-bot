@@ -19,15 +19,18 @@ namespace SchedulerBot.Controllers
 		private readonly SchedulerBotContext context;
 		private readonly ServiceClientCredentials credentials;
 		private readonly IScheduleParser scheduleParser;
+		private readonly IScheduleDescriptionFormatter scheduleDescriptionFormatter;
 
 		public MessagesController(
 			SchedulerBotContext context,
 			ServiceClientCredentials credentials,
-			IScheduleParser scheduleParser)
+			IScheduleParser scheduleParser,
+			IScheduleDescriptionFormatter scheduleDescriptionFormatter)
 		{
 			this.context = context;
 			this.credentials = credentials;
 			this.scheduleParser = scheduleParser;
+			this.scheduleDescriptionFormatter = scheduleDescriptionFormatter;
 		}
 
 		[HttpGet]
@@ -49,7 +52,9 @@ namespace SchedulerBot.Controllers
 				{
 					await AddScheduledMessageAsync(activity, schedule);
 
-					replyText = $"Created an event with the following schedule: \"{textSchedule}\"";
+					string scheduleDescription = scheduleDescriptionFormatter.Format(schedule, activity.Locale);
+
+					replyText = $"Created an event with the following schedule: {scheduleDescription}";
 				}
 				else
 				{

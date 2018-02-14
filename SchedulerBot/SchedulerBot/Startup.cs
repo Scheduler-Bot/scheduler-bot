@@ -47,6 +47,7 @@ namespace SchedulerBot
 			services.AddMvc(options => options.Filters.Add<TrustServiceUrlAttribute>());
 			services.AddSingleton<IHostedService, ScheduledMessageProcessorService>();
 			services.AddTransient<IScheduleParser, CronScheduleParser>();
+			services.AddTransient<IScheduleDescriptionFormatter, CronDescriptionFormatter>();
 		}
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
