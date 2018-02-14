@@ -15,11 +15,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Business", "Business", "{24
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Business.Services", "SchedulerBot.Business.Services\SchedulerBot.Business.Services.csproj", "{5C4F6A3C-D4F2-447C-B649-32665BA3134D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Insrastructure", "Insrastructure", "{98AA3A8F-C420-4110-832A-5631BCC183F2}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{98AA3A8F-C420-4110-832A-5631BCC183F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchedulerBot.Infrastructure.Interfaces", "SchedulerBot.Infrastructure.Interfaces\SchedulerBot.Infrastructure.Interfaces.csproj", "{03CD614B-0377-46E2-84C3-1E9F5F7E3DEE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Infrastructure.Interfaces", "SchedulerBot.Infrastructure.Interfaces\SchedulerBot.Infrastructure.Interfaces.csproj", "{03CD614B-0377-46E2-84C3-1E9F5F7E3DEE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchedulerBot.Infrastructure.Utils", "SchedulerBot.Infrastructure.Utils\SchedulerBot.Infrastructure.Utils.csproj", "{E512CE3D-C02B-49C8-B688-DEE45524E8AC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Infrastructure.Utils", "SchedulerBot.Infrastructure.Utils\SchedulerBot.Infrastructure.Utils.csproj", "{E512CE3D-C02B-49C8-B688-DEE45524E8AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
