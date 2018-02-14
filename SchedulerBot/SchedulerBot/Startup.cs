@@ -9,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SchedulerBot.Business.Services;
 using SchedulerBot.Database.Core;
+using SchedulerBot.Infrastructure.Interfaces;
+using SchedulerBot.Infrastructure.Utils;
 
 namespace SchedulerBot
 {
@@ -41,6 +43,7 @@ namespace SchedulerBot
 			services.AddDbContext<SchedulerBotContext>(builder => builder.UseSqlite(connectionString));
 			services.AddMvc(options => options.Filters.Add<TrustServiceUrlAttribute>());
 			services.AddSingleton<IHostedService, ScheduledMessageProcessorService>();
+			services.AddTransient<IScheduleParser, CronScheduleParser>();
 		}
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
