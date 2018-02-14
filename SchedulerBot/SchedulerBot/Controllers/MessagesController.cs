@@ -17,12 +17,14 @@ namespace SchedulerBot.Controllers
 	{
 		private readonly SchedulerBotContext context;
 		private readonly IConfiguration configuration;
+		private readonly ICredentialProvider credentialProvider;
 		private readonly IScheduleParser scheduleParser;
 
-		public MessagesController(SchedulerBotContext context, IConfiguration configuration, IScheduleParser scheduleParser)
+		public MessagesController(SchedulerBotContext context, IConfiguration configuration, ICredentialProvider credentialProvider, IScheduleParser scheduleParser)
 		{
 			this.context = context;
 			this.configuration = configuration;
+			this.credentialProvider = credentialProvider;
 			this.scheduleParser = scheduleParser;
 		}
 
@@ -74,6 +76,12 @@ namespace SchedulerBot.Controllers
 
 			await context.ScheduledMessages.AddAsync(scheduledMessage);
 			await context.SaveChangesAsync();
+		}
+
+		[HttpGet]
+		public IActionResult Get()
+		{
+			return Ok("MessagesController");
 		}
 	}
 }
