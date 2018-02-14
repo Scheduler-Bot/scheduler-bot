@@ -28,6 +28,12 @@ namespace SchedulerBot.Controllers
 			this.scheduleParser = scheduleParser;
 		}
 
+		[HttpGet]
+		public IActionResult Get()
+		{
+			return Ok("MessagesController");
+		}
+
 		[Authorize(Roles = "Bot")]
 		[HttpPost]
 		public async Task<OkResult> Post([FromBody] Activity activity)
@@ -70,17 +76,27 @@ namespace SchedulerBot.Controllers
 			ScheduledMessage scheduledMessage = new ScheduledMessage
 			{
 				Text = "Hello!",
-				Schedule = schedule.Text
+				Schedule = schedule.Text,
+				Details = CreateMessageDetails(activity)
 			};
 
 			await context.ScheduledMessages.AddAsync(scheduledMessage);
 			await context.SaveChangesAsync();
 		}
 
-		[HttpGet]
-		public IActionResult Get()
+		private static ScheduledMessageDetails CreateMessageDetails(Activity activity)
 		{
-			return Ok("MessagesController");
+			return new ScheduledMessageDetails
+			{
+				ServiceUrl = activity.ServiceUrl,
+				FromId = activity.Recipient.Id,
+				FromName = activity.Recipient.Name,
+				RecipientId = activity.From.Id,
+				RecipientName = activity.From.Name,
+				ChannelId = activity.ChannelId,
+				ConversationId = activity.Conversation.Id,
+				Locale = activity.Locale
+			};
 		}
 	}
 }
