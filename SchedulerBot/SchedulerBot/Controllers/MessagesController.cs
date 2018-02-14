@@ -35,7 +35,7 @@ namespace SchedulerBot.Controllers
 				string replyText;
 				string textSchedule = activity.Text;
 
-				if (scheduleParser.TryParse(textSchedule, out ISchedule schedule))
+				if (scheduleParser.TryParse(textSchedule, DateTime.UtcNow, out ISchedule schedule))
 				{
 					await AddScheduledMessageAsync(activity, schedule);
 
