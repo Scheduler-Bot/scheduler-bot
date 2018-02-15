@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -68,14 +67,6 @@ namespace SchedulerBot
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceScopeFactory scopeFactory)
 		{
-			using (IServiceScope scope = scopeFactory.CreateScope())
-			{
-				IServiceProvider scopeServiceProvider = scope.ServiceProvider;
-				SchedulerBotContext context = scopeServiceProvider.GetRequiredService<SchedulerBotContext>();
-
-				context.Database.Migrate();
-			}
-
 			app.UseDefaultFiles();
 			app.UseStaticFiles();
 			app.UseAuthentication();
