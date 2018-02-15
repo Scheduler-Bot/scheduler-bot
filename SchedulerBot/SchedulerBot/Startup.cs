@@ -80,6 +80,7 @@ namespace SchedulerBot
 			app.UseStaticFiles();
 			app.UseAuthentication();
 			app.UseMvc();
+			app.UseExceptionHandler();
 		}
 	}
 }
