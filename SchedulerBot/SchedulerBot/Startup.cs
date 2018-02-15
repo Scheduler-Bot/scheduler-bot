@@ -58,7 +58,8 @@ namespace SchedulerBot
 			services.AddTransient<IList<IBotCommand>>(provider => new[]
 			{
 				CreateAddCommand(provider),
-				CreateRemoveCommand(provider)
+				CreateRemoveCommand(provider),
+				CreateListCommand(provider)
 			});
 		}
 
@@ -89,6 +90,14 @@ namespace SchedulerBot
 		private static IBotCommand CreateRemoveCommand(IServiceProvider serviceProvider)
 		{
 			return new RemoveCommand(serviceProvider.GetRequiredService<SchedulerBotContext>());
+		}
+
+		private static IBotCommand CreateListCommand(IServiceProvider serviceProvider)
+		{
+			return new ListCommand(
+				serviceProvider.GetRequiredService<SchedulerBotContext>(),
+				serviceProvider.GetRequiredService<IScheduleParser>(),
+				serviceProvider.GetRequiredService<IScheduleDescriptionFormatter>());
 		}
 	}
 }
