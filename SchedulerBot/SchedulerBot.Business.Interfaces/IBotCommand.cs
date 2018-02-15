@@ -7,6 +7,6 @@ namespace SchedulerBot.Business.Interfaces
 	{
 		string Name { get; }
 
-		Task<CommandResult> ExecuteAsync(Activity activity, string arguments);
+		Task<string> ExecuteAsync(Activity activity, string arguments);
 	}
 }

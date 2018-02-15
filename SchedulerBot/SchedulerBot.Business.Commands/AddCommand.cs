@@ -21,13 +21,15 @@ namespace SchedulerBot.Business.Commands
 			this.context = context;
 			this.scheduleParser = scheduleParser;
 			this.scheduleDescriptionFormatter = scheduleDescriptionFormatter;
+
+			Name = "add";
 		}
 
-		public string Name { get; } = "add";
+		public string Name { get; }
 
-		public async Task<CommandResult> ExecuteAsync(Activity activity, string arguments)
+		public async Task<string> ExecuteAsync(Activity activity, string arguments)
 		{
-			CommandResult result;
+			string result;
 			string textSchedule = arguments;
 
 			if (scheduleParser.TryParse(textSchedule, DateTime.UtcNow, out ISchedule schedule))
@@ -39,11 +41,11 @@ namespace SchedulerBot.Business.Commands
 
 				string scheduleDescription = scheduleDescriptionFormatter.Format(schedule, activity.Locale);
 
-				result = new CommandResult($"Created an event with the following schedule: {scheduleDescription}", succeeded: true);
+				result = $"Created an event with the following schedule: {scheduleDescription}";
 			}
 			else
 			{
-				result = new CommandResult($"Cannot recognize schedule \"{textSchedule}\"", succeeded: false);
+				result = $"Cannot recognize schedule \"{textSchedule}\"";
 			}
 
 			return result;
