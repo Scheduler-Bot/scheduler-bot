@@ -55,21 +55,19 @@ namespace SchedulerBot
 			services.AddTransient<IScheduleDescriptionFormatter, CronDescriptionFormatter>();
 			services.AddTransient<ICommandSelector, CommandSelector>();
 			services.AddTransient<ICommandRequestParser, CommandRequestParser>();
-			services.AddTransient<IList<IBotCommand>>(provider => new[]
+			services.AddTransient<AddCommand>();
+			services.AddTransient<RemoveCommand>();
+			services.AddTransient<ListCommand>();
+			services.AddTransient<IList<IBotCommand>>(provider => new IBotCommand[]
 			{
-				CreateAddCommand(provider),
-				CreateRemoveCommand(provider),
-				CreateListCommand(provider)
+				provider.GetRequiredService<AddCommand>(),
+				provider.GetRequiredService<RemoveCommand>(),
+				provider.GetRequiredService<ListCommand>()
 			});
 		}
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceScopeFactory scopeFactory)
 		{
-			app.UseDefaultFiles();
-			app.UseStaticFiles();
-			app.UseAuthentication();
-			app.UseMvc();
-
 			using (IServiceScope scope = scopeFactory.CreateScope())
 			{
 				IServiceProvider scopeServiceProvider = scope.ServiceProvider;
@@ -77,27 +75,11 @@ namespace SchedulerBot
 
 				context.Database.Migrate();
 			}
-		}
 
-		private static IBotCommand CreateAddCommand(IServiceProvider serviceProvider)
-		{
-			return new AddCommand(
-				serviceProvider.GetRequiredService<SchedulerBotContext>(),
-				serviceProvider.GetRequiredService<IScheduleParser>(),
-				serviceProvider.GetRequiredService<IScheduleDescriptionFormatter>());
-		}
-
-		private static IBotCommand CreateRemoveCommand(IServiceProvider serviceProvider)
-		{
-			return new RemoveCommand(serviceProvider.GetRequiredService<SchedulerBotContext>());
-		}
-
-		private static IBotCommand CreateListCommand(IServiceProvider serviceProvider)
-		{
-			return new ListCommand(
-				serviceProvider.GetRequiredService<SchedulerBotContext>(),
-				serviceProvider.GetRequiredService<IScheduleParser>(),
-				serviceProvider.GetRequiredService<IScheduleDescriptionFormatter>());
+			app.UseDefaultFiles();
+			app.UseStaticFiles();
+			app.UseAuthentication();
+			app.UseMvc();
 		}
 	}
 }
