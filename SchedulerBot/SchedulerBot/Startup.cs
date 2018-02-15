@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +10,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Rest;
+using SchedulerBot.Business.Commands;
+using SchedulerBot.Business.Interfaces;
 using SchedulerBot.Business.Services;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Infrastructure.Interfaces;
@@ -48,6 +52,11 @@ namespace SchedulerBot
 			services.AddSingleton<IHostedService, ScheduledMessageProcessorService>();
 			services.AddTransient<IScheduleParser, CronScheduleParser>();
 			services.AddTransient<IScheduleDescriptionFormatter, CronDescriptionFormatter>();
+			services.AddTransient<ICommandSelector, CommandSelector>();
+			services.AddTransient<IList<IBotCommand>>(provider => new[]
+			{
+				CreateAddCommand(provider)
+			});
 		}
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -57,6 +66,14 @@ namespace SchedulerBot
 
 			app.UseAuthentication();
 			app.UseMvc();
+		}
+
+		private static IBotCommand CreateAddCommand(IServiceProvider serviceProvider)
+		{
+			return new AddCommand(
+				serviceProvider.GetRequiredService<SchedulerBotContext>(),
+				serviceProvider.GetRequiredService<IScheduleParser>(),
+				serviceProvider.GetRequiredService<IScheduleDescriptionFormatter>());
 		}
 	}
 }
