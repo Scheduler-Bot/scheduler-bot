@@ -1,19 +1,20 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace SchedulerBot.Business.Commands.Utils
 {
 	internal static class ArgumentHelper
 	{
-		public static string Unquote(string argument) => argument.Trim('\'', '"');
+		// input: not in quotes 'in single quotes' "in double quotes"
+		// output: not, in, quotes, in single quotes, in double quotes
+		private static readonly Regex ArgumentRegex = new Regex("(?<=\")[^\"]*(?=\")|(?<=\')[^\']*(?=\')|[^\\s\"\']+");
 
 		public static string[] ParseArguments(string arguments)
 		{
-			return Regex
-				.Split(arguments, @"\s")
-				.Where(argument => string.Empty.Equals(argument, StringComparison.Ordinal))
-				.Select(Unquote)
+			return ArgumentRegex
+				.Matches(arguments)
+				.Select(match => match.Value.Trim())
+				.Where(value => !string.IsNullOrEmpty(value))
 				.ToArray();
 		}
 	}
