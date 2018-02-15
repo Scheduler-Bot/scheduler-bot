@@ -58,7 +58,7 @@ namespace SchedulerBot.Controllers
 				}
 				else
 				{
-					replyText = $"Cannot recognize schedule \"{textSchedule}\"";
+					replyText = $"Cannot recognize schedule expression \"{textSchedule}\"";
 				}
 
 				await ReplyAsync(activity, replyText);
