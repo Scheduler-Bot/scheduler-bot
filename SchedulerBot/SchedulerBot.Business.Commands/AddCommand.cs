@@ -35,13 +35,13 @@ namespace SchedulerBot.Business.Commands
 			if (scheduleParser.TryParse(textSchedule, DateTime.UtcNow, out ISchedule schedule))
 			{
 				ScheduledMessage scheduledMessage = CreateScheduledMessageAsync(activity, schedule);
+				ScheduledMessage createdMessage = (await context.ScheduledMessages.AddAsync(scheduledMessage)).Entity;
 
-				await context.ScheduledMessages.AddAsync(scheduledMessage);
 				await context.SaveChangesAsync();
 
 				string scheduleDescription = scheduleDescriptionFormatter.Format(schedule, activity.Locale);
 
-				result = $"Created an event with the following schedule: {scheduleDescription}";
+				result = $"New event has been created:{Environment.NewLine}ID: '{createdMessage.Id}'{Environment.NewLine}Schedule: {scheduleDescription}";
 			}
 			else
 			{
