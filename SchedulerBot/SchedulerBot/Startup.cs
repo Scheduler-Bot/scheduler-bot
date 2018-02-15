@@ -46,9 +46,9 @@ namespace SchedulerBot
 			services.AddSingleton<ICredentialProvider>(credentialProvider);
 			services.AddSingleton<ServiceClientCredentials>(new MicrosoftAppCredentials(appId, appPassword));
 
-			string connectionString = Configuration.GetConnectionString("SchedulerBotDatabase");
+			string connectionString = Configuration["Secrets:ConnectionString"];
 
-			services.AddDbContext<SchedulerBotContext>(builder => builder.UseSqlite(connectionString));
+			services.AddDbContext<SchedulerBotContext>(builder => builder.UseSqlServer(connectionString));
 			services.AddMvc(options => options.Filters.Add<TrustServiceUrlAttribute>());
 			services.AddSingleton<IHostedService, ScheduledMessageProcessorService>();
 			services.AddTransient<IScheduleParser, CronScheduleParser>();
