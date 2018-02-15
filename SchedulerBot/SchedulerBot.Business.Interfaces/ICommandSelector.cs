@@ -2,6 +2,6 @@
 {
 	public interface ICommandSelector
 	{
-		IBotCommand GetCommand(string inputText);
+		IBotCommand GetCommand(string name);
 	}
 }
