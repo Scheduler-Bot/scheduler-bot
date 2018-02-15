@@ -53,6 +53,7 @@ namespace SchedulerBot
 			services.AddTransient<IScheduleParser, CronScheduleParser>();
 			services.AddTransient<IScheduleDescriptionFormatter, CronDescriptionFormatter>();
 			services.AddTransient<ICommandSelector, CommandSelector>();
+			services.AddTransient<ICommandRequestParser, CommandRequestParser>();
 			services.AddTransient<IList<IBotCommand>>(provider => new[]
 			{
 				CreateAddCommand(provider)

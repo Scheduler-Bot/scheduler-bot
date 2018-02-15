@@ -1,36 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Rest;
-using SchedulerBot.Database.Core;
-using SchedulerBot.Database.Entities;
-using SchedulerBot.Database.Entities.Enums;
-using SchedulerBot.Infrastructure.Interfaces;
+using SchedulerBot.Business.Interfaces;
 
 namespace SchedulerBot.Controllers
 {
 	[Route("api/[controller]")]
 	public class MessagesController : Controller
 	{
-		private readonly SchedulerBotContext context;
 		private readonly ServiceClientCredentials credentials;
-		private readonly IScheduleParser scheduleParser;
-		private readonly IScheduleDescriptionFormatter scheduleDescriptionFormatter;
+		private readonly ICommandRequestParser commandRequestParser;
+		private readonly ICommandSelector commandSelector;
 
 		public MessagesController(
-			SchedulerBotContext context,
 			ServiceClientCredentials credentials,
-			IScheduleParser scheduleParser,
-			IScheduleDescriptionFormatter scheduleDescriptionFormatter)
+			ICommandRequestParser commandRequestParser,
+			ICommandSelector commandSelector)
 		{
-			this.context = context;
 			this.credentials = credentials;
-			this.scheduleParser = scheduleParser;
-			this.scheduleDescriptionFormatter = scheduleDescriptionFormatter;
+			this.commandRequestParser = commandRequestParser;
+			this.commandSelector = commandSelector;
 		}
 
 		[HttpGet]
@@ -45,23 +38,20 @@ namespace SchedulerBot.Controllers
 		{
 			if (activity.Type == ActivityTypes.Message)
 			{
-				string replyText;
-				string textSchedule = activity.Text;
+				string replyText = null;
+				CommandRequestParseResult parsedCommandRequest = commandRequestParser.Parse(activity.Text);
 
-				if (scheduleParser.TryParse(textSchedule, DateTime.UtcNow, out ISchedule schedule))
+				if (parsedCommandRequest != null)
 				{
-					await AddScheduledMessageAsync(activity, schedule);
+					IBotCommand command = commandSelector.GetCommand(parsedCommandRequest.Name);
 
-					string scheduleDescription = scheduleDescriptionFormatter.Format(schedule, activity.Locale);
-
-					replyText = $"Created an event with the following schedule: {scheduleDescription}";
-				}
-				else
-				{
-					replyText = $"Cannot recognize schedule expression \"{textSchedule}\"";
+					if (command != null)
+					{
+						replyText = await command.ExecuteAsync(activity, parsedCommandRequest.Arguments);
+					}
 				}
 
-				await ReplyAsync(activity, replyText);
+				await ReplyAsync(activity, replyText ?? "Sorry, I don't understand you :(");
 			}
 
 			return Ok();
@@ -75,48 +65,6 @@ namespace SchedulerBot.Controllers
 			{
 				return connector.Conversations.ReplyToActivityAsync(reply);
 			}
-		}
-
-		private async Task AddScheduledMessageAsync(Activity activity, ISchedule schedule)
-		{
-			ScheduledMessage scheduledMessage = new ScheduledMessage
-			{
-				Text = "Hello!",
-				Schedule = schedule.Text,
-				Details = CreateMessageDetails(activity),
-				Events = new List<ScheduledMessageEvent>
-				{
-					CreateMessageEvent(schedule)
-				}
-			};
-
-			await context.ScheduledMessages.AddAsync(scheduledMessage);
-			await context.SaveChangesAsync();
-		}
-
-		private static ScheduledMessageDetails CreateMessageDetails(Activity activity)
-		{
-			return new ScheduledMessageDetails
-			{
-				ServiceUrl = activity.ServiceUrl,
-				FromId = activity.Recipient.Id,
-				FromName = activity.Recipient.Name,
-				RecipientId = activity.From.Id,
-				RecipientName = activity.From.Name,
-				ChannelId = activity.ChannelId,
-				ConversationId = activity.Conversation.Id,
-				Locale = activity.Locale
-			};
-		}
-
-		private static ScheduledMessageEvent CreateMessageEvent(ISchedule schedule)
-		{
-			return new ScheduledMessageEvent
-			{
-				CreatedOn = DateTime.UtcNow,
-				NextOccurence = schedule.NextOccurence,
-				State = ScheduledMessageEventState.Pending
-			};
 		}
 	}
 }
