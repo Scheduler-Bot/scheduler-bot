@@ -29,6 +29,10 @@ namespace SchedulerBot
 						builder.AddAzureKeyVault(
 							keyVaultEndpoint, keyVaultClient, new DefaultKeyVaultSecretManager());
 					}
+					else
+					{
+						builder.AddUserSecrets<Startup>();
+					}
 				})
 				.UseStartup<Startup>()
 				.Build();

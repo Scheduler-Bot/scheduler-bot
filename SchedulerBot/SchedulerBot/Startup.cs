@@ -30,8 +30,8 @@ namespace SchedulerBot
 
 		public void ConfigureServices(IServiceCollection services)
 		{
-			string appId = Configuration[MicrosoftAppCredentials.MicrosoftAppIdKey];
-			string appPassword = Configuration[MicrosoftAppCredentials.MicrosoftAppPasswordKey];
+			string appId = Configuration["Secrets:MicrosoftAppIdKey"];
+			string appPassword = Configuration["Secrets:MicrosoftAppPassword"];
 			SimpleCredentialProvider credentialProvider = new SimpleCredentialProvider(appId, appPassword);
 
 			services.AddAuthentication(

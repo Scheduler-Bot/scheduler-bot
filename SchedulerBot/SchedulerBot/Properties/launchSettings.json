@@ -12,6 +12,13 @@
 			"commandName": "IISExpress",
 			"launchBrowser": true,
 			"environmentVariables": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			}
+		},
+		"IIS Express with KeyVault": {
+			"commandName": "IISExpress",
+			"launchBrowser": true,
+			"environmentVariables": {
 				"ASPNETCORE_ENVIRONMENT": "Development",
 				"KEYVAULT_ENDPOINT": "https://scheduler-bot-key-vault.vault.azure.net/"
 			}
