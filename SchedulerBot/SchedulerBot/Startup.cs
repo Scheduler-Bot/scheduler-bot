@@ -59,13 +59,20 @@ namespace SchedulerBot
 			});
 		}
 
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceScopeFactory scopeFactory)
 		{
 			app.UseDefaultFiles();
 			app.UseStaticFiles();
-
 			app.UseAuthentication();
 			app.UseMvc();
+
+			using (IServiceScope scope = scopeFactory.CreateScope())
+			{
+				IServiceProvider scopeServiceProvider = scope.ServiceProvider;
+				SchedulerBotContext context = scopeServiceProvider.GetRequiredService<SchedulerBotContext>();
+
+				context.Database.Migrate();
+			}
 		}
 
 		private static IBotCommand CreateAddCommand(IServiceProvider serviceProvider)
