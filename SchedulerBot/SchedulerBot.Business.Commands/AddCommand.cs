@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
+using SchedulerBot.Business.Commands.Utils;
 using SchedulerBot.Business.Interfaces;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
@@ -10,6 +12,7 @@ using SchedulerBot.Infrastructure.Interfaces;
 
 namespace SchedulerBot.Business.Commands
 {
+	// Expected input: add 'Turn off the iron!' '0 * * * *'
 	public class AddCommand : IBotCommand
 	{
 		private readonly SchedulerBotContext context;
@@ -30,32 +33,41 @@ namespace SchedulerBot.Business.Commands
 		public async Task<string> ExecuteAsync(Activity activity, string arguments)
 		{
 			string result;
-			string textSchedule = arguments;
+			string[] splitArguments = ArgumentHelper.ParseArguments(arguments);
+			string text = splitArguments.ElementAtOrDefault(0);
+			string textSchedule = splitArguments.ElementAtOrDefault(1);
 
-			if (scheduleParser.TryParse(textSchedule, DateTime.UtcNow, out ISchedule schedule))
+			if (!string.IsNullOrWhiteSpace(text) && !string.IsNullOrWhiteSpace(textSchedule))
 			{
-				ScheduledMessage scheduledMessage = CreateScheduledMessageAsync(activity, schedule);
-				ScheduledMessage createdMessage = (await context.ScheduledMessages.AddAsync(scheduledMessage)).Entity;
+				if (scheduleParser.TryParse(textSchedule, DateTime.UtcNow, out ISchedule schedule))
+				{
+					ScheduledMessage scheduledMessage = CreateScheduledMessageAsync(activity, text, schedule);
+					ScheduledMessage createdMessage = (await context.ScheduledMessages.AddAsync(scheduledMessage)).Entity;
 
-				await context.SaveChangesAsync();
+					await context.SaveChangesAsync();
 
-				string scheduleDescription = scheduleDescriptionFormatter.Format(schedule, activity.Locale);
+					string scheduleDescription = scheduleDescriptionFormatter.Format(schedule, activity.Locale);
 
-				result = $"New event has been created:{Environment.NewLine}ID: '{createdMessage.Id}'{Environment.NewLine}Schedule: {scheduleDescription}";
+					result = $"New event has been created:{Environment.NewLine}ID: '{createdMessage.Id}'{Environment.NewLine}Schedule: {scheduleDescription}";
+				}
+				else
+				{
+					result = $"Cannot recognize schedule \"{textSchedule}\"";
+				}
 			}
 			else
 			{
-				result = $"Cannot recognize schedule \"{textSchedule}\"";
+				result = "Command arguments are in incorrect format. Use the following pattern: add 'your text' 'your schedule'";
 			}
 
 			return result;
 		}
 
-		private static ScheduledMessage CreateScheduledMessageAsync(Activity activity, ISchedule schedule)
+		private static ScheduledMessage CreateScheduledMessageAsync(Activity activity, string text, ISchedule schedule)
 		{
 			return new ScheduledMessage
 			{
-				Text = "Hello!",
+				Text = text,
 				Schedule = schedule.Text,
 				Details = CreateMessageDetails(activity),
 				Events = new List<ScheduledMessageEvent>
