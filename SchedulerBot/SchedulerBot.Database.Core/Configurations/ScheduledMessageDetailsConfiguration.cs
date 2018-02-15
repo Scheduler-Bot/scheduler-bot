@@ -19,7 +19,8 @@ namespace SchedulerBot.Database.Core.Configurations
 			builder.Property(details => details.RecipientName).IsRequired();
 			builder.Property(details => details.ChannelId).IsRequired();
 			builder.Property(details => details.ConversationId).IsRequired();
-			builder.Property(details => details.Locale).IsRequired();
+			builder.Property(details => details.ServiceUrl).IsRequired();
+			builder.Property(details => details.Locale).IsRequired(false);
 		}
 	}
 }

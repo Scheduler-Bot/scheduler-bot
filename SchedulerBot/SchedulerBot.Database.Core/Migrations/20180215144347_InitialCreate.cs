@@ -29,10 +29,10 @@ namespace SchedulerBot.Database.Core.Migrations
 					ConversationId = table.Column<string>(nullable: false),
 					FromId = table.Column<string>(nullable: false),
 					FromName = table.Column<string>(nullable: false),
-					Locale = table.Column<string>(nullable: false),
+					Locale = table.Column<string>(nullable: true),
 					RecipientId = table.Column<string>(nullable: false),
 					RecipientName = table.Column<string>(nullable: false),
-					ServiceUrl = table.Column<string>(nullable: true)
+					ServiceUrl = table.Column<string>(nullable: false)
 				},
 				constraints: table =>
 				{
