@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using SchedulerBot.Business.Interfaces;
 
-namespace SchedulerBot.Business.Commands
+namespace SchedulerBot.Business.Commands.Utils
 {
 	public class CommandRequestParser : ICommandRequestParser
 	{

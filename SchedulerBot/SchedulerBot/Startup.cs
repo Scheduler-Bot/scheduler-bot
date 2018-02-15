@@ -11,6 +11,7 @@ using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Rest;
 using SchedulerBot.Business.Commands;
+using SchedulerBot.Business.Commands.Utils;
 using SchedulerBot.Business.Interfaces;
 using SchedulerBot.Business.Services;
 using SchedulerBot.Database.Core;

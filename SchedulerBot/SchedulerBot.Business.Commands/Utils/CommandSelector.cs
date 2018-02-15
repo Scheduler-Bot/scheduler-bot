@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SchedulerBot.Business.Interfaces;
 
-namespace SchedulerBot.Business.Commands
+namespace SchedulerBot.Business.Commands.Utils
 {
 	public class CommandSelector : ICommandSelector
 	{
