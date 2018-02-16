@@ -21,9 +21,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Infrastructure
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Infrastructure.Utils", "SchedulerBot.Infrastructure.Utils\SchedulerBot.Infrastructure.Utils.csproj", "{E512CE3D-C02B-49C8-B688-DEE45524E8AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchedulerBot.Business.Interfaces", "SchedulerBot.Business.Interfaces\SchedulerBot.Business.Interfaces.csproj", "{A9B6A7F0-A252-4683-9B22-60B597E9B25D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Business.Interfaces", "SchedulerBot.Business.Interfaces\SchedulerBot.Business.Interfaces.csproj", "{A9B6A7F0-A252-4683-9B22-60B597E9B25D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchedulerBot.Business.Commands", "SchedulerBot.Business.Commands\SchedulerBot.Business.Commands.csproj", "{87DAD18A-E454-4851-8CC1-01198D1CBA1D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Business.Commands", "SchedulerBot.Business.Commands\SchedulerBot.Business.Commands.csproj", "{87DAD18A-E454-4851-8CC1-01198D1CBA1D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchedulerBot.Business.Utils", "SchedulerBot.Business.Utils\SchedulerBot.Business.Utils.csproj", "{6AE730F0-CA6E-460A-85B1-5DE8D03169D8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{87DAD18A-E454-4851-8CC1-01198D1CBA1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87DAD18A-E454-4851-8CC1-01198D1CBA1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87DAD18A-E454-4851-8CC1-01198D1CBA1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AE730F0-CA6E-460A-85B1-5DE8D03169D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AE730F0-CA6E-460A-85B1-5DE8D03169D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AE730F0-CA6E-460A-85B1-5DE8D03169D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AE730F0-CA6E-460A-85B1-5DE8D03169D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,6 +81,7 @@ Global
 		{E512CE3D-C02B-49C8-B688-DEE45524E8AC} = {98AA3A8F-C420-4110-832A-5631BCC183F2}
 		{A9B6A7F0-A252-4683-9B22-60B597E9B25D} = {24104A42-CB02-4E91-9555-320CBCB33F01}
 		{87DAD18A-E454-4851-8CC1-01198D1CBA1D} = {24104A42-CB02-4E91-9555-320CBCB33F01}
+		{6AE730F0-CA6E-460A-85B1-5DE8D03169D8} = {24104A42-CB02-4E91-9555-320CBCB33F01}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CCF3E0B7-D57A-4B5C-93BE-9ACA4D593E1E}
