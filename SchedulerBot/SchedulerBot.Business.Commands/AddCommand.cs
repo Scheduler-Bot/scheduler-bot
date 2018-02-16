@@ -6,6 +6,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Commands.Utils;
 using SchedulerBot.Business.Interfaces;
+using SchedulerBot.Business.Utils;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
@@ -61,8 +62,9 @@ namespace SchedulerBot.Business.Commands
 
 					string scheduleDescription = scheduleDescriptionFormatter.Format(schedule, activity.Locale);
 					string createdMessageId = createdMessage.Id.ToString();
+					string newLine = MessageUtils.NewLine;
 
-					result = $"New event has been created:{Environment.NewLine}ID: '{createdMessageId}'{Environment.NewLine}Schedule: {scheduleDescription}";
+					result = $"New event has been created:{newLine}ID: '{createdMessageId}'{newLine}Schedule: {scheduleDescription}";
 					logger.LogInformation("Created a scheduled message with id '{0}'", createdMessageId);
 				}
 				else

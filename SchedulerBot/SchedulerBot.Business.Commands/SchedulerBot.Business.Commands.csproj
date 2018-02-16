@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SchedulerBot.Business.Interfaces\SchedulerBot.Business.Interfaces.csproj" />
+    <ProjectReference Include="..\SchedulerBot.Business.Utils\SchedulerBot.Business.Utils.csproj" />
     <ProjectReference Include="..\SchedulerBot.Database.Core\SchedulerBot.Database.Core.csproj" />
     <ProjectReference Include="..\SchedulerBot.Database.Entities\SchedulerBot.Database.Entities.csproj" />
   </ItemGroup>

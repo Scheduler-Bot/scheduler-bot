@@ -73,7 +73,7 @@ namespace SchedulerBot.Controllers
 
 		private Task<ResourceResponse> ReplyAsync(Activity activity, string replyText)
 		{
-			Activity reply = activity.CreateReply(replyText);
+			Activity reply = activity.CreateReply(replyText, activity.Locale);
 
 			using (ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl), credentials))
 			{

@@ -6,6 +6,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Interfaces;
+using SchedulerBot.Business.Utils;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Infrastructure.Interfaces;
@@ -55,7 +56,7 @@ namespace SchedulerBot.Business.Commands
 
 			if (messageCount > 0)
 			{
-				result = stringBuilder.ToString();
+				result = stringBuilder.ToString().Trim();
 				logger.LogInformation("Found '{0}' scheduled messages for the conversation '{1}'", messageCount, conversationId);
 			}
 			else
@@ -80,15 +81,18 @@ namespace SchedulerBot.Business.Commands
 			DateTime currentTime = DateTime.UtcNow;
 			ISchedule schedule = scheduleParser.Parse(message.Schedule, currentTime);
 			string scheduleDescription = scheduleDescriptionFormatter.Format(schedule, locale);
+			string newLine = MessageUtils.NewLine;
+			const string messageSeparator = "----------------------------------";
 
 			stringBuilder
-				.AppendLine()
 				.AppendFormat("ID: {0}", message.Id)
-				.AppendLine()
+				.Append(newLine)
 				.AppendFormat("Text: {0}", message.Text)
-				.AppendLine()
+				.Append(newLine)
 				.AppendFormat("Schedule: {0}", scheduleDescription)
-				.AppendLine();
+				.Append(newLine)
+				.Append(messageSeparator)
+				.Append(newLine);
 		}
 	}
 }
