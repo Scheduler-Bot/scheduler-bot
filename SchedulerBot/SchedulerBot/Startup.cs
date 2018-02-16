@@ -16,6 +16,7 @@ using SchedulerBot.Business.Services;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Infrastructure.Interfaces;
 using SchedulerBot.Infrastructure.Utils;
+using SchedulerBot.Extensions;
 
 namespace SchedulerBot
 {
@@ -45,7 +46,7 @@ namespace SchedulerBot
 			services.AddSingleton<ICredentialProvider>(credentialProvider);
 			services.AddSingleton<ServiceClientCredentials>(new MicrosoftAppCredentials(appId, appPassword));
 
-			string connectionString = Configuration["Secrets:ConnectionString"];
+			string connectionString = Configuration.GetConnectionString();
 
 			services.AddDbContext<SchedulerBotContext>(builder => builder.UseSqlServer(connectionString));
 			services.AddMvc(options => options.Filters.Add<TrustServiceUrlAttribute>());

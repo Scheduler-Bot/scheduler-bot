@@ -12,7 +12,7 @@ namespace SchedulerBot.Extensions
 {
 	public static class ConfigurationExtensions
 	{
-		public static IConfigurationBuilder AddSecrets(this IConfigurationBuilder builder)
+		public static IConfigurationBuilder AddAzureSecrets(this IConfigurationBuilder builder)
 		{
 			string keyVaultEndpoint = GetKeyVaultEndpoint();
 
@@ -24,10 +24,6 @@ namespace SchedulerBot.Extensions
 						azureServiceTokenProvider.KeyVaultTokenCallback));
 				builder.AddAzureKeyVault(
 					keyVaultEndpoint, keyVaultClient, new DefaultKeyVaultSecretManager());
-			}
-			else
-			{
-				builder.AddUserSecrets<Startup>();
 			}
 
 			return builder;
@@ -46,6 +42,21 @@ namespace SchedulerBot.Extensions
 			return host;
 		}
 
+		public static string GetConnectionString(this IConfiguration configuration)
+		{
+			string settingName = IsDevelopment() ? "ConnectionString" : "Secrets:ConnectionString";
+			string connectionString = configuration[settingName];
+
+			return connectionString;
+		}
+
 		private static string GetKeyVaultEndpoint() => Environment.GetEnvironmentVariable("KEYVAULT_ENDPOINT");
+
+		private static bool IsDevelopment()
+		{
+			string currentEnvironmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+			return EnvironmentName.Development.Equals(currentEnvironmentName, StringComparison.Ordinal);
+		}
 	}
 }
