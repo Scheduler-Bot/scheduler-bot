@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Interfaces;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
@@ -16,12 +17,18 @@ namespace SchedulerBot.Business.Commands
 		private readonly SchedulerBotContext context;
 		private readonly IScheduleParser scheduleParser;
 		private readonly IScheduleDescriptionFormatter scheduleDescriptionFormatter;
+		private readonly ILogger<ListCommand> logger;
 
-		public ListCommand(SchedulerBotContext context, IScheduleParser scheduleParser, IScheduleDescriptionFormatter scheduleDescriptionFormatter)
+		public ListCommand(
+			SchedulerBotContext context,
+			IScheduleParser scheduleParser,
+			IScheduleDescriptionFormatter scheduleDescriptionFormatter,
+			ILogger<ListCommand> logger)
 		{
 			this.context = context;
 			this.scheduleParser = scheduleParser;
 			this.scheduleDescriptionFormatter = scheduleDescriptionFormatter;
+			this.logger = logger;
 
 			Name = "list";
 		}
@@ -30,16 +37,32 @@ namespace SchedulerBot.Business.Commands
 
 		public Task<string> ExecuteAsync(Activity activity, string arguments)
 		{
-			bool messagesFound = false;
+			logger.LogInformation("Executing '{0}' command", Name);
+
+			int messageCount = 0;
+			string conversationId = activity.Conversation.Id;
 			StringBuilder stringBuilder = new StringBuilder();
 
-			foreach (ScheduledMessage message in GetConversationMessages(activity.Conversation.Id))
+			logger.LogInformation("Searching for the scheduled messages for the conversation with id '{0}'", conversationId);
+
+			foreach (ScheduledMessage message in GetConversationMessages(conversationId))
 			{
-				messagesFound = true;
 				AppendMessageDescription(message, activity.Locale, stringBuilder);
+				messageCount++;
 			}
 
-			string result = messagesFound ? stringBuilder.ToString() : "No scheduled events for this conversation";
+			string result;
+
+			if (messageCount > 0)
+			{
+				result = stringBuilder.ToString();
+				logger.LogInformation("Found '{0}' scheduled messages for the conversation '{1}'", messageCount, conversationId);
+			}
+			else
+			{
+				result = "No scheduled events for this conversation";
+				logger.LogInformation("No schedule messages found for the conversation '{1}'", conversationId);
+			}
 
 			return Task.FromResult(result);
 		}

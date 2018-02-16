@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
+using Microsoft.Extensions.Logging;
 using Microsoft.Rest;
 using SchedulerBot.Business.Interfaces;
 
@@ -15,15 +16,18 @@ namespace SchedulerBot.Controllers
 		private readonly ServiceClientCredentials credentials;
 		private readonly ICommandRequestParser commandRequestParser;
 		private readonly ICommandSelector commandSelector;
+		private readonly ILogger<MessagesController> logger;
 
 		public MessagesController(
 			ServiceClientCredentials credentials,
 			ICommandRequestParser commandRequestParser,
-			ICommandSelector commandSelector)
+			ICommandSelector commandSelector,
+			ILogger<MessagesController> logger)
 		{
 			this.credentials = credentials;
 			this.commandRequestParser = commandRequestParser;
 			this.commandSelector = commandSelector;
+			this.logger = logger;
 		}
 
 		[HttpGet]
@@ -38,6 +42,8 @@ namespace SchedulerBot.Controllers
 		{
 			if (activity.Type == ActivityTypes.Message)
 			{
+				logger.LogInformation("Recieved the message with the following text: '{0}'", activity.Text);
+
 				string replyText = null;
 				CommandRequestParseResult parsedCommandRequest = commandRequestParser.Parse(activity.Text);
 
@@ -51,7 +57,14 @@ namespace SchedulerBot.Controllers
 					}
 				}
 
-				await ReplyAsync(activity, replyText ?? "Sorry, I don't understand you :(");
+				if (replyText == null)
+				{
+					replyText = "Sorry, I don't understand you :(";
+				}
+
+				logger.LogInformation("Replying with '{0}'", replyText);
+
+				await ReplyAsync(activity, replyText);
 			}
 
 			return Ok();

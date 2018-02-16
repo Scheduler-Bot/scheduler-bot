@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Commands.Utils;
 using SchedulerBot.Business.Interfaces;
 using SchedulerBot.Database.Core;
@@ -14,10 +15,12 @@ namespace SchedulerBot.Business.Commands
 	public class RemoveCommand : IBotCommand
 	{
 		private readonly SchedulerBotContext context;
+		private readonly ILogger<RemoveCommand> logger;
 
-		public RemoveCommand(SchedulerBotContext context)
+		public RemoveCommand(SchedulerBotContext context, ILogger<RemoveCommand> logger)
 		{
 			this.context = context;
+			this.logger = logger;
 
 			Name = "remove";
 		}
@@ -26,12 +29,16 @@ namespace SchedulerBot.Business.Commands
 
 		public async Task<string> ExecuteAsync(Activity activity, string arguments)
 		{
+			logger.LogInformation("Executing '{0}' command with arguments '{1}'", Name, arguments);
+
 			string result = null;
 			string[] splitArguments = ArgumentHelper.ParseArguments(arguments);
 			string messageIdText = splitArguments.ElementAtOrDefault(0);
 
 			if (messageIdText != null && Guid.TryParse(messageIdText, out Guid messageId))
 			{
+				logger.LogInformation("Parsed the arguments to message id '{0}'", messageId);
+
 				ScheduledMessage scheduledMessage = await context
 					.ScheduledMessages
 					.Where(message => message.Id == messageId)
@@ -41,12 +48,22 @@ namespace SchedulerBot.Business.Commands
 
 				if (scheduledMessage != null)
 				{
+					logger.LogInformation("Removing scheduled message with id '{0}'", messageId);
 					context.Remove(scheduledMessage);
 
 					await context.SaveChangesAsync();
 
 					result = "The event has been removed";
+					logger.LogInformation("The scheduled message '{0}' has been removed", messageId);
 				}
+				else
+				{
+					logger.LogWarning("Scheduled message with id '{0}' cannot be found", messageId);
+				}
+			}
+			else
+			{
+				logger.LogWarning("Cannot parse the command arguments '{0}'", arguments);
 			}
 
 			return result ?? "Cannot remove such an event";

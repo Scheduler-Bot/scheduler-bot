@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Interfaces;
 
 namespace SchedulerBot.Business.Commands.Utils
@@ -9,9 +10,17 @@ namespace SchedulerBot.Business.Commands.Utils
 		private const string ArgumentsGroup = "arguments";
 		private const string Pattern = @"^\s*(?'" + NameGroup + @"'[^\s]+)\s*(?'" + ArgumentsGroup + @"'.*)\s*$";
 		private static readonly Regex CommandRegex = new Regex(Pattern);
+		private readonly ILogger<CommandRequestParser> logger;
+
+		public CommandRequestParser(ILogger<CommandRequestParser> logger)
+		{
+			this.logger = logger;
+		}
 
 		public CommandRequestParseResult Parse(string inputText)
 		{
+			logger.LogInformation("Parsing command request '{0}'", inputText);
+
 			CommandRequestParseResult parseResult = null;
 			Match match = CommandRegex.Match(inputText);
 
@@ -21,6 +30,12 @@ namespace SchedulerBot.Business.Commands.Utils
 				string arguments = match.Groups[ArgumentsGroup]?.Value ?? string.Empty;
 
 				parseResult = new CommandRequestParseResult(name, arguments);
+				logger.LogInformation("Command request parsed to command '{0}' with arguments '{1}'", name, arguments);
+			}
+
+			if (parseResult == null)
+			{
+				logger.LogWarning("Command request '{0}' cannot be parsed", inputText);
 			}
 
 			return parseResult;

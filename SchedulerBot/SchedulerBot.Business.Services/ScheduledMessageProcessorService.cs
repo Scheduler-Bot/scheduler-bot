@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Rest;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
@@ -21,16 +22,24 @@ namespace SchedulerBot.Business.Services
 	{
 		private readonly ServiceClientCredentials credentials;
 		private readonly IServiceScopeFactory scopeFactory;
+		private readonly ILogger<ScheduledMessageProcessorService> logger;
 		private readonly IScheduleParser scheduleParser;
 		private readonly TimeSpan pollingInterval;
 		private readonly CancellationTokenSource serviceCancellationTokenSource;
 		private readonly CancellationToken serviceCancellationToken;
 
-		public ScheduledMessageProcessorService(ServiceClientCredentials credentials, IServiceScopeFactory scopeFactory, IConfiguration configuration, IScheduleParser scheduleParser)
+		public ScheduledMessageProcessorService(
+			ServiceClientCredentials credentials,
+			IScheduleParser scheduleParser,
+			IServiceScopeFactory scopeFactory,
+			IConfiguration configuration,
+			ILogger<ScheduledMessageProcessorService> logger)
 		{
 			this.credentials = credentials;
-			this.scopeFactory = scopeFactory;
 			this.scheduleParser = scheduleParser;
+			this.scopeFactory = scopeFactory;
+			this.logger = logger;
+
 			pollingInterval = TimeSpan.Parse(configuration["MessageProcessingInterval"], CultureInfo.InvariantCulture);
 			serviceCancellationTokenSource = new CancellationTokenSource();
 			serviceCancellationToken = serviceCancellationTokenSource.Token;
@@ -38,15 +47,20 @@ namespace SchedulerBot.Business.Services
 
 		public async Task StartAsync(CancellationToken cancellationToken)
 		{
+			logger.LogInformation("Starting polling");
+
 			while (!serviceCancellationTokenSource.IsCancellationRequested)
 			{
 				await ProcessScheduledMessagesAsync();
 				await WaitAsync();
 			}
+
+			logger.LogInformation("Polling stopped");
 		}
 
 		public Task StopAsync(CancellationToken cancellationToken)
 		{
+			logger.LogInformation("Stopping polling");
 			serviceCancellationTokenSource.Cancel();
 
 			// TODO: make this wait for the real cancellation.
@@ -60,6 +74,8 @@ namespace SchedulerBot.Business.Services
 
 		private async Task ProcessScheduledMessagesAsync()
 		{
+			logger.LogInformation("Starting to process scheduled messages");
+
 			using (IServiceScope scope = scopeFactory.CreateScope())
 			{
 				SchedulerBotContext context = scope.ServiceProvider.GetRequiredService<SchedulerBotContext>();
@@ -67,14 +83,20 @@ namespace SchedulerBot.Business.Services
 				foreach (ScheduledMessageEvent scheduledMessageEvent in GetPendingEvents(context))
 				{
 					ScheduledMessage scheduledMessage = scheduledMessageEvent.ScheduledMessage;
+					string scheduledMessageId = scheduledMessage.Id.ToString();
+
+					logger.LogInformation("Processing scheduled message '{0}'", scheduledMessageId);
 
 					await SendMessageAsync(scheduledMessage);
 
 					scheduledMessageEvent.State = ScheduledMessageEventState.Completed;
 					AddPendingEvent(scheduledMessage);
+					logger.LogInformation("Scheduled message '{0}' has been processed", scheduledMessageId);
 				}
 
 				await context.SaveChangesAsync(serviceCancellationToken);
+
+				logger.LogInformation("Finished processing scheduled messages");
 			}
 		}
 
@@ -93,6 +115,8 @@ namespace SchedulerBot.Business.Services
 		{
 			try
 			{
+				logger.LogInformation("Waiting for the next poll");
+
 				await Task.Delay(pollingInterval, serviceCancellationToken);
 			}
 			catch (TaskCanceledException)
