@@ -45,7 +45,8 @@ namespace SchedulerBot.Controllers
 				logger.LogInformation("Recieved the message with the following text: '{0}'", activity.Text);
 
 				string replyText = null;
-				CommandRequestParseResult parsedCommandRequest = commandRequestParser.Parse(activity.Text);
+
+				CommandRequestParseResult parsedCommandRequest = commandRequestParser.Parse(activity);
 
 				if (parsedCommandRequest != null)
 				{

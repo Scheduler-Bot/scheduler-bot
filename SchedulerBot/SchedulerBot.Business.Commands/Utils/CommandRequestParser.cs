@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Interfaces;
 
@@ -17,12 +18,14 @@ namespace SchedulerBot.Business.Commands.Utils
 			this.logger = logger;
 		}
 
-		public CommandRequestParseResult Parse(string inputText)
+		public CommandRequestParseResult Parse(Activity activity)
 		{
-			logger.LogInformation("Parsing command request '{0}'", inputText);
+			string commandRequestText = activity.RemoveRecipientMention();
+
+			logger.LogInformation("Parsing command request '{0}'", commandRequestText);
 
 			CommandRequestParseResult parseResult = null;
-			Match match = CommandRegex.Match(inputText);
+			Match match = CommandRegex.Match(commandRequestText);
 
 			if (match.Success)
 			{
@@ -35,7 +38,7 @@ namespace SchedulerBot.Business.Commands.Utils
 
 			if (parseResult == null)
 			{
-				logger.LogWarning("Command request '{0}' cannot be parsed", inputText);
+				logger.LogWarning("Command request '{0}' cannot be parsed", commandRequestText);
 			}
 
 			return parseResult;

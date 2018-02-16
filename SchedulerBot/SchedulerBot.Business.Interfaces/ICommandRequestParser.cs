@@ -1,7 +1,9 @@
-﻿namespace SchedulerBot.Business.Interfaces
+﻿using Microsoft.Bot.Schema;
+
+namespace SchedulerBot.Business.Interfaces
 {
 	public interface ICommandRequestParser
 	{
-		CommandRequestParseResult Parse(string inputText);
+		CommandRequestParseResult Parse(Activity activity);
 	}
 }
