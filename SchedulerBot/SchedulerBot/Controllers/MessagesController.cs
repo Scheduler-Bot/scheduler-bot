@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -42,10 +43,9 @@ namespace SchedulerBot.Controllers
 		{
 			if (activity.Type == ActivityTypes.Message)
 			{
-				logger.LogInformation("Recieved the message with the following text: '{0}'", activity.Text);
+				DecodeActivityText(activity);
 
 				string replyText = null;
-
 				CommandRequestParseResult parsedCommandRequest = commandRequestParser.Parse(activity);
 
 				if (parsedCommandRequest != null)
@@ -79,6 +79,13 @@ namespace SchedulerBot.Controllers
 			{
 				return connector.Conversations.ReplyToActivityAsync(reply);
 			}
+		}
+
+		private void DecodeActivityText(Activity activity)
+		{
+			logger.LogInformation("Recieved the message with the following text: '{0}'", activity.Text);
+			activity.Text = WebUtility.HtmlDecode(activity.Text);
+			logger.LogInformation("Decoded the text to '{0}'", activity.Text);
 		}
 	}
 }
