@@ -20,7 +20,7 @@ namespace SchedulerBot.Business.Commands.Utils
 
 		public CommandRequestParseResult Parse(Activity activity)
 		{
-			string commandRequestText = activity.RemoveRecipientMention();
+			string commandRequestText = RemoveRecipientMention(activity);
 
 			logger.LogInformation("Parsing command request '{0}'", commandRequestText);
 
@@ -42,6 +42,17 @@ namespace SchedulerBot.Business.Commands.Utils
 			}
 
 			return parseResult;
+		}
+
+		// This is a workaround for removing entries like '@scheduler-bot' from a message.
+		// The RemoveRecipientMention method provided by Microsoft.Bot.Schema.ActivityExtensions
+		// has a known issue and doesn't work for Skype mentions:
+		// https://github.com/Microsoft/BotBuilder/issues/3067
+		private static string RemoveRecipientMention(Activity activity)
+		{
+			string mentionText = "@" + activity.Recipient.Name;
+
+			return Regex.Replace(activity.Text, mentionText, string.Empty, RegexOptions.IgnoreCase);
 		}
 	}
 }
