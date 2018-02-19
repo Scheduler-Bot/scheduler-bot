@@ -6,6 +6,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Interfaces;
+using SchedulerBot.Business.Interfaces.Entities;
 using SchedulerBot.Business.Utils;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
@@ -36,7 +37,7 @@ namespace SchedulerBot.Business.Commands
 
 		public string Name { get; }
 
-		public Task<string> ExecuteAsync(Activity activity, string arguments)
+		public Task<CommandExecutionResult> ExecuteAsync(Activity activity, string arguments)
 		{
 			logger.LogInformation("Executing '{0}' command", Name);
 
@@ -52,7 +53,7 @@ namespace SchedulerBot.Business.Commands
 				messageCount++;
 			}
 
-			string result;
+			CommandExecutionResult result;
 
 			if (messageCount > 0)
 			{
@@ -61,7 +62,7 @@ namespace SchedulerBot.Business.Commands
 			}
 			else
 			{
-				result = "No scheduled events for this conversation";
+				result = CommandExecutionResult.Error("No scheduled events for this conversation");
 				logger.LogInformation("No schedule messages found for the conversation '{1}'", conversationId);
 			}
 

@@ -49,8 +49,11 @@ namespace SchedulerBot
 			string connectionString = Configuration.GetConnectionString();
 
 			services.AddDbContext<SchedulerBotContext>(builder => builder.UseSqlServer(connectionString));
+
 			services.AddMvc(options => options.Filters.Add<TrustServiceUrlAttribute>());
+
 			services.AddSingleton<IHostedService, ScheduledMessageProcessorService>();
+
 			services.AddTransient<IScheduleParser, CronScheduleParser>();
 			services.AddTransient<IScheduleDescriptionFormatter, CronDescriptionFormatter>();
 			services.AddTransient<ICommandSelector, CommandSelector>();

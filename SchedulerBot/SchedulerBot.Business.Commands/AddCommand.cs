@@ -6,6 +6,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Commands.Utils;
 using SchedulerBot.Business.Interfaces;
+using SchedulerBot.Business.Interfaces.Entities;
 using SchedulerBot.Business.Utils;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
@@ -38,16 +39,16 @@ namespace SchedulerBot.Business.Commands
 
 		public string Name { get; }
 
-		public async Task<string> ExecuteAsync(Activity activity, string arguments)
+		public async Task<CommandExecutionResult> ExecuteAsync(Activity activity, string arguments)
 		{
 			logger.LogInformation("Executing '{0}' command with arguments '{1}'", Name, arguments);
 
-			string result;
+			CommandExecutionResult result;
 			string[] splitArguments = ArgumentHelper.ParseArguments(arguments);
 			string text = splitArguments.ElementAtOrDefault(0);
 			string textSchedule = splitArguments.ElementAtOrDefault(1);
 
-			if (!string.IsNullOrWhiteSpace(text) && !string.IsNullOrWhiteSpace(textSchedule))
+			if (!string.IsNullOrWhiteSpace(text) && !string.IsNullOrWhiteSpace(textSchedule) && splitArguments.Length == 2)
 			{
 				logger.LogInformation("Parsed the arguments to text '{0}' and schedule '{1}'", text, textSchedule);
 
@@ -69,13 +70,13 @@ namespace SchedulerBot.Business.Commands
 				}
 				else
 				{
-					result = $"Cannot recognize schedule \"{textSchedule}\"";
-					logger.LogWarning(result);
+					result = CommandExecutionResult.Error($"Cannot recognize schedule \"{textSchedule}\"");
+					logger.LogWarning(result.Message);
 				}
 			}
 			else
 			{
-				result = "Command arguments are in incorrect format. Use the following pattern: add 'your text' 'your schedule'";
+				result = CommandExecutionResult.Error("Command arguments are in incorrect format. Use the following pattern: add 'your text' 'your schedule'");
 				logger.LogWarning("Cannot parse the command arguments");
 			}
 

@@ -10,9 +10,9 @@ using SchedulerBot.Database.Core;
 
 namespace SchedulerBot.Extensions
 {
-	public static class ConfigurationExtensions
+	internal static class ConfigurationExtensions
 	{
-		public static IConfigurationBuilder AddAzureSecrets(this IConfigurationBuilder builder)
+		internal static IConfigurationBuilder AddAzureSecrets(this IConfigurationBuilder builder)
 		{
 			string keyVaultEndpoint = GetKeyVaultEndpoint();
 
@@ -29,7 +29,7 @@ namespace SchedulerBot.Extensions
 			return builder;
 		}
 
-		public static IWebHost EnsureDatabaseMigrated(this IWebHost host)
+		internal static IWebHost EnsureDatabaseMigrated(this IWebHost host)
 		{
 			using (IServiceScope scope = host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
 			{
@@ -42,7 +42,7 @@ namespace SchedulerBot.Extensions
 			return host;
 		}
 
-		public static string GetConnectionString(this IConfiguration configuration)
+		internal static string GetConnectionString(this IConfiguration configuration)
 		{
 			string settingName = IsDevelopment() ? "ConnectionString" : "Secrets:ConnectionString";
 			string connectionString = configuration[settingName];

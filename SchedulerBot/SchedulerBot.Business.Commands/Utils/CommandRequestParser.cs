@@ -2,6 +2,7 @@
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Interfaces;
+using SchedulerBot.Business.Interfaces.Entities;
 
 namespace SchedulerBot.Business.Commands.Utils
 {
@@ -10,6 +11,7 @@ namespace SchedulerBot.Business.Commands.Utils
 		private const string NameGroup = "name";
 		private const string ArgumentsGroup = "arguments";
 		private const string Pattern = @"^\s*(?'" + NameGroup + @"'[^\s]+)\s*(?'" + ArgumentsGroup + @"'.*)\s*$";
+
 		private static readonly Regex CommandRegex = new Regex(Pattern);
 		private readonly ILogger<CommandRequestParser> logger;
 

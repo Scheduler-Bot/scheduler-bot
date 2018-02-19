@@ -8,6 +8,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using Microsoft.Rest;
 using SchedulerBot.Business.Interfaces;
+using SchedulerBot.Business.Interfaces.Entities;
 
 namespace SchedulerBot.Controllers
 {
@@ -54,7 +55,7 @@ namespace SchedulerBot.Controllers
 
 					if (command != null)
 					{
-						replyText = await command.ExecuteAsync(activity, parsedCommandRequest.Arguments);
+						replyText = (await command.ExecuteAsync(activity, parsedCommandRequest.Arguments)).Message;
 					}
 				}
 
@@ -83,7 +84,7 @@ namespace SchedulerBot.Controllers
 
 		private void DecodeActivityText(Activity activity)
 		{
-			logger.LogInformation("Recieved the message with the following text: '{0}'", activity.Text);
+			logger.LogInformation("Received the message with the following text: '{0}'", activity.Text);
 			activity.Text = WebUtility.HtmlDecode(activity.Text);
 			logger.LogInformation("Decoded the text to '{0}'", activity.Text);
 		}

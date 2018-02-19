@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
+using SchedulerBot.Business.Interfaces.Entities;
 
 namespace SchedulerBot.Business.Interfaces
 {
@@ -7,6 +8,6 @@ namespace SchedulerBot.Business.Interfaces
 	{
 		string Name { get; }
 
-		Task<string> ExecuteAsync(Activity activity, string arguments);
+		Task<CommandExecutionResult> ExecuteAsync(Activity activity, string arguments);
 	}
 }

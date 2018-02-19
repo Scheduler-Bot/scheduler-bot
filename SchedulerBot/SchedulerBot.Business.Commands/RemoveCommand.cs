@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Commands.Utils;
 using SchedulerBot.Business.Interfaces;
+using SchedulerBot.Business.Interfaces.Entities;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 
@@ -27,11 +28,11 @@ namespace SchedulerBot.Business.Commands
 
 		public string Name { get; }
 
-		public async Task<string> ExecuteAsync(Activity activity, string arguments)
+		public async Task<CommandExecutionResult> ExecuteAsync(Activity activity, string arguments)
 		{
 			logger.LogInformation("Executing '{0}' command with arguments '{1}'", Name, arguments);
 
-			string result = null;
+			CommandExecutionResult result = null;
 			string[] splitArguments = ArgumentHelper.ParseArguments(arguments);
 			string messageIdText = splitArguments.ElementAtOrDefault(0);
 
@@ -66,7 +67,7 @@ namespace SchedulerBot.Business.Commands
 				logger.LogWarning("Cannot parse the command arguments '{0}'", arguments);
 			}
 
-			return result ?? "Cannot remove such an event";
+			return result ?? CommandExecutionResult.Error("Cannot remove such an event");
 		}
 	}
 }

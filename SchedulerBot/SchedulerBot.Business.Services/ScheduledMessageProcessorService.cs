@@ -74,7 +74,7 @@ namespace SchedulerBot.Business.Services
 
 		private async Task ProcessScheduledMessagesAsync()
 		{
-			logger.LogInformation("Starting to process scheduled messages");
+			logger.LogInformation("Starting to process scheduled messages queue");
 
 			using (IServiceScope scope = scopeFactory.CreateScope())
 			{
@@ -95,9 +95,9 @@ namespace SchedulerBot.Business.Services
 				}
 
 				await context.SaveChangesAsync(serviceCancellationToken);
-
-				logger.LogInformation("Finished processing scheduled messages");
 			}
+
+			logger.LogInformation("Finished processing scheduled messages queue");
 		}
 
 		private static IQueryable<ScheduledMessageEvent> GetPendingEvents(SchedulerBotContext context)
@@ -128,7 +128,7 @@ namespace SchedulerBot.Business.Services
 		private async Task SendMessageAsync(ScheduledMessage scheduledMessage)
 		{
 			Uri serviceUri = new Uri(scheduledMessage.Details.ServiceUrl);
-			Activity activity = CreateMessageActivity(scheduledMessage);
+			Activity activity = CreateBotMessageActivity(scheduledMessage);
 
 			using (ConnectorClient connector = new ConnectorClient(serviceUri, credentials))
 			{
@@ -136,7 +136,7 @@ namespace SchedulerBot.Business.Services
 			}
 		}
 
-		private static Activity CreateMessageActivity(ScheduledMessage scheduledMessage)
+		private static Activity CreateBotMessageActivity(ScheduledMessage scheduledMessage)
 		{
 			ScheduledMessageDetails details = scheduledMessage.Details;
 			Activity activity = (Activity)Activity.CreateMessageActivity();
