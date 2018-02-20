@@ -12,9 +12,10 @@ using System;
 namespace SchedulerBot.Database.Core.Migrations
 {
     [DbContext(typeof(SchedulerBotContext))]
-    partial class SchedulerBotContextModelSnapshot : ModelSnapshot
+    [Migration("20180220131529_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

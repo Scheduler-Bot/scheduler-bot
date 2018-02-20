@@ -2,8 +2,9 @@
 {
 	public enum ScheduledMessageEventState
 	{
-		Pending = 0,
-		Completed = 1,
-		Failed = 2
+		Pending = 1,
+		Completed = 2,
+		Failed = 3,
+		Deleted = 4
 	}
 }

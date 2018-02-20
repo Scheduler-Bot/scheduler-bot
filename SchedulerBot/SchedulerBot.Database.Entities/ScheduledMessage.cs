@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SchedulerBot.Database.Entities.Enums;
 
 namespace SchedulerBot.Database.Entities
 {
@@ -10,6 +11,8 @@ namespace SchedulerBot.Database.Entities
 		public string Schedule { get; set; }
 
 		public string Text { get; set; }
+
+		public ScheduledMessageState State { get; set; }
 
 		public ScheduledMessageDetails Details { get; set; }
 

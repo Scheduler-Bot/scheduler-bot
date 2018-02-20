@@ -10,6 +10,7 @@ using SchedulerBot.Business.Interfaces.Entities;
 using SchedulerBot.Business.Utils;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
+using SchedulerBot.Database.Entities.Enums;
 using SchedulerBot.Infrastructure.Interfaces;
 
 namespace SchedulerBot.Business.Commands
@@ -72,8 +73,8 @@ namespace SchedulerBot.Business.Commands
 		private IQueryable<ScheduledMessage> GetConversationMessages(string conversationId)
 		{
 			return context.ScheduledMessageDetails
-				.Where(details => details.ConversationId.Equals(conversationId, StringComparison.Ordinal))
-				.Include(details => details.ScheduledMessage)
+				.Where(details => details.ConversationId.Equals(conversationId, StringComparison.Ordinal)
+					&& details.ScheduledMessage.State == ScheduledMessageState.Active)
 				.Select(details => details.ScheduledMessage);
 		}
 

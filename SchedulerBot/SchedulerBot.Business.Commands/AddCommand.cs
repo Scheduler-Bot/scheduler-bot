@@ -89,6 +89,7 @@ namespace SchedulerBot.Business.Commands
 			{
 				Text = text,
 				Schedule = schedule.Text,
+				State = ScheduledMessageState.Active,
 				Details = CreateMessageDetails(activity),
 				Events = new List<ScheduledMessageEvent>
 				{

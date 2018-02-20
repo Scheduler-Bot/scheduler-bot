@@ -9,6 +9,7 @@ using SchedulerBot.Business.Interfaces;
 using SchedulerBot.Business.Interfaces.Entities;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
+using SchedulerBot.Database.Entities.Enums;
 
 namespace SchedulerBot.Business.Commands
 {
@@ -42,7 +43,7 @@ namespace SchedulerBot.Business.Commands
 
 				ScheduledMessage scheduledMessage = await context
 					.ScheduledMessages
-					.Where(message => message.Id == messageId)
+					.Where(message => message.Id == messageId && message.State == ScheduledMessageState.Active)
 					.Include(message => message.Details)
 					.Include(message => message.Events)
 					.FirstOrDefaultAsync();
@@ -50,7 +51,17 @@ namespace SchedulerBot.Business.Commands
 				if (scheduledMessage != null)
 				{
 					logger.LogInformation("Removing scheduled message with id '{0}'", messageId);
-					context.Remove(scheduledMessage);
+					scheduledMessage.State = ScheduledMessageState.Deleted;
+					context.Update(scheduledMessage);
+
+					foreach (ScheduledMessageEvent scheduledMessageEvent
+						in scheduledMessage.Events.Where(@event => @event.State == ScheduledMessageEventState.Pending))
+					{
+						logger.LogInformation("Removing scheduled message event with id '{0}'", scheduledMessageEvent.Id);
+						scheduledMessageEvent.State = ScheduledMessageEventState.Deleted;
+						// TODO: Do we need this update operation below?
+						context.Update(scheduledMessageEvent);
+					}
 
 					await context.SaveChangesAsync();
 

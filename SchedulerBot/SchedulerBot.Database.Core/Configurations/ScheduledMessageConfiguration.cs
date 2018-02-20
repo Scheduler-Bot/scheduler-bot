@@ -12,6 +12,7 @@ namespace SchedulerBot.Database.Core.Configurations
 			builder.Property(message => message.Id).ValueGeneratedOnAdd();
 			builder.Property(message => message.Schedule).IsRequired();
 			builder.Property(message => message.Text).IsRequired();
+			builder.Property(message => message.State).IsRequired();
 		}
 	}
 }
