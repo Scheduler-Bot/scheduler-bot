@@ -6,26 +6,32 @@ namespace SchedulerBot.Infrastructure.Utils
 {
 	public class CronScheduleParser : IScheduleParser
 	{
-		public ISchedule Parse(string textSchedule, DateTime baseTime)
+		public ISchedule Parse(string textSchedule, DateTime baseTime, TimeSpan? timeZoneOffset = null)
 		{
 			CrontabSchedule cronSchedule = CrontabSchedule.Parse(textSchedule);
-			Schedule schedule = CreateSchedule(textSchedule, baseTime, cronSchedule);
+			Schedule schedule = CreateSchedule(textSchedule, cronSchedule, baseTime);
 
 			return schedule;
 		}
 
-		public bool TryParse(string textSchedule, DateTime baseTime, out ISchedule schedule)
+		public bool TryParse(string textSchedule, DateTime baseTime, TimeSpan? timeZoneOffset, out ISchedule schedule)
 		{
 			CrontabSchedule cronSchedule = CrontabSchedule.TryParse(textSchedule);
-			schedule = cronSchedule != null ? CreateSchedule(textSchedule, baseTime, cronSchedule) : null;
+			schedule = cronSchedule != null ? CreateSchedule(textSchedule, cronSchedule, baseTime, timeZoneOffset) : null;
 
 			return schedule != null;
 		}
 
-		private static Schedule CreateSchedule(string textSchedule, DateTime baseTime, CrontabSchedule cronSchedule)
+		private static Schedule CreateSchedule(string textSchedule, CrontabSchedule cronSchedule, DateTime baseTime, TimeSpan? timeZoneOffset = null)
 		{
 			DateTime nextOccurence = cronSchedule.GetNextOccurrence(baseTime);
-			Schedule schedule = new Schedule(textSchedule, nextOccurence);
+			// if channel timeZoneOffset provided use it during calculation of nextOccurence in Utc
+			if (timeZoneOffset != null)
+			{
+				nextOccurence = nextOccurence.Add(-timeZoneOffset.Value);
+			}
+
+			Schedule schedule = new Schedule(textSchedule, nextOccurence, timeZoneOffset);
 
 			return schedule;
 		}

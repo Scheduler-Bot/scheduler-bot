@@ -66,6 +66,8 @@ namespace SchedulerBot.Database.Core.Migrations
                     b.Property<string>("ServiceUrl")
                         .IsRequired();
 
+                    b.Property<TimeSpan?>("TimeZoneOffset");
+
                     b.HasKey("ScheduledMessageId");
 
                     b.ToTable("ScheduledMessageDetails");

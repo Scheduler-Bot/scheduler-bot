@@ -52,17 +52,17 @@ namespace SchedulerBot.Business.Commands
 			{
 				logger.LogInformation("Parsed the arguments to text '{0}' and schedule '{1}'", text, textSchedule);
 
-				if (scheduleParser.TryParse(textSchedule, DateTime.UtcNow, out ISchedule schedule))
+				if (scheduleParser.TryParse(textSchedule, DateTime.UtcNow, activity.LocalTimestamp?.Offset, out ISchedule schedule))
 				{
 					logger.LogInformation("Creating a new scheduled message");
 
 					ScheduledMessage scheduledMessage = CreateScheduledMessageAsync(activity, text, schedule);
-					ScheduledMessage createdMessage = (await context.ScheduledMessages.AddAsync(scheduledMessage)).Entity;
+					scheduledMessage = (await context.ScheduledMessages.AddAsync(scheduledMessage)).Entity;
 
 					await context.SaveChangesAsync();
 
 					string scheduleDescription = scheduleDescriptionFormatter.Format(schedule, activity.Locale);
-					string createdMessageId = createdMessage.Id.ToString();
+					string createdMessageId = scheduledMessage.Id.ToString();
 					string newLine = MessageUtils.NewLine;
 
 					result = $"New event has been created:{newLine}ID: '{createdMessageId}'{newLine}Schedule: {scheduleDescription}";
@@ -109,7 +109,8 @@ namespace SchedulerBot.Business.Commands
 				RecipientName = activity.From.Name,
 				ChannelId = activity.ChannelId,
 				ConversationId = activity.Conversation.Id,
-				Locale = activity.Locale
+				Locale = activity.Locale,
+				TimeZoneOffset = activity.LocalTimestamp?.Offset
 			};
 		}
 

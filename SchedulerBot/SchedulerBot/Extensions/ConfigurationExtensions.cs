@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
@@ -50,7 +51,22 @@ namespace SchedulerBot.Extensions
 			return connectionString;
 		}
 
+		internal static TimeSpan GetMessageProcessingInterval(this IConfiguration configuration)
+		{
+			string messageProcessingInterval = Environment.GetEnvironmentVariable("MESSAGE_PROCESSING_INTERVAL");
+
+			if (string.IsNullOrEmpty(messageProcessingInterval))
+			{
+				messageProcessingInterval = configuration["MessageProcessingInterval"];
+			}
+
+			TimeSpan result = TimeSpan.Parse(configuration["MessageProcessingInterval"], CultureInfo.InvariantCulture);
+			return result;
+		}
+
 		private static string GetKeyVaultEndpoint() => Environment.GetEnvironmentVariable("KEYVAULT_ENDPOINT");
+
+		private static string GetMessageProcessingInterval() => Environment.GetEnvironmentVariable("MESSAGE_PROCESSING_INTERVAL");
 
 		private static bool IsDevelopment()
 		{

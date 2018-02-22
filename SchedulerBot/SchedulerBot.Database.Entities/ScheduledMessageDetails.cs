@@ -23,5 +23,7 @@ namespace SchedulerBot.Database.Entities
 		public string ConversationId { get; set; }
 
 		public string Locale { get; set; }
+
+		public TimeSpan? TimeZoneOffset { get; set; }
 	}
 }

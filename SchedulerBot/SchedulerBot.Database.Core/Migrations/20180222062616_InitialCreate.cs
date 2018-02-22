@@ -34,7 +34,8 @@ namespace SchedulerBot.Database.Core.Migrations
                     Locale = table.Column<string>(nullable: true),
                     RecipientId = table.Column<string>(nullable: false),
                     RecipientName = table.Column<string>(nullable: false),
-                    ServiceUrl = table.Column<string>(nullable: false)
+                    ServiceUrl = table.Column<string>(nullable: false),
+                    TimeZoneOffset = table.Column<TimeSpan>(nullable: true)
                 },
                 constraints: table =>
                 {

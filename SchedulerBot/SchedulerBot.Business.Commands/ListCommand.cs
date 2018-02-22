@@ -3,7 +3,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Interfaces;
 using SchedulerBot.Business.Interfaces.Entities;
@@ -50,7 +49,7 @@ namespace SchedulerBot.Business.Commands
 
 			foreach (ScheduledMessage message in GetConversationMessages(conversationId))
 			{
-				AppendMessageDescription(message, activity.Locale, stringBuilder);
+				AppendMessageDescription(message, stringBuilder, activity.Locale, activity.LocalTimestamp?.Offset);
 				messageCount++;
 			}
 
@@ -78,10 +77,11 @@ namespace SchedulerBot.Business.Commands
 				.Select(details => details.ScheduledMessage);
 		}
 
-		private void AppendMessageDescription(ScheduledMessage message, string locale, StringBuilder stringBuilder)
+		private void AppendMessageDescription(ScheduledMessage message, StringBuilder stringBuilder, string locale, TimeSpan? timeZoneOffset)
 		{
 			DateTime currentTime = DateTime.UtcNow;
-			ISchedule schedule = scheduleParser.Parse(message.Schedule, currentTime);
+			// No need to pass timezone offset in the reason that message is displayed for the user in hist time zone (possibly not UTC)
+			ISchedule schedule = scheduleParser.Parse(message.Schedule, currentTime, timeZoneOffset);
 			string scheduleDescription = scheduleDescriptionFormatter.Format(schedule, locale);
 			string newLine = MessageUtils.NewLine;
 			const string messageSeparator = "----------------------------------";

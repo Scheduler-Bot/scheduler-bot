@@ -155,7 +155,7 @@ namespace SchedulerBot.Business.Services
 		private void AddPendingEvent(ScheduledMessage scheduledMessage)
 		{
 			DateTime currentTime = DateTime.UtcNow;
-			ISchedule schedule = scheduleParser.Parse(scheduledMessage.Schedule, currentTime);
+			ISchedule schedule = scheduleParser.Parse(scheduledMessage.Schedule, currentTime, scheduledMessage.Details.TimeZoneOffset);
 
 			scheduledMessage.Events.Add(new ScheduledMessageEvent
 			{

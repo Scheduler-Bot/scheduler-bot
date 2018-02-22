@@ -12,7 +12,7 @@ using System;
 namespace SchedulerBot.Database.Core.Migrations
 {
     [DbContext(typeof(SchedulerBotContext))]
-    [Migration("20180220131529_InitialCreate")]
+    [Migration("20180222062616_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -66,6 +66,8 @@ namespace SchedulerBot.Database.Core.Migrations
 
                     b.Property<string>("ServiceUrl")
                         .IsRequired();
+
+                    b.Property<TimeSpan?>("TimeZoneOffset");
 
                     b.HasKey("ScheduledMessageId");
 
