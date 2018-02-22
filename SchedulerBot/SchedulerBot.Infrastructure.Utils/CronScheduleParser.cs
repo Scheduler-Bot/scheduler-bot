@@ -6,10 +6,10 @@ namespace SchedulerBot.Infrastructure.Utils
 {
 	public class CronScheduleParser : IScheduleParser
 	{
-		public ISchedule Parse(string textSchedule, DateTime baseTime, TimeSpan? timeZoneOffset = null)
+		public ISchedule Parse(string textSchedule, DateTime baseTime, TimeSpan? timeZoneOffset)
 		{
 			CrontabSchedule cronSchedule = CrontabSchedule.Parse(textSchedule);
-			Schedule schedule = CreateSchedule(textSchedule, cronSchedule, baseTime);
+			Schedule schedule = CreateSchedule(textSchedule, cronSchedule, baseTime, timeZoneOffset);
 
 			return schedule;
 		}
@@ -24,12 +24,12 @@ namespace SchedulerBot.Infrastructure.Utils
 
 		private static Schedule CreateSchedule(string textSchedule, CrontabSchedule cronSchedule, DateTime baseTime, TimeSpan? timeZoneOffset = null)
 		{
+			// base time should be converted to channel timeZoneOffset to prevent possibly issues with +N timezones
+			baseTime = timeZoneOffset != null ? baseTime.Add(timeZoneOffset.Value) : baseTime;
+
 			DateTime nextOccurence = cronSchedule.GetNextOccurrence(baseTime);
 			// if channel timeZoneOffset provided use it during calculation of nextOccurence in Utc
-			if (timeZoneOffset != null)
-			{
-				nextOccurence = nextOccurence.Add(-timeZoneOffset.Value);
-			}
+			nextOccurence = timeZoneOffset != null ? nextOccurence.Add(-timeZoneOffset.Value) : nextOccurence;
 
 			Schedule schedule = new Schedule(textSchedule, nextOccurence, timeZoneOffset);
 
