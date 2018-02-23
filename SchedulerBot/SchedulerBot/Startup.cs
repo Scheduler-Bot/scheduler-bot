@@ -58,14 +58,17 @@ namespace SchedulerBot
 			services.AddTransient<IScheduleDescriptionFormatter, CronDescriptionFormatter>();
 			services.AddTransient<ICommandSelector, CommandSelector>();
 			services.AddTransient<ICommandRequestParser, CommandRequestParser>();
+			services.AddTransient<IMessageListFormatter, MessageListFormatter>();
 			services.AddTransient<AddCommand>();
 			services.AddTransient<RemoveCommand>();
 			services.AddTransient<ListCommand>();
+			services.AddTransient<NextCommand>();
 			services.AddTransient<IList<IBotCommand>>(provider => new IBotCommand[]
 			{
 				provider.GetRequiredService<AddCommand>(),
 				provider.GetRequiredService<RemoveCommand>(),
-				provider.GetRequiredService<ListCommand>()
+				provider.GetRequiredService<ListCommand>(),
+				provider.GetRequiredService<NextCommand>()
 			});
 		}
 
