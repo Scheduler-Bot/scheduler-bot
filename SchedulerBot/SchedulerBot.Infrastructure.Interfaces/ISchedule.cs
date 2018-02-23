@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SchedulerBot.Infrastructure.Interfaces
 {
@@ -9,5 +10,7 @@ namespace SchedulerBot.Infrastructure.Interfaces
 		DateTime GetNextOccurence();
 
 		DateTime GetNextOccurence(DateTime baseTime);
+
+		IEnumerable<DateTime> GetNextOccurences(DateTime baseTime, DateTime endTime);
 	}
 }
