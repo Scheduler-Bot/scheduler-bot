@@ -3,9 +3,9 @@ using SchedulerBot.Infrastructure.Interfaces;
 
 namespace SchedulerBot.Infrastructure.Utils
 {
-	public class Schedule : ISchedule
+	public class CronSchedule : ISchedule
 	{
-		public Schedule(string text, DateTime nextOccurence, TimeSpan? timeZoneOffset)
+		public CronSchedule(string text, DateTime nextOccurence, TimeSpan? timeZoneOffset)
 		{
 			Text = text;
 			NextOccurence = nextOccurence;
