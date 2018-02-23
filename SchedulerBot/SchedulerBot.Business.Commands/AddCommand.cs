@@ -52,7 +52,7 @@ namespace SchedulerBot.Business.Commands
 			{
 				logger.LogInformation("Parsed the arguments to text '{0}' and schedule '{1}'", text, textSchedule);
 
-				if (scheduleParser.TryParse(textSchedule, DateTime.UtcNow, activity.LocalTimestamp?.Offset, out ISchedule schedule))
+				if (scheduleParser.TryParse(textSchedule, activity.LocalTimestamp?.Offset, out ISchedule schedule))
 				{
 					logger.LogInformation("Creating a new scheduled message");
 
@@ -119,7 +119,7 @@ namespace SchedulerBot.Business.Commands
 			return new ScheduledMessageEvent
 			{
 				CreatedOn = DateTime.UtcNow,
-				NextOccurence = schedule.NextOccurence,
+				NextOccurence = schedule.GetNextOccurence(),
 				State = ScheduledMessageEventState.Pending
 			};
 		}

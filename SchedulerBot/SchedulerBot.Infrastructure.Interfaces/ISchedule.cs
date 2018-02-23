@@ -6,6 +6,8 @@ namespace SchedulerBot.Infrastructure.Interfaces
 	{
 		string Text { get; }
 
-		DateTime NextOccurence { get; }
+		DateTime GetNextOccurence();
+
+		DateTime GetNextOccurence(DateTime baseTime);
 	}
 }
