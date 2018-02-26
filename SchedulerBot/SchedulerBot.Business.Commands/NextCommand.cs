@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Commands.Utils;
 using SchedulerBot.Business.Interfaces;
@@ -22,6 +23,8 @@ namespace SchedulerBot.Business.Commands
 	{
 		#region Private Fields
 
+		private readonly int defaultMessageCount;
+		private readonly int maxMessageCount;
 		private readonly SchedulerBotContext context;
 		private readonly IScheduleParser scheduleParser;
 		private readonly ILogger<ListCommand> logger;
@@ -33,12 +36,15 @@ namespace SchedulerBot.Business.Commands
 		public NextCommand(
 			SchedulerBotContext context,
 			IScheduleParser scheduleParser,
+			IConfiguration configuration,
 			ILogger<ListCommand> logger)
 		{
 			this.context = context;
 			this.scheduleParser = scheduleParser;
 			this.logger = logger;
 
+			defaultMessageCount = int.Parse(configuration["Commands:Next:DefaultMessageCount"], CultureInfo.InvariantCulture);
+			maxMessageCount = int.Parse(configuration["Commands:Next:MaxMessageCount"], CultureInfo.InvariantCulture);
 			Name = "next";
 		}
 
@@ -68,7 +74,7 @@ namespace SchedulerBot.Business.Commands
 		{
 			ScheduledMessageEvent nextEvent = GetNextMessageEvent(activity.Conversation.Id);
 			CommandExecutionResult executionResult = nextEvent != null
-				? BuildResponseMessageText(nextEvent, clientCulture)
+				? ExecuteWithMessageAndCount(nextEvent.ScheduledMessage, defaultMessageCount, clientCulture)
 				: GetNoScheduledMessagesResult();
 
 			return executionResult;
@@ -122,9 +128,8 @@ namespace SchedulerBot.Business.Commands
 				.Where(@event => @event.State == ScheduledMessageEventState.Pending)
 				.OrderBy(@event => @event.NextOccurence)
 				.FirstOrDefault();
-
 			CommandExecutionResult executionResult = nextEvent != null
-				? BuildResponseMessageText(nextEvent, clientCulture)
+				? ExecuteWithMessageAndCount(nextEvent.ScheduledMessage, defaultMessageCount, clientCulture)
 				: GetNoScheduledMessagesResult();
 
 			return executionResult;
@@ -156,7 +161,7 @@ namespace SchedulerBot.Business.Commands
 			}
 			else
 			{
-				executionResult = CommandExecutionResult.Error("The requested message count must be between 1 and 30");
+				executionResult = CommandExecutionResult.Error($"The requested message count must be between 1 and {maxMessageCount}");
 			}
 
 			return executionResult;
@@ -188,9 +193,9 @@ namespace SchedulerBot.Business.Commands
 					message.Details.ConversationId.Equals(conversationId, StringComparison.Ordinal));
 		}
 
-		private static bool IsRequestedCountValid(int count)
+		private bool IsRequestedCountValid(int count)
 		{
-			return count > 0 && count < 31;
+			return count > 0 && count <= maxMessageCount;
 		}
 
 		private static string BuildResponseMessageText(ScheduledMessage message, IEnumerable<DateTime> nextOccurences, CultureInfo clientCulture)
@@ -214,11 +219,6 @@ namespace SchedulerBot.Business.Commands
 			}
 
 			return stringBuilder.ToString().Trim();
-		}
-
-		private static string BuildResponseMessageText(ScheduledMessageEvent messageEvent, CultureInfo clientCulture)
-		{
-			return BuildResponseMessageText(messageEvent.ScheduledMessage, new[] { messageEvent.NextOccurence }, clientCulture);
 		}
 
 		private static CommandExecutionResult GetNoScheduledMessagesResult()
