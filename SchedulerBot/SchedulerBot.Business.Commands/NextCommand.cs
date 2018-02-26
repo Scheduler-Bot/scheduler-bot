@@ -202,20 +202,22 @@ namespace SchedulerBot.Business.Commands
 		{
 			StringBuilder stringBuilder = new StringBuilder();
 			TimeSpan timeZoneOffset = message.Details.TimeZoneOffset.GetValueOrDefault();
+			string newLine = MessageUtils.NewLine;
 
 			stringBuilder
 				.AppendFormat("ID: '{0}'", message.Id)
-				.Append(MessageUtils.NewLine)
+				.Append(newLine)
 				.AppendFormat("Message: '{0}'", message.Text)
-				.Append(MessageUtils.NewLine);
+				.Append(newLine)
+				.Append("Occurrences:");
 
 			foreach (DateTime occurence in nextOccurences)
 			{
 				DateTime adjustedOccurence = occurence.Add(timeZoneOffset);
 
 				stringBuilder
-					.Append(MessageUtils.NewLine)
-					.AppendFormat("Occurence: {0}", adjustedOccurence.ToString(clientCulture));
+					.Append(newLine)
+					.Append(adjustedOccurence.ToString(clientCulture));
 			}
 
 			return stringBuilder.ToString().Trim();
