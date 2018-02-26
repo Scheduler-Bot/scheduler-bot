@@ -40,11 +40,11 @@ namespace SchedulerBot.Business.Commands
 
 		public Task<CommandExecutionResult> ExecuteAsync(Activity activity, string arguments)
 		{
-			CommandExecutionResult result = null;
-			List<ScheduledMessageOccurence> occurences = new List<ScheduledMessageOccurence>();
-
 			logger.LogInformation("Executing '{0}' command", Name);
 
+			CommandExecutionResult result = null;
+			ScheduledMessage nextScheduledMessage = null;
+			List<DateTime> nextOccurences = new List<DateTime>();
 			CultureInfo clientCulture = GetCultureInfoOrDefault(activity.Locale);
 
 			if (string.IsNullOrWhiteSpace(arguments))
@@ -53,7 +53,8 @@ namespace SchedulerBot.Business.Commands
 
 				if (nextEvent != null)
 				{
-					occurences.Add(new ScheduledMessageOccurence(nextEvent.ScheduledMessage, nextEvent.NextOccurence));
+					nextScheduledMessage = nextEvent.ScheduledMessage;
+					nextOccurences.Add(nextEvent.NextOccurence);
 				}
 				else
 				{
@@ -67,9 +68,9 @@ namespace SchedulerBot.Business.Commands
 
 				if (Guid.TryParse(stringMessageId, out Guid messageId))
 				{
-					ScheduledMessage message = GetNextMessageById(activity.Conversation.Id, messageId);
+					nextScheduledMessage = GetNextMessageById(activity.Conversation.Id, messageId);
 
-					if (message != null)
+					if (nextScheduledMessage != null)
 					{
 						string stringCount = splitArguments.ElementAtOrDefault(1);
 
@@ -77,19 +78,18 @@ namespace SchedulerBot.Business.Commands
 						{
 							if (int.TryParse(stringCount, NumberStyles.Integer, clientCulture, out int count))
 							{
-								bool scheduledMessageExists = message
+								bool scheduledMessageExists = nextScheduledMessage
 									.Events
 									.Any(@event => @event.State == ScheduledMessageEventState.Pending);
 
 								if (scheduledMessageExists)
 								{
-									ISchedule schedule = scheduleParser.Parse(message.Schedule, message.Details.TimeZoneOffset);
-									IEnumerable<ScheduledMessageOccurence> messageOccurences = schedule
+									ISchedule schedule = scheduleParser.Parse(nextScheduledMessage.Schedule, nextScheduledMessage.Details.TimeZoneOffset);
+									IEnumerable<DateTime> messageOccurences = schedule
 										.GetNextOccurences(DateTime.UtcNow, DateTime.MaxValue)
-										.Take(count)
-										.Select(occurenceTime => new ScheduledMessageOccurence(message, occurenceTime));
+										.Take(count);
 
-									occurences.AddRange(messageOccurences);
+									nextOccurences.AddRange(messageOccurences);
 								}
 								else
 								{
@@ -103,7 +103,7 @@ namespace SchedulerBot.Business.Commands
 						}
 						else
 						{
-							ScheduledMessageEvent nextEvent = message
+							ScheduledMessageEvent nextEvent = nextScheduledMessage
 								.Events
 								.Where(@event => @event.State == ScheduledMessageEventState.Pending)
 								.OrderBy(@event => @event.NextOccurence)
@@ -111,7 +111,7 @@ namespace SchedulerBot.Business.Commands
 
 							if (nextEvent != null)
 							{
-								occurences.Add(new ScheduledMessageOccurence(message, nextEvent.NextOccurence));
+								nextOccurences.Add(nextEvent.NextOccurence);
 							}
 							else
 							{
@@ -130,21 +130,20 @@ namespace SchedulerBot.Business.Commands
 				}
 			}
 
-			if (occurences.Count > 0)
+			if (nextOccurences.Count > 0 && nextScheduledMessage != null)
 			{
-				ScheduledMessage message = occurences[0].Message;
 				StringBuilder stringBuilder = new StringBuilder();
-				TimeSpan timeZoneOffset = message.Details.TimeZoneOffset.GetValueOrDefault();
+				TimeSpan timeZoneOffset = nextScheduledMessage.Details.TimeZoneOffset.GetValueOrDefault();
 
 				stringBuilder
-					.AppendFormat("ID: '{0}'", message.Id)
+					.AppendFormat("ID: '{0}'", nextScheduledMessage.Id)
 					.Append(MessageUtils.NewLine)
-					.AppendFormat("Message: '{0}'", message.Text)
+					.AppendFormat("Message: '{0}'", nextScheduledMessage.Text)
 					.Append(MessageUtils.NewLine);
 
-				foreach (ScheduledMessageOccurence occurence in occurences)
+				foreach (DateTime occurence in nextOccurences)
 				{
-					DateTime adjustedOccurence = occurence.Occurence.Add(timeZoneOffset);
+					DateTime adjustedOccurence = occurence.Add(timeZoneOffset);
 
 					stringBuilder
 						.AppendFormat("Occurence: {0}", adjustedOccurence.ToString(clientCulture))
@@ -195,20 +194,8 @@ namespace SchedulerBot.Business.Commands
 				.Include(message => message.Events)
 				.FirstOrDefault(message =>
 					message.Id == messageId &&
+					message.State == ScheduledMessageState.Active &&
 					message.Details.ConversationId.Equals(conversationId, StringComparison.Ordinal));
-		}
-
-		private class ScheduledMessageOccurence
-		{
-			public ScheduledMessageOccurence(ScheduledMessage message, DateTime occurence)
-			{
-				Message = message;
-				Occurence = occurence;
-			}
-
-			public ScheduledMessage Message { get; }
-
-			public DateTime Occurence { get; }
 		}
 	}
 }
