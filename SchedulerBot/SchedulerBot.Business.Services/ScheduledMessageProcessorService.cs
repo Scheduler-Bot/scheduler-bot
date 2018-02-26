@@ -51,8 +51,18 @@ namespace SchedulerBot.Business.Services
 
 			while (!serviceCancellationTokenSource.IsCancellationRequested)
 			{
-				await ProcessScheduledMessagesAsync();
-				await WaitAsync();
+				try
+				{
+					await ProcessScheduledMessagesAsync();
+				}
+				catch (Exception exception)
+				{
+					logger.LogCritical($"ProcessScheduledMessagesAsync method execution failed due Exception {exception.Message}. StackTrace: {exception.StackTrace}.");
+				}
+				finally
+				{
+					await WaitAsync();
+				}
 			}
 
 			logger.LogInformation("Polling stopped");
@@ -80,18 +90,26 @@ namespace SchedulerBot.Business.Services
 			{
 				SchedulerBotContext context = scope.ServiceProvider.GetRequiredService<SchedulerBotContext>();
 
+				// TODO: there can be used parallel foreach
 				foreach (ScheduledMessageEvent scheduledMessageEvent in GetPendingEvents(context))
 				{
-					ScheduledMessage scheduledMessage = scheduledMessageEvent.ScheduledMessage;
-					string scheduledMessageId = scheduledMessage.Id.ToString();
+					try
+					{
+						ScheduledMessage scheduledMessage = scheduledMessageEvent.ScheduledMessage;
+						string scheduledMessageId = scheduledMessage.Id.ToString();
 
-					logger.LogInformation("Processing scheduled message '{0}'", scheduledMessageId);
+						logger.LogInformation("Processing scheduled message '{0}'", scheduledMessageId);
 
-					await SendMessageAsync(scheduledMessage);
+						await SendMessageAsync(scheduledMessage);
 
-					scheduledMessageEvent.State = ScheduledMessageEventState.Completed;
-					AddPendingEvent(scheduledMessage);
-					logger.LogInformation("Scheduled message '{0}' has been processed", scheduledMessageId);
+						scheduledMessageEvent.State = ScheduledMessageEventState.Completed;
+						AddPendingEvent(scheduledMessage);
+						logger.LogInformation("Scheduled message '{0}' has been processed", scheduledMessageId);
+					}
+					catch (Exception exception)
+					{
+						logger.LogError($"Sending message was failed due Exception {exception.Message}. StackTrace: {exception.StackTrace}.");
+					}
 				}
 
 				await context.SaveChangesAsync(serviceCancellationToken);
