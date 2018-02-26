@@ -51,8 +51,18 @@ namespace SchedulerBot.Business.Services
 
 			while (!serviceCancellationTokenSource.IsCancellationRequested)
 			{
-				await ProcessScheduledMessagesAsync();
-				await WaitAsync();
+				try
+				{
+					await ProcessScheduledMessagesAsync();
+				}
+				catch (Exception exception)
+				{
+					logger.LogCritical($"ProcessScheduledMessagesAsync method execution failed due Exception {exception.Message}. StackTrace: {exception.StackTrace}.");
+				}
+				finally
+				{
+					await WaitAsync();
+				}
 			}
 
 			logger.LogInformation("Polling stopped");
