@@ -45,13 +45,13 @@ namespace SchedulerBot.Infrastructure.Utils
 		private DateTime AdjustDateTime(DateTime baseTime)
 		{
 			// base time should be converted to channel timeZoneOffset to prevent possibly issues with +N timezones
-			return TimeZoneOffset.HasValue ? baseTime.Add(TimeZoneOffset.Value) : baseTime;
+			return TimeZoneOffset.HasValue && baseTime != DateTime.MaxValue ? baseTime.Add(TimeZoneOffset.Value) : baseTime;
 		}
 
 		private DateTime AdjustOccurence(DateTime occurence)
 		{
 			// if channel timeZoneOffset provided use it during calculation of nextOccurence in Utc
-			return TimeZoneOffset.HasValue ? occurence.Add(-TimeZoneOffset.Value) : occurence;
+			return TimeZoneOffset.HasValue && occurence != DateTime.MinValue ? occurence.Add(-TimeZoneOffset.Value) : occurence;
 		}
 	}
 }
