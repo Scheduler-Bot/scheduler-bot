@@ -62,7 +62,7 @@ namespace SchedulerBot.Business.Commands
 			}
 			else
 			{
-				result = CommandExecutionResult.Error("No scheduled events for this conversation");
+				result = CommandExecutionResult.Success("No scheduled events for this conversation");
 				logger.LogInformation("No schedule messages found for the conversation '{1}'", conversationId);
 			}
 
@@ -79,9 +79,8 @@ namespace SchedulerBot.Business.Commands
 
 		private void AppendMessageDescription(ScheduledMessage message, StringBuilder stringBuilder, string locale, TimeSpan? timeZoneOffset)
 		{
-			DateTime currentTime = DateTime.UtcNow;
 			// No need to pass timezone offset in the reason that message is displayed for the user in hist time zone (possibly not UTC)
-			ISchedule schedule = scheduleParser.Parse(message.Schedule, currentTime, timeZoneOffset);
+			ISchedule schedule = scheduleParser.Parse(message.Schedule, timeZoneOffset);
 			string scheduleDescription = scheduleDescriptionFormatter.Format(schedule, locale);
 			string newLine = MessageUtils.NewLine;
 			const string messageSeparator = "----------------------------------";
