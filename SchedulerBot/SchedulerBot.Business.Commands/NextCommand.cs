@@ -20,9 +20,15 @@ namespace SchedulerBot.Business.Commands
 {
 	public class NextCommand : IBotCommand
 	{
+		#region Private Fields
+
 		private readonly SchedulerBotContext context;
 		private readonly IScheduleParser scheduleParser;
 		private readonly ILogger<ListCommand> logger;
+
+		#endregion
+
+		#region Constructor
 
 		public NextCommand(
 			SchedulerBotContext context,
@@ -36,124 +42,188 @@ namespace SchedulerBot.Business.Commands
 			Name = "next";
 		}
 
+		#endregion
+
+		#region Implementation of IBotCommand
+
 		public string Name { get; }
 
 		public Task<CommandExecutionResult> ExecuteAsync(Activity activity, string arguments)
 		{
 			logger.LogInformation("Executing '{0}' command", Name);
 
-			CommandExecutionResult result = null;
-			ScheduledMessage nextScheduledMessage = null;
-			List<DateTime> nextOccurences = new List<DateTime>();
 			CultureInfo clientCulture = GetCultureInfoOrDefault(activity.Locale);
+			CommandExecutionResult result = string.IsNullOrWhiteSpace(arguments)
+				? ExecuteWithNoArguments(activity, clientCulture)
+				: ExecuteWithArguments(activity, arguments, clientCulture);
 
-			if (string.IsNullOrWhiteSpace(arguments))
+			return Task.FromResult(result);
+		}
+
+		#endregion
+
+		#region Private Methods
+
+		private CommandExecutionResult ExecuteWithNoArguments(Activity activity, CultureInfo clientCulture)
+		{
+			ScheduledMessageEvent nextEvent = GetNextMessageEvent(activity.Conversation.Id);
+			CommandExecutionResult executionResult = nextEvent != null
+				? BuildResponseMessageText(nextEvent, clientCulture)
+				: GetNoScheduledMessagesResult();
+
+			return executionResult;
+		}
+
+		private CommandExecutionResult ExecuteWithArguments(
+			Activity activity,
+			string arguments,
+			CultureInfo clientCulture)
+		{
+			CommandExecutionResult result;
+			string[] splitArguments = ArgumentHelper.ParseArguments(arguments);
+			string messageIdArgument = splitArguments.ElementAtOrDefault(0);
+
+			if (Guid.TryParse(messageIdArgument, out Guid messageId))
 			{
-				ScheduledMessageEvent nextEvent = GetNextMessageEvent(activity.Conversation.Id);
+				ScheduledMessage scheduledMessage = GetMessageById(activity.Conversation.Id, messageId);
 
-				if (nextEvent != null)
+				if (scheduledMessage != null)
 				{
-					nextScheduledMessage = nextEvent.ScheduledMessage;
-					nextOccurences.Add(nextEvent.NextOccurence);
+					string countArgument = splitArguments.ElementAtOrDefault(1);
+
+					if (countArgument != null)
+					{
+						result = int.TryParse(countArgument, NumberStyles.Integer, clientCulture, out int count)
+							? ExecuteWithMessageAndCount(scheduledMessage, count, clientCulture)
+							: CommandExecutionResult.Error($"Cannot retrieve the requested number of events from the argument '{countArgument}'");
+					}
+					else
+					{
+						result = ExecuteWithMessage(scheduledMessage, clientCulture);
+					}
 				}
 				else
 				{
-					result = CommandExecutionResult.Success("No scheduled events for this conversation");
+					result = GetNoScheduledMessagesResult();
 				}
 			}
 			else
 			{
-				string[] splitArguments = ArgumentHelper.ParseArguments(arguments);
-				string stringMessageId = splitArguments.ElementAtOrDefault(0);
+				result = CommandExecutionResult.Error($"Cannot parse the message id '{messageIdArgument}'");
+			}
 
-				if (Guid.TryParse(stringMessageId, out Guid messageId))
+			return result;
+		}
+
+		private CommandExecutionResult ExecuteWithMessage(ScheduledMessage message, CultureInfo clientCulture)
+		{
+			ScheduledMessageEvent nextEvent = message
+				.Events
+				.Where(@event => @event.State == ScheduledMessageEventState.Pending)
+				.OrderBy(@event => @event.NextOccurence)
+				.FirstOrDefault();
+
+			CommandExecutionResult executionResult = nextEvent != null
+				? BuildResponseMessageText(nextEvent, clientCulture)
+				: GetNoScheduledMessagesResult();
+
+			return executionResult;
+		}
+
+		private CommandExecutionResult ExecuteWithMessageAndCount(ScheduledMessage message, int count, CultureInfo clientCulture)
+		{
+			CommandExecutionResult executionResult;
+
+			if (IsRequestedCountValid(count))
+			{
+				bool hasPendingEvents = message
+					.Events
+					.Any(@event => @event.State == ScheduledMessageEventState.Pending);
+
+				if (hasPendingEvents)
 				{
-					nextScheduledMessage = GetNextMessageById(activity.Conversation.Id, messageId);
+					ISchedule schedule = scheduleParser.Parse(message.Schedule, message.Details.TimeZoneOffset);
+					IEnumerable<DateTime> messageOccurences = schedule
+						.GetNextOccurences(DateTime.UtcNow, DateTime.MaxValue)
+						.Take(count);
 
-					if (nextScheduledMessage != null)
-					{
-						string stringCount = splitArguments.ElementAtOrDefault(1);
-
-						if (stringCount != null)
-						{
-							if (int.TryParse(stringCount, NumberStyles.Integer, clientCulture, out int count))
-							{
-								bool scheduledMessageExists = nextScheduledMessage
-									.Events
-									.Any(@event => @event.State == ScheduledMessageEventState.Pending);
-
-								if (scheduledMessageExists)
-								{
-									ISchedule schedule = scheduleParser.Parse(nextScheduledMessage.Schedule, nextScheduledMessage.Details.TimeZoneOffset);
-									IEnumerable<DateTime> messageOccurences = schedule
-										.GetNextOccurences(DateTime.UtcNow, DateTime.MaxValue)
-										.Take(count);
-
-									nextOccurences.AddRange(messageOccurences);
-								}
-								else
-								{
-									result = CommandExecutionResult.Success("No scheduled events for this conversation");
-								}
-							}
-							else
-							{
-								result = CommandExecutionResult.Error($"Cannot retrieve the requested number of events from the argument '{stringCount}'");
-							}
-						}
-						else
-						{
-							ScheduledMessageEvent nextEvent = nextScheduledMessage
-								.Events
-								.Where(@event => @event.State == ScheduledMessageEventState.Pending)
-								.OrderBy(@event => @event.NextOccurence)
-								.FirstOrDefault();
-
-							if (nextEvent != null)
-							{
-								nextOccurences.Add(nextEvent.NextOccurence);
-							}
-							else
-							{
-								result = CommandExecutionResult.Success("No scheduled events for this conversation");
-							}
-						}
-					}
-					else
-					{
-						result = CommandExecutionResult.Success("No scheduled events for this conversation");
-					}
+					executionResult = BuildResponseMessageText(message, messageOccurences, clientCulture);
 				}
 				else
 				{
-					result = CommandExecutionResult.Error($"Cannot parse the message id '{stringMessageId}'");
+					executionResult = GetNoScheduledMessagesResult();
 				}
 			}
-
-			if (nextOccurences.Count > 0 && nextScheduledMessage != null)
+			else
 			{
-				StringBuilder stringBuilder = new StringBuilder();
-				TimeSpan timeZoneOffset = nextScheduledMessage.Details.TimeZoneOffset.GetValueOrDefault();
+				executionResult = CommandExecutionResult.Error("The requested message count must be between 1 and 30");
+			}
+
+			return executionResult;
+		}
+
+		private ScheduledMessageEvent GetNextMessageEvent(string conversationId)
+		{
+			return context
+				.ScheduledMessageEvents
+				.Include(@event => @event.ScheduledMessage)
+				.ThenInclude(message => message.Details)
+				.Where(@event =>
+					@event.State == ScheduledMessageEventState.Pending &&
+					@event.ScheduledMessage.State == ScheduledMessageState.Active &&
+					@event.ScheduledMessage.Details.ConversationId.Equals(conversationId, StringComparison.Ordinal))
+				.OrderBy(@event => @event.NextOccurence)
+				.FirstOrDefault();
+		}
+
+		private ScheduledMessage GetMessageById(string conversationId, Guid messageId)
+		{
+			return context
+				.ScheduledMessages
+				.Include(message => message.Details)
+				.Include(message => message.Events)
+				.FirstOrDefault(message =>
+					message.Id == messageId &&
+					message.State == ScheduledMessageState.Active &&
+					message.Details.ConversationId.Equals(conversationId, StringComparison.Ordinal));
+		}
+
+		private static bool IsRequestedCountValid(int count)
+		{
+			return count > 0 && count < 31;
+		}
+
+		private static string BuildResponseMessageText(ScheduledMessage message, IEnumerable<DateTime> nextOccurences, CultureInfo clientCulture)
+		{
+			StringBuilder stringBuilder = new StringBuilder();
+			TimeSpan timeZoneOffset = message.Details.TimeZoneOffset.GetValueOrDefault();
+
+			stringBuilder
+				.AppendFormat("ID: '{0}'", message.Id)
+				.Append(MessageUtils.NewLine)
+				.AppendFormat("Message: '{0}'", message.Text)
+				.Append(MessageUtils.NewLine);
+
+			foreach (DateTime occurence in nextOccurences)
+			{
+				DateTime adjustedOccurence = occurence.Add(timeZoneOffset);
 
 				stringBuilder
-					.AppendFormat("ID: '{0}'", nextScheduledMessage.Id)
 					.Append(MessageUtils.NewLine)
-					.AppendFormat("Message: '{0}'", nextScheduledMessage.Text)
-					.Append(MessageUtils.NewLine);
-
-				foreach (DateTime occurence in nextOccurences)
-				{
-					DateTime adjustedOccurence = occurence.Add(timeZoneOffset);
-
-					stringBuilder
-						.AppendFormat("Occurence: {0}", adjustedOccurence.ToString(clientCulture))
-						.Append(MessageUtils.NewLine);
-				}
-
-				result = CommandExecutionResult.Success(stringBuilder.ToString().Trim());
+					.AppendFormat("Occurence: {0}", adjustedOccurence.ToString(clientCulture));
 			}
 
-			return Task.FromResult(result ?? CommandExecutionResult.Error("Unexpected error"));
+			return stringBuilder.ToString().Trim();
+		}
+
+		private static string BuildResponseMessageText(ScheduledMessageEvent messageEvent, CultureInfo clientCulture)
+		{
+			return BuildResponseMessageText(messageEvent.ScheduledMessage, new[] { messageEvent.NextOccurence }, clientCulture);
+		}
+
+		private static CommandExecutionResult GetNoScheduledMessagesResult()
+		{
+			return CommandExecutionResult.Success("No scheduled events for this conversation");
 		}
 
 		private static CultureInfo GetCultureInfoOrDefault(string name)
@@ -172,30 +242,6 @@ namespace SchedulerBot.Business.Commands
 			return cultureInfo;
 		}
 
-		private ScheduledMessageEvent GetNextMessageEvent(string conversationId)
-		{
-			return context
-				.ScheduledMessageEvents
-				.Include(@event => @event.ScheduledMessage)
-				.ThenInclude(message => message.Details)
-				.Where(@event =>
-					@event.State == ScheduledMessageEventState.Pending &&
-					@event.ScheduledMessage.State == ScheduledMessageState.Active &&
-					@event.ScheduledMessage.Details.ConversationId.Equals(conversationId, StringComparison.Ordinal))
-				.OrderBy(@event => @event.NextOccurence)
-				.FirstOrDefault();
-		}
-
-		private ScheduledMessage GetNextMessageById(string conversationId, Guid messageId)
-		{
-			return context
-				.ScheduledMessages
-				.Include(message => message.Details)
-				.Include(message => message.Events)
-				.FirstOrDefault(message =>
-					message.Id == messageId &&
-					message.State == ScheduledMessageState.Active &&
-					message.Details.ConversationId.Equals(conversationId, StringComparison.Ordinal));
-		}
+		#endregion
 	}
 }
