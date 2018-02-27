@@ -1,0 +1,12 @@
+language: csharp
+mono: none
+dotnet: 2.1.4
+install:
+  - nvm install 8.9.4
+  - nvm use 8.9.4
+before_script:
+  - cd SchedulerBot
+script:
+ - dotnet restore
+ - dotnet build --configuration Release
+ 
