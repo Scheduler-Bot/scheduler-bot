@@ -57,7 +57,7 @@ namespace SchedulerBot.Business.Services
 				}
 				catch (Exception exception)
 				{
-					logger.LogCritical($"ProcessScheduledMessagesAsync method execution failed due Exception {exception.Message}. StackTrace: {exception.StackTrace}.");
+					logger.LogCritical(exception, $"ProcessScheduledMessagesAsync method execution failed due Exception {exception.Message}. StackTrace: {exception.StackTrace}.");
 				}
 				finally
 				{
@@ -108,7 +108,7 @@ namespace SchedulerBot.Business.Services
 					}
 					catch (Exception exception)
 					{
-						logger.LogError($"Sending message was failed due Exception {exception.Message}. StackTrace: {exception.StackTrace}.");
+						logger.LogError(exception, $"Sending message was failed due Exception {exception.Message}. StackTrace: {exception.StackTrace}.");
 					}
 				}
 
