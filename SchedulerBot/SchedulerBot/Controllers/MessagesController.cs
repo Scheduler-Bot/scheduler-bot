@@ -7,8 +7,8 @@ using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using Microsoft.Rest;
+using SchedulerBot.Business.Entities;
 using SchedulerBot.Business.Interfaces;
-using SchedulerBot.Business.Interfaces.Entities;
 
 namespace SchedulerBot.Controllers
 {

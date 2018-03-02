@@ -1,5 +1,5 @@
 ﻿using Microsoft.Bot.Schema;
-using SchedulerBot.Business.Interfaces.Entities;
+using SchedulerBot.Business.Entities;
 
 namespace SchedulerBot.Business.Interfaces
 {
