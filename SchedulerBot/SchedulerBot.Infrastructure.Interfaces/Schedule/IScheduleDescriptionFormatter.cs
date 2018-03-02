@@ -1,4 +1,6 @@
-﻿namespace SchedulerBot.Infrastructure.Interfaces
+﻿using SchedulerBot.Infrastructure.Interfaces.Schedule;
+
+namespace SchedulerBot.Infrastructure.Interfaces
 {
 	public interface IScheduleDescriptionFormatter
 	{

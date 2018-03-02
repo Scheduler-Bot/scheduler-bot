@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SchedulerBot.Infrastructure.Interfaces
+namespace SchedulerBot.Infrastructure.Interfaces.Schedule
 {
 	public interface ISchedule
 	{

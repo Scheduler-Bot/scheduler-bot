@@ -1,7 +1,7 @@
 ﻿using System;
-using SchedulerBot.Infrastructure.Interfaces;
+using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
-namespace SchedulerBot.Infrastructure.Utils
+namespace SchedulerBot.Infrastructure.Scheduler
 {
 	public class Schedule : ISchedule
 	{

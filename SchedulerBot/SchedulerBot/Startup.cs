@@ -16,8 +16,9 @@ using SchedulerBot.Business.Interfaces;
 using SchedulerBot.Business.Services;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Infrastructure.Interfaces;
-using SchedulerBot.Infrastructure.Utils;
 using SchedulerBot.Extensions;
+using SchedulerBot.Infrastructure.Interfaces.Schedule;
+using SchedulerBot.Infrastructure.Scheduler;
 
 namespace SchedulerBot
 {

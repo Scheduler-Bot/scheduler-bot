@@ -11,6 +11,7 @@ using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
 using SchedulerBot.Infrastructure.Interfaces;
+using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
 namespace SchedulerBot.Business.Commands
 {
