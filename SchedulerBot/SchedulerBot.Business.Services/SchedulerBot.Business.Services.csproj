@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SchedulerBot.Business.Entities\SchedulerBot.Business.Entities.csproj" />
     <ProjectReference Include="..\SchedulerBot.Database.Core\SchedulerBot.Database.Core.csproj" />
     <ProjectReference Include="..\SchedulerBot.Infrastructure.Interfaces\SchedulerBot.Infrastructure.Interfaces.csproj" />
   </ItemGroup>

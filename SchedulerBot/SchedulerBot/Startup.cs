@@ -11,6 +11,7 @@ using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Rest;
 using SchedulerBot.Business.Commands;
 using SchedulerBot.Business.Commands.Utils;
+using SchedulerBot.Business.Entities;
 using SchedulerBot.Business.Interfaces;
 using SchedulerBot.Business.Services;
 using SchedulerBot.Database.Core;
@@ -45,6 +46,7 @@ namespace SchedulerBot
 
 			services.AddSingleton<ICredentialProvider>(credentialProvider);
 			services.AddSingleton<ServiceClientCredentials>(new MicrosoftAppCredentials(appId, appPassword));
+			services.AddSingleton(new AppCredentials(appId, appPassword));
 
 			string connectionString = Configuration.GetConnectionString();
 
