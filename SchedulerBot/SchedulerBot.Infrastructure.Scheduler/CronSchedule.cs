@@ -4,7 +4,7 @@ using System.Linq;
 using NCrontab;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
-namespace SchedulerBot.Infrastructure.Utils
+namespace SchedulerBot.Infrastructure.Scheduler
 {
 	public class CronSchedule : ISchedule
 	{

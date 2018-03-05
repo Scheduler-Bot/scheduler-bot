@@ -1,7 +1,6 @@
 ﻿using System;
 using NCrontab;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
-using SchedulerBot.Infrastructure.Utils;
 
 namespace SchedulerBot.Infrastructure.Scheduler
 {
