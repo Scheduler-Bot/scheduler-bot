@@ -9,13 +9,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Commands.Utils;
+using SchedulerBot.Business.Entities;
 using SchedulerBot.Business.Interfaces;
-using SchedulerBot.Business.Interfaces.Entities;
 using SchedulerBot.Business.Utils;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
-using SchedulerBot.Infrastructure.Interfaces;
+using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
 namespace SchedulerBot.Business.Commands
 {

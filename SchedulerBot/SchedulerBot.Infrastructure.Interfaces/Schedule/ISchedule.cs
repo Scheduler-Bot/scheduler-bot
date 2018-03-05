@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SchedulerBot.Infrastructure.Interfaces
+namespace SchedulerBot.Infrastructure.Interfaces.Schedule
 {
 	public interface ISchedule
 	{

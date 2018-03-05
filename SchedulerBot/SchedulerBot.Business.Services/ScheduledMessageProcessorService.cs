@@ -11,16 +11,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Rest;
+using SchedulerBot.Business.Entities;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
 using SchedulerBot.Infrastructure.Interfaces;
+using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
 namespace SchedulerBot.Business.Services
 {
 	public sealed class ScheduledMessageProcessorService : IHostedService, IDisposable
 	{
 		private readonly ServiceClientCredentials credentials;
+		private readonly AppCredentials appCredentials;
 		private readonly IServiceScopeFactory scopeFactory;
 		private readonly ILogger<ScheduledMessageProcessorService> logger;
 		private readonly IScheduleParser scheduleParser;
@@ -30,12 +33,14 @@ namespace SchedulerBot.Business.Services
 
 		public ScheduledMessageProcessorService(
 			ServiceClientCredentials credentials,
+			AppCredentials appCredentials,
 			IScheduleParser scheduleParser,
 			IServiceScopeFactory scopeFactory,
 			IConfiguration configuration,
 			ILogger<ScheduledMessageProcessorService> logger)
 		{
 			this.credentials = credentials;
+			this.appCredentials = appCredentials;
 			this.scheduleParser = scheduleParser;
 			this.scopeFactory = scopeFactory;
 			this.logger = logger;
@@ -57,7 +62,7 @@ namespace SchedulerBot.Business.Services
 				}
 				catch (Exception exception)
 				{
-					logger.LogCritical($"ProcessScheduledMessagesAsync method execution failed due Exception {exception.Message}. StackTrace: {exception.StackTrace}.");
+					logger.LogCritical(exception, $"ProcessScheduledMessagesAsync method execution failed due Exception {exception.Message}. StackTrace: {exception.StackTrace}.");
 				}
 				finally
 				{
@@ -108,7 +113,7 @@ namespace SchedulerBot.Business.Services
 					}
 					catch (Exception exception)
 					{
-						logger.LogError($"Sending message was failed due Exception {exception.Message}. StackTrace: {exception.StackTrace}.");
+						logger.LogError(exception, $"Sending message was failed due Exception {exception.Message}. StackTrace: {exception.StackTrace}.");
 					}
 				}
 

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot", "SchedulerBot\SchedulerBot.csproj", "{6AEF7BB9-E8AD-4303-96F7-5724487315F2}"
 EndProject
@@ -25,7 +25,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Business.Inter
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Business.Commands", "SchedulerBot.Business.Commands\SchedulerBot.Business.Commands.csproj", "{87DAD18A-E454-4851-8CC1-01198D1CBA1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchedulerBot.Business.Utils", "SchedulerBot.Business.Utils\SchedulerBot.Business.Utils.csproj", "{6AE730F0-CA6E-460A-85B1-5DE8D03169D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Business.Utils", "SchedulerBot.Business.Utils\SchedulerBot.Business.Utils.csproj", "{6AE730F0-CA6E-460A-85B1-5DE8D03169D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchedulerBot.Business.Entities", "SchedulerBot.Business.Entities\SchedulerBot.Business.Entities.csproj", "{DB48D24D-236F-4FF8-BA47-3CC2D8B44452}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchedulerBot.Infrastructure.Scheduler", "SchedulerBot.Infrastructure.Scheduler\SchedulerBot.Infrastructure.Scheduler.csproj", "{F27CDE58-A6B6-4BBF-B008-FF05989563DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +73,14 @@ Global
 		{6AE730F0-CA6E-460A-85B1-5DE8D03169D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6AE730F0-CA6E-460A-85B1-5DE8D03169D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6AE730F0-CA6E-460A-85B1-5DE8D03169D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB48D24D-236F-4FF8-BA47-3CC2D8B44452}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB48D24D-236F-4FF8-BA47-3CC2D8B44452}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB48D24D-236F-4FF8-BA47-3CC2D8B44452}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB48D24D-236F-4FF8-BA47-3CC2D8B44452}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F27CDE58-A6B6-4BBF-B008-FF05989563DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F27CDE58-A6B6-4BBF-B008-FF05989563DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F27CDE58-A6B6-4BBF-B008-FF05989563DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F27CDE58-A6B6-4BBF-B008-FF05989563DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,6 +94,8 @@ Global
 		{A9B6A7F0-A252-4683-9B22-60B597E9B25D} = {24104A42-CB02-4E91-9555-320CBCB33F01}
 		{87DAD18A-E454-4851-8CC1-01198D1CBA1D} = {24104A42-CB02-4E91-9555-320CBCB33F01}
 		{6AE730F0-CA6E-460A-85B1-5DE8D03169D8} = {24104A42-CB02-4E91-9555-320CBCB33F01}
+		{DB48D24D-236F-4FF8-BA47-3CC2D8B44452} = {24104A42-CB02-4E91-9555-320CBCB33F01}
+		{F27CDE58-A6B6-4BBF-B008-FF05989563DF} = {98AA3A8F-C420-4110-832A-5631BCC183F2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CCF3E0B7-D57A-4B5C-93BE-9ACA4D593E1E}

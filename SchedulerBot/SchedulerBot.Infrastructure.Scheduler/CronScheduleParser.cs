@@ -1,8 +1,9 @@
 ﻿using System;
 using NCrontab;
-using SchedulerBot.Infrastructure.Interfaces;
+using SchedulerBot.Infrastructure.Interfaces.Schedule;
+using SchedulerBot.Infrastructure.Utils;
 
-namespace SchedulerBot.Infrastructure.Utils
+namespace SchedulerBot.Infrastructure.Scheduler
 {
 	public class CronScheduleParser : IScheduleParser
 	{

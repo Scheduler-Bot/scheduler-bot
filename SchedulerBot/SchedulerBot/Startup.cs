@@ -11,12 +11,14 @@ using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Rest;
 using SchedulerBot.Business.Commands;
 using SchedulerBot.Business.Commands.Utils;
+using SchedulerBot.Business.Entities;
 using SchedulerBot.Business.Interfaces;
 using SchedulerBot.Business.Services;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Infrastructure.Interfaces;
-using SchedulerBot.Infrastructure.Utils;
 using SchedulerBot.Extensions;
+using SchedulerBot.Infrastructure.Interfaces.Schedule;
+using SchedulerBot.Infrastructure.Scheduler;
 
 namespace SchedulerBot
 {
@@ -45,6 +47,7 @@ namespace SchedulerBot
 
 			services.AddSingleton<ICredentialProvider>(credentialProvider);
 			services.AddSingleton<ServiceClientCredentials>(new MicrosoftAppCredentials(appId, appPassword));
+			services.AddSingleton(new AppCredentials(appId, appPassword));
 
 			string connectionString = Configuration.GetConnectionString();
 

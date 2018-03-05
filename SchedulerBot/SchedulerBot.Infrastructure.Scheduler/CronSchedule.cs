@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NCrontab;
-using SchedulerBot.Infrastructure.Interfaces;
+using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
 namespace SchedulerBot.Infrastructure.Utils
 {

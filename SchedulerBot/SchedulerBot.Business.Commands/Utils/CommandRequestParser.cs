@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
+using SchedulerBot.Business.Entities;
 using SchedulerBot.Business.Interfaces;
-using SchedulerBot.Business.Interfaces.Entities;
 
 namespace SchedulerBot.Business.Commands.Utils
 {

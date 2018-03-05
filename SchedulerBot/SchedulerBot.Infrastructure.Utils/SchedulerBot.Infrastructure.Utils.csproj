@@ -8,9 +8,4 @@
     <ProjectReference Include="..\SchedulerBot.Infrastructure.Interfaces\SchedulerBot.Infrastructure.Interfaces.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CronExpressionDescriptor" Version="2.2.0" />
-    <PackageReference Include="ncrontab" Version="3.3.0" />
-  </ItemGroup>
-
 </Project>

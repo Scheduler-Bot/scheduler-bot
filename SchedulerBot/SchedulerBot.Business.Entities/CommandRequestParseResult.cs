@@ -1,4 +1,4 @@
-﻿namespace SchedulerBot.Business.Interfaces.Entities
+﻿namespace SchedulerBot.Business.Entities
 {
 	public class CommandRequestParseResult
 	{
