@@ -289,3 +289,6 @@ __pycache__/
 
 # SQLite
 *.db
+
+# Web UI build artifacts
+SchedulerBot/SchedulerBot.Web.UI/wwwroot/
