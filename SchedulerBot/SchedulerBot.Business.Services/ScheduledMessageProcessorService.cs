@@ -177,12 +177,13 @@ namespace SchedulerBot.Business.Services
 		
 		private void AddPendingEvent(ScheduledMessage scheduledMessage)
 		{
-			ISchedule schedule = scheduleParser.Parse(scheduledMessage.Schedule, scheduledMessage.Details.TimeZoneOffset);
+			DateTime currentTime = DateTime.UtcNow;
+			ISchedule schedule = scheduleParser.Parse(scheduledMessage.Schedule, currentTime, scheduledMessage.Details.TimeZoneOffset);
 
 			scheduledMessage.Events.Add(new ScheduledMessageEvent
 			{
-				CreatedOn = DateTime.UtcNow,
-				NextOccurence = schedule.GetNextOccurence(),
+				CreatedOn = currentTime,
+				NextOccurence = schedule.NextOccurence,
 				State = ScheduledMessageEventState.Pending
 			});
 		}
