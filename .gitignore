@@ -291,4 +291,4 @@ __pycache__/
 *.db
 
 # Web UI build artifacts
-SchedulerBot/SchedulerBot.Web.UI/wwwroot/
+SchedulerBot/SchedulerBot/wwwroot/
