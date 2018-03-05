@@ -65,12 +65,14 @@ namespace SchedulerBot
 			services.AddTransient<RemoveCommand>();
 			services.AddTransient<ListCommand>();
 			services.AddTransient<EchoCommand>();
+			services.AddTransient<NextCommand>();
 			services.AddTransient<IList<IBotCommand>>(provider => new IBotCommand[]
 			{
 				provider.GetRequiredService<AddCommand>(),
 				provider.GetRequiredService<RemoveCommand>(),
 				provider.GetRequiredService<ListCommand>(),
-				provider.GetRequiredService<EchoCommand>()
+				provider.GetRequiredService<EchoCommand>(),
+				provider.GetRequiredService<NextCommand>()
 			});
 		}
 
