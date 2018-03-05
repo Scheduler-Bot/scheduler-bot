@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <UserSecretsId>18e25439-a2d0-4aa9-8184-c0408b9dc1cc</UserSecretsId>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,11 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Files not to publish -->
-    <Content Remove="ClientApp\**" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <Folder Include="ClientApp\" CopyToPublishDirectory="Never" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
