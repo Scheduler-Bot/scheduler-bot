@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
+using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Entities;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Infrastructure.Interfaces.BotConnector;
@@ -13,10 +14,14 @@ namespace SchedulerBot.Infrastructure.BotConnector
 	public class MessageProcessor : IMessageProcessor
 	{
 		private readonly AppCredentials appCredentials;
+		private readonly ILogger<MessageProcessor> logger;
 
-		public MessageProcessor(AppCredentials appCredentials)
+		public MessageProcessor(
+			AppCredentials appCredentials,
+			ILogger<MessageProcessor> logger)
 		{
 			this.appCredentials = appCredentials;
+			this.logger = logger;
 		}
 
 		public async Task SendMessageAsync(ScheduledMessage scheduledMessage, CancellationToken cancellationToken)
@@ -30,6 +35,7 @@ namespace SchedulerBot.Infrastructure.BotConnector
 
 			using (ConnectorClient connector = new ConnectorClient(serviceUri, credentials))
 			{
+				logger.LogInformation($"Sending message to conversation RecipientId: ${activity.Recipient.Id}.");
 				await connector.Conversations.SendToConversationAsync(activity, cancellationToken);
 			}
 		}
