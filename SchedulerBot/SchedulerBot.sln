@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot", "SchedulerBot\SchedulerBot.csproj", "{6AEF7BB9-E8AD-4303-96F7-5724487315F2}"
 EndProject
@@ -27,9 +27,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Business.Comma
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Business.Utils", "SchedulerBot.Business.Utils\SchedulerBot.Business.Utils.csproj", "{6AE730F0-CA6E-460A-85B1-5DE8D03169D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchedulerBot.Business.Entities", "SchedulerBot.Business.Entities\SchedulerBot.Business.Entities.csproj", "{DB48D24D-236F-4FF8-BA47-3CC2D8B44452}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Business.Entities", "SchedulerBot.Business.Entities\SchedulerBot.Business.Entities.csproj", "{DB48D24D-236F-4FF8-BA47-3CC2D8B44452}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchedulerBot.Infrastructure.Scheduler", "SchedulerBot.Infrastructure.Scheduler\SchedulerBot.Infrastructure.Scheduler.csproj", "{F27CDE58-A6B6-4BBF-B008-FF05989563DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Infrastructure.Scheduler", "SchedulerBot.Infrastructure.Scheduler\SchedulerBot.Infrastructure.Scheduler.csproj", "{F27CDE58-A6B6-4BBF-B008-FF05989563DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
