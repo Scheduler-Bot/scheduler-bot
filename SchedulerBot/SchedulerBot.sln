@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2036
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot", "SchedulerBot\SchedulerBot.csproj", "{6AEF7BB9-E8AD-4303-96F7-5724487315F2}"
 EndProject
@@ -19,8 +19,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastru
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Infrastructure.Interfaces", "SchedulerBot.Infrastructure.Interfaces\SchedulerBot.Infrastructure.Interfaces.csproj", "{03CD614B-0377-46E2-84C3-1E9F5F7E3DEE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Infrastructure.Utils", "SchedulerBot.Infrastructure.Utils\SchedulerBot.Infrastructure.Utils.csproj", "{E512CE3D-C02B-49C8-B688-DEE45524E8AC}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Business.Interfaces", "SchedulerBot.Business.Interfaces\SchedulerBot.Business.Interfaces.csproj", "{A9B6A7F0-A252-4683-9B22-60B597E9B25D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Business.Commands", "SchedulerBot.Business.Commands\SchedulerBot.Business.Commands.csproj", "{87DAD18A-E454-4851-8CC1-01198D1CBA1D}"
@@ -30,6 +28,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Business.Entities", "SchedulerBot.Business.Entities\SchedulerBot.Business.Entities.csproj", "{DB48D24D-236F-4FF8-BA47-3CC2D8B44452}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Infrastructure.Scheduler", "SchedulerBot.Infrastructure.Scheduler\SchedulerBot.Infrastructure.Scheduler.csproj", "{F27CDE58-A6B6-4BBF-B008-FF05989563DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchedulerBot.Infrastructure.BotConnector", "SchedulerBot.Infrastructure.BotConnector\SchedulerBot.Infrastructure.BotConnector.csproj", "{74F5D8BD-5A1F-4FA7-B0A9-B18792FB67AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,10 +57,6 @@ Global
 		{03CD614B-0377-46E2-84C3-1E9F5F7E3DEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03CD614B-0377-46E2-84C3-1E9F5F7E3DEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03CD614B-0377-46E2-84C3-1E9F5F7E3DEE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E512CE3D-C02B-49C8-B688-DEE45524E8AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E512CE3D-C02B-49C8-B688-DEE45524E8AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E512CE3D-C02B-49C8-B688-DEE45524E8AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E512CE3D-C02B-49C8-B688-DEE45524E8AC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A9B6A7F0-A252-4683-9B22-60B597E9B25D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A9B6A7F0-A252-4683-9B22-60B597E9B25D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A9B6A7F0-A252-4683-9B22-60B597E9B25D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -81,6 +77,10 @@ Global
 		{F27CDE58-A6B6-4BBF-B008-FF05989563DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F27CDE58-A6B6-4BBF-B008-FF05989563DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F27CDE58-A6B6-4BBF-B008-FF05989563DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74F5D8BD-5A1F-4FA7-B0A9-B18792FB67AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74F5D8BD-5A1F-4FA7-B0A9-B18792FB67AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74F5D8BD-5A1F-4FA7-B0A9-B18792FB67AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74F5D8BD-5A1F-4FA7-B0A9-B18792FB67AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -90,12 +90,12 @@ Global
 		{3B7207A0-45C0-40BA-AC67-34D915600177} = {5D8E3AC3-D48E-4D9C-A7D8-A3E853B26C62}
 		{5C4F6A3C-D4F2-447C-B649-32665BA3134D} = {24104A42-CB02-4E91-9555-320CBCB33F01}
 		{03CD614B-0377-46E2-84C3-1E9F5F7E3DEE} = {98AA3A8F-C420-4110-832A-5631BCC183F2}
-		{E512CE3D-C02B-49C8-B688-DEE45524E8AC} = {98AA3A8F-C420-4110-832A-5631BCC183F2}
 		{A9B6A7F0-A252-4683-9B22-60B597E9B25D} = {24104A42-CB02-4E91-9555-320CBCB33F01}
 		{87DAD18A-E454-4851-8CC1-01198D1CBA1D} = {24104A42-CB02-4E91-9555-320CBCB33F01}
 		{6AE730F0-CA6E-460A-85B1-5DE8D03169D8} = {24104A42-CB02-4E91-9555-320CBCB33F01}
 		{DB48D24D-236F-4FF8-BA47-3CC2D8B44452} = {24104A42-CB02-4E91-9555-320CBCB33F01}
 		{F27CDE58-A6B6-4BBF-B008-FF05989563DF} = {98AA3A8F-C420-4110-832A-5631BCC183F2}
+		{74F5D8BD-5A1F-4FA7-B0A9-B18792FB67AA} = {98AA3A8F-C420-4110-832A-5631BCC183F2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CCF3E0B7-D57A-4B5C-93BE-9ACA4D593E1E}

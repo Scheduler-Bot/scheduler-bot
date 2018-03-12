@@ -4,4 +4,8 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SchedulerBot.Database.Entities\SchedulerBot.Database.Entities.csproj" />
+  </ItemGroup>
+
 </Project>

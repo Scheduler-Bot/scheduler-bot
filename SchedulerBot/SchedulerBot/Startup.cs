@@ -9,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Authentication;
-using Microsoft.Rest;
 using SchedulerBot.Business.Commands;
 using SchedulerBot.Business.Commands.Utils;
 using SchedulerBot.Business.Entities;
@@ -18,6 +17,8 @@ using SchedulerBot.Business.Services;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Infrastructure.Interfaces;
 using SchedulerBot.Extensions;
+using SchedulerBot.Infrastructure.BotConnector;
+using SchedulerBot.Infrastructure.Interfaces.BotConnector;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
 using SchedulerBot.Infrastructure.Scheduler;
 
@@ -46,8 +47,8 @@ namespace SchedulerBot
 				})
 				.AddBotAuthentication(credentialProvider);
 
-			services.AddSingleton<ICredentialProvider>(credentialProvider);
-			services.AddSingleton<ServiceClientCredentials>(new MicrosoftAppCredentials(appId, appPassword));
+			//services.AddSingleton<ICredentialProvider>(credentialProvider);
+			//services.AddSingleton<ServiceClientCredentials>(new MicrosoftAppCredentials(appId, appPassword));
 			services.AddSingleton(new AppCredentials(appId, appPassword));
 
 			string connectionString = Configuration.GetConnectionString();
@@ -57,6 +58,8 @@ namespace SchedulerBot
 			services.AddMvc(options => options.Filters.Add<TrustServiceUrlAttribute>());
 
 			services.AddSingleton<IHostedService, ScheduledMessageProcessorService>();
+
+			services.AddSingleton<IMessageProcessor, MessageProcessor>();
 
 			services.AddTransient<IScheduleParser, CronScheduleParser>();
 			services.AddTransient<IScheduleDescriptionFormatter, CronDescriptionFormatter>();

@@ -9,17 +9,16 @@ namespace SchedulerBot.Infrastructure.Scheduler
 	public class CronSchedule : ISchedule
 	{
 		private readonly CrontabSchedule crontabSchedule;
+		private TimeSpan? timeZoneOffset;
 
 		public CronSchedule(CrontabSchedule crontabSchedule, string text, TimeSpan? timeZoneOffset)
 		{
 			this.crontabSchedule = crontabSchedule;
 			Text = text;
-			TimeZoneOffset = timeZoneOffset;
+			this.timeZoneOffset = timeZoneOffset;
 		}
 
 		public string Text { get; }
-
-		public TimeSpan? TimeZoneOffset { get; }
 
 		public DateTime GetNextOccurence() => GetNextOccurence(DateTime.UtcNow);
 
@@ -45,13 +44,13 @@ namespace SchedulerBot.Infrastructure.Scheduler
 		private DateTime AdjustDateTime(DateTime baseTime)
 		{
 			// base time should be converted to channel timeZoneOffset to prevent possibly issues with +N timezones
-			return TimeZoneOffset.HasValue && baseTime != DateTime.MaxValue ? baseTime.Add(TimeZoneOffset.Value) : baseTime;
+			return timeZoneOffset.HasValue && baseTime != DateTime.MaxValue ? baseTime.Add(timeZoneOffset.Value) : baseTime;
 		}
 
 		private DateTime AdjustOccurence(DateTime occurence)
 		{
 			// if channel timeZoneOffset provided use it during calculation of nextOccurence in Utc
-			return TimeZoneOffset.HasValue && occurence != DateTime.MinValue ? occurence.Add(-TimeZoneOffset.Value) : occurence;
+			return timeZoneOffset.HasValue && occurence != DateTime.MinValue ? occurence.Add(-timeZoneOffset.Value) : occurence;
 		}
 	}
 }
