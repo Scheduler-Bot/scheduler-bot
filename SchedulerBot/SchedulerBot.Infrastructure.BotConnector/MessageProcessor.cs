@@ -26,9 +26,7 @@ namespace SchedulerBot.Infrastructure.BotConnector
 
 		public async Task SendMessageAsync(ScheduledMessage scheduledMessage, CancellationToken cancellationToken)
 		{
-			MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(
-				appCredentials.AppId,
-				appCredentials.AppPassword);
+			MicrosoftAppCredentials credentials = BuildMicrosoftAppCredentials();
 
 			Uri serviceUri = new Uri(scheduledMessage.Details.ServiceUrl);
 			Activity activity = CreateBotMessageActivity(scheduledMessage);
@@ -38,6 +36,26 @@ namespace SchedulerBot.Infrastructure.BotConnector
 				logger.LogInformation($"Sending message to conversation RecipientId: ${activity.Recipient.Id}.");
 				await connector.Conversations.SendToConversationAsync(activity, cancellationToken);
 			}
+		}
+
+		public Task<ResourceResponse> ReplyAsync(Activity activity, string replyText)
+		{
+			MicrosoftAppCredentials credentials = BuildMicrosoftAppCredentials();
+
+			Activity reply = activity.CreateReply(replyText, activity.Locale);
+
+			using (ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl), credentials))
+			{
+				return connector.Conversations.ReplyToActivityAsync(reply);
+			}
+		}
+
+		private MicrosoftAppCredentials BuildMicrosoftAppCredentials()
+		{
+			MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(
+				appCredentials.AppId,
+				appCredentials.AppPassword);
+			return credentials;
 		}
 
 		private static Activity CreateBotMessageActivity(ScheduledMessage scheduledMessage)

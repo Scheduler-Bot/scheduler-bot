@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Bot.Connector" Version="4.0.0-alpha20180221" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SchedulerBot.Database.Entities\SchedulerBot.Database.Entities.csproj" />
   </ItemGroup>
 
