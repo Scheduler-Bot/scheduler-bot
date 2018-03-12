@@ -3,14 +3,12 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <UserSecretsId>18e25439-a2d0-4aa9-8184-c0408b9dc1cc</UserSecretsId>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="2.0.0" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.1.0-preview" />
     <PackageReference Include="Microsoft.Bot.Connector.AspNetCore" Version="4.0.0-alpha201802123" />
     <PackageReference Include="Microsoft.Extensions.SecretManager.Tools" Version="2.0.0" />
@@ -30,5 +28,25 @@
     <ProjectReference Include="..\SchedulerBot.Infrastructure.Scheduler\SchedulerBot.Infrastructure.Scheduler.csproj" />
     <ProjectReference Include="..\SchedulerBot.Infrastructure.Utils\SchedulerBot.Infrastructure.Utils.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ClientApp\" CopyToPublishDirectory="Never" />
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <Target Name="PublishBuildAngular" AfterTargets="ComputeFilesToPublish">
+    <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
+    <Exec Command="npm install" WorkingDirectory="ClientApp" />
+    <Exec Command="node_modules\.bin\ng build -prod" WorkingDirectory="ClientApp" />
+
+    <!-- Include the newly-built files in the publish output -->
+    <ItemGroup>
+      <DistFiles Include="wwwroot\**" />
+      <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+        <RelativePath>%(DistFiles.Identity)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
 
 </Project>

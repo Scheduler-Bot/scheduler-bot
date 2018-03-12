@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -65,13 +66,17 @@ namespace SchedulerBot
 			services.AddTransient<RemoveCommand>();
 			services.AddTransient<ListCommand>();
 			services.AddTransient<EchoCommand>();
+			services.AddTransient<NextCommand>();
 			services.AddTransient<IList<IBotCommand>>(provider => new IBotCommand[]
 			{
 				provider.GetRequiredService<AddCommand>(),
 				provider.GetRequiredService<RemoveCommand>(),
 				provider.GetRequiredService<ListCommand>(),
-				provider.GetRequiredService<EchoCommand>()
+				provider.GetRequiredService<EchoCommand>(),
+				provider.GetRequiredService<NextCommand>()
 			});
+
+			services.AddSpaStaticFiles(options => options.RootPath = "wwwroot");
 		}
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceScopeFactory scopeFactory)
@@ -81,6 +86,23 @@ namespace SchedulerBot
 			app.UseAuthentication();
 			app.UseMvc();
 			app.UseExceptionHandler();
+
+			bool isDevelopment = env.IsDevelopment();
+
+			if (!isDevelopment)
+			{
+				app.UseDeveloperExceptionPage();
+			}
+
+			app.UseSpa(builder =>
+			{
+				builder.Options.SourcePath = "ClientApp";
+
+				if (isDevelopment)
+				{
+					builder.UseAngularCliServer(npmScript: "start");
+				}
+			});
 		}
 	}
 }
