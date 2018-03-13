@@ -47,8 +47,6 @@ namespace SchedulerBot
 				})
 				.AddBotAuthentication(credentialProvider);
 
-			//services.AddSingleton<ICredentialProvider>(credentialProvider);
-			//services.AddSingleton<ServiceClientCredentials>(new MicrosoftAppCredentials(appId, appPassword));
 			services.AddSingleton(new AppCredentials(appId, appPassword));
 
 			string connectionString = Configuration.GetConnectionString();
