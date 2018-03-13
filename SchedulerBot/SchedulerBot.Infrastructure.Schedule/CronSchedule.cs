@@ -9,7 +9,7 @@ namespace SchedulerBot.Infrastructure.Schedule
 	public class CronSchedule : ISchedule
 	{
 		private readonly CrontabSchedule crontabSchedule;
-		private TimeSpan? timeZoneOffset;
+		private readonly TimeSpan? timeZoneOffset;
 
 		public CronSchedule(CrontabSchedule crontabSchedule, string text, TimeSpan? timeZoneOffset)
 		{
