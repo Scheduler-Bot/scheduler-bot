@@ -6,20 +6,43 @@ using SchedulerBot.Business.Interfaces;
 
 namespace SchedulerBot.Business.Commands.Utils
 {
+	/// <summary>
+	/// The parser for converting a user request into the information about the requested command.
+	/// </summary>
+	/// <seealso cref="ICommandRequestParser" />
 	public class CommandRequestParser : ICommandRequestParser
 	{
+		#region Constants
+
 		private const string NameGroup = "name";
 		private const string ArgumentsGroup = "arguments";
 		private const string Pattern = @"^\s*(?'" + NameGroup + @"'[^\s]+)\s*(?'" + ArgumentsGroup + @"'.*)\s*$";
 
+		#endregion
+
+		#region Private Fields
+
 		private static readonly Regex CommandRegex = new Regex(Pattern);
 		private readonly ILogger<CommandRequestParser> logger;
 
+		#endregion
+
+		#region Constructor
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="CommandRequestParser"/> class.
+		/// </summary>
+		/// <param name="logger">The logger.</param>
 		public CommandRequestParser(ILogger<CommandRequestParser> logger)
 		{
 			this.logger = logger;
 		}
 
+		#endregion
+
+		#region ICommandRequestParser Implementation
+
+		/// <inheritdoc />
 		public CommandRequestParseResult Parse(Activity activity)
 		{
 			string commandRequestText = RemoveRecipientMention(activity);
@@ -46,6 +69,10 @@ namespace SchedulerBot.Business.Commands.Utils
 			return parseResult;
 		}
 
+		#endregion
+
+		#region Private Methods
+
 		// This is a workaround for removing entries like '@scheduler-bot' from a message.
 		// The RemoveRecipientMention method provided by Microsoft.Bot.Schema.ActivityExtensions
 		// has a known issue and doesn't work for Skype mentions:
@@ -56,5 +83,7 @@ namespace SchedulerBot.Business.Commands.Utils
 
 			return Regex.Replace(activity.Text, mentionText, string.Empty, RegexOptions.IgnoreCase);
 		}
+
+		#endregion
 	}
 }

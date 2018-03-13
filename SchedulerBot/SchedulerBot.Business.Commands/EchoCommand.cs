@@ -8,18 +8,32 @@ using SchedulerBot.Business.Interfaces;
 
 namespace SchedulerBot.Business.Commands
 {
+	/// <summary>
+	/// The command for responding to the user with the same text.
+	/// </summary>
+	/// <example>
+	/// Input: echo 'Hello World!'
+	/// Output: Hello World!
+	/// </example>
+	/// <seealso cref="IBotCommand" />
 	public class EchoCommand : IBotCommand
 	{
 		private readonly ILogger<EchoCommand> logger;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="EchoCommand"/> class.
+		/// </summary>
+		/// <param name="logger">The logger.</param>
 		public EchoCommand(ILogger<EchoCommand> logger)
 		{
 			this.logger = logger;
 			Name = "echo";
 		}
 
+		/// <inheritdoc />
 		public string Name { get; }
 
+		/// <inheritdoc />
 		public Task<CommandExecutionResult> ExecuteAsync(Activity activity, string arguments)
 		{
 			logger.LogInformation("Executing '{0}' command with arguments '{1}'", Name, arguments);
