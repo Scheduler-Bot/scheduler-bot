@@ -4,8 +4,13 @@ using SchedulerBot.Database.Entities;
 
 namespace SchedulerBot.Database.Core.Configurations
 {
+	/// <summary>
+	/// Configures the <see cref="ScheduledMessageDetails"/> entity properties.
+	/// </summary>
+	/// <seealso cref="IEntityTypeConfiguration{T}" />
 	public class ScheduledMessageDetailsConfiguration : IEntityTypeConfiguration<ScheduledMessageDetails>
 	{
+		/// <inheritdoc />
 		public void Configure(EntityTypeBuilder<ScheduledMessageDetails> builder)
 		{
 			builder.HasKey(details => details.ScheduledMessageId);
