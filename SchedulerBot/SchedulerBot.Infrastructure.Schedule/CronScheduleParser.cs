@@ -4,8 +4,13 @@ using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
 namespace SchedulerBot.Infrastructure.Schedule
 {
+	/// <summary>
+	/// An <see cref="IScheduleParser"/> implementation allowing to parse cron expressions.
+	/// </summary>
+	/// <seealso cref="IScheduleParser" />
 	public class CronScheduleParser : IScheduleParser
 	{
+		/// <inheritdoc />
 		public ISchedule Parse(string textSchedule, TimeSpan? timeZoneOffset)
 		{
 			CrontabSchedule cronSchedule = CrontabSchedule.Parse(textSchedule);
@@ -14,6 +19,7 @@ namespace SchedulerBot.Infrastructure.Schedule
 			return schedule;
 		}
 
+		/// <inheritdoc />
 		public bool TryParse(string textSchedule, TimeSpan? timeZoneOffset, out ISchedule schedule)
 		{
 			CrontabSchedule cronSchedule = CrontabSchedule.TryParse(textSchedule);

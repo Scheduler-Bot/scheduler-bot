@@ -10,18 +10,34 @@ using SchedulerBot.Business.Utils;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
-using SchedulerBot.Infrastructure.Interfaces;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
 namespace SchedulerBot.Business.Commands
 {
+	/// <summary>
+	/// The command allowing to list the scheduled messages for the current conversation.
+	/// </summary>
+	/// <seealso cref="IBotCommand" />
 	public class ListCommand : IBotCommand
 	{
+		#region Private Fields
+
 		private readonly SchedulerBotContext context;
 		private readonly IScheduleParser scheduleParser;
 		private readonly IScheduleDescriptionFormatter scheduleDescriptionFormatter;
 		private readonly ILogger<ListCommand> logger;
 
+		#endregion
+
+		#region Constuctor
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ListCommand"/> class.
+		/// </summary>
+		/// <param name="context">The context.</param>
+		/// <param name="scheduleParser">The schedule parser.</param>
+		/// <param name="scheduleDescriptionFormatter">The schedule description formatter.</param>
+		/// <param name="logger">The logger.</param>
 		public ListCommand(
 			SchedulerBotContext context,
 			IScheduleParser scheduleParser,
@@ -36,8 +52,14 @@ namespace SchedulerBot.Business.Commands
 			Name = "list";
 		}
 
+		#endregion
+
+		#region IBotCommand Implementation
+
+		/// <inheritdoc />
 		public string Name { get; }
 
+		/// <inheritdoc />
 		public Task<CommandExecutionResult> ExecuteAsync(Activity activity, string arguments)
 		{
 			logger.LogInformation("Executing '{0}' command", Name);
@@ -70,11 +92,15 @@ namespace SchedulerBot.Business.Commands
 			return Task.FromResult(result);
 		}
 
+		#endregion
+
+		#region Private Methods
+
 		private IQueryable<ScheduledMessage> GetConversationMessages(string conversationId)
 		{
 			return context.ScheduledMessageDetails
 				.Where(details => details.ConversationId.Equals(conversationId, StringComparison.Ordinal)
-					&& details.ScheduledMessage.State == ScheduledMessageState.Active)
+				                  && details.ScheduledMessage.State == ScheduledMessageState.Active)
 				.Select(details => details.ScheduledMessage);
 		}
 
@@ -96,5 +122,7 @@ namespace SchedulerBot.Business.Commands
 				.Append(messageSeparator)
 				.Append(newLine);
 		}
+
+		#endregion
 	}
 }

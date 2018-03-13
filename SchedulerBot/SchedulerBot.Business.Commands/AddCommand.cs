@@ -16,14 +16,31 @@ using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
 namespace SchedulerBot.Business.Commands
 {
-	// Expected input: add 'Turn off the iron!' '0 * * * *'
+	/// <summary>
+	/// The command for entering a new scheduled message.
+	/// </summary>
+	/// <example>Expected input: add 'Turn off the iron!' '0 * * * *'</example>
+	/// <seealso cref="IBotCommand" />
 	public class AddCommand : IBotCommand
 	{
+		#region Private Fields
+
 		private readonly SchedulerBotContext context;
 		private readonly IScheduleParser scheduleParser;
 		private readonly IScheduleDescriptionFormatter scheduleDescriptionFormatter;
 		private readonly ILogger<AddCommand> logger;
 
+		#endregion
+
+		#region Constructor
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="AddCommand"/> class.
+		/// </summary>
+		/// <param name="context">The context.</param>
+		/// <param name="scheduleParser">The schedule parser.</param>
+		/// <param name="scheduleDescriptionFormatter">The schedule description formatter.</param>
+		/// <param name="logger">The logger.</param>
 		public AddCommand(
 			SchedulerBotContext context,
 			IScheduleParser scheduleParser,
@@ -38,8 +55,14 @@ namespace SchedulerBot.Business.Commands
 			Name = "add";
 		}
 
+		#endregion
+
+		#region IBotCommand Implementation
+
+		/// <inheritdoc />
 		public string Name { get; }
 
+		/// <inheritdoc />
 		public async Task<CommandExecutionResult> ExecuteAsync(Activity activity, string arguments)
 		{
 			logger.LogInformation("Executing '{0}' command with arguments '{1}'", Name, arguments);
@@ -84,6 +107,10 @@ namespace SchedulerBot.Business.Commands
 			return result;
 		}
 
+		#endregion
+
+		#region Private Methods
+
 		private static ScheduledMessage CreateScheduledMessageAsync(Activity activity, string text, ISchedule schedule)
 		{
 			return new ScheduledMessage
@@ -124,5 +151,7 @@ namespace SchedulerBot.Business.Commands
 				State = ScheduledMessageEventState.Pending
 			};
 		}
+
+		#endregion
 	}
 }

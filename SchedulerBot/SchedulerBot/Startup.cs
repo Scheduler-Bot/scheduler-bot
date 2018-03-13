@@ -15,7 +15,6 @@ using SchedulerBot.Business.Entities;
 using SchedulerBot.Business.Interfaces;
 using SchedulerBot.Business.Services;
 using SchedulerBot.Database.Core;
-using SchedulerBot.Infrastructure.Interfaces;
 using SchedulerBot.Extensions;
 using SchedulerBot.Infrastructure.BotConnector;
 using SchedulerBot.Infrastructure.Interfaces.BotConnector;
@@ -24,19 +23,30 @@ using SchedulerBot.Infrastructure.Schedule;
 
 namespace SchedulerBot
 {
+	/// <summary>
+	/// Describes how the application startup happens.
+	/// </summary>
 	public class Startup
 	{
+		private readonly IConfiguration configuration;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Startup"/> class.
+		/// </summary>
+		/// <param name="configuration">The configuration.</param>
 		public Startup(IConfiguration configuration)
 		{
-			Configuration = configuration;
+			this.configuration = configuration;
 		}
 
-		public IConfiguration Configuration { get; }
-
+		/// <summary>
+		/// Configures the services injected at runtime.
+		/// </summary>
+		/// <param name="services">The services.</param>
 		public void ConfigureServices(IServiceCollection services)
 		{
-			string appId = Configuration["Secrets:MicrosoftAppIdKey"];
-			string appPassword = Configuration["Secrets:MicrosoftAppPassword"];
+			string appId = configuration["Secrets:MicrosoftAppIdKey"];
+			string appPassword = configuration["Secrets:MicrosoftAppPassword"];
 			SimpleCredentialProvider credentialProvider = new SimpleCredentialProvider(appId, appPassword);
 
 			services.AddAuthentication(
@@ -49,7 +59,7 @@ namespace SchedulerBot
 
 			services.AddSingleton(new AppCredentials(appId, appPassword));
 
-			string connectionString = Configuration.GetConnectionString();
+			string connectionString = configuration.GetConnectionString();
 
 			services.AddDbContext<SchedulerBotContext>(builder => builder.UseSqlServer(connectionString));
 
@@ -80,6 +90,12 @@ namespace SchedulerBot
 			services.AddSpaStaticFiles(options => options.RootPath = "wwwroot");
 		}
 
+		/// <summary>
+		/// Configures the specified application.
+		/// </summary>
+		/// <param name="app">The application.</param>
+		/// <param name="env">The environment.</param>
+		/// <param name="scopeFactory">The scope factory.</param>
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceScopeFactory scopeFactory)
 		{
 			app.UseDefaultFiles();

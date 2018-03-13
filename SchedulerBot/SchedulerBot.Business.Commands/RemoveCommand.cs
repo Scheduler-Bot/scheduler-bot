@@ -13,12 +13,21 @@ using SchedulerBot.Database.Entities.Enums;
 
 namespace SchedulerBot.Business.Commands
 {
-	// Expected input: remove '75fc6a1e-f524-4807-81c5-e5b7ab0ac2d0'
+	/// <summary>
+	/// The command allowing to remove a scheduled message.
+	/// </summary>
+	/// <example>Expected input: remove '75fc6a1e-f524-4807-81c5-e5b7ab0ac2d0'</example>
+	/// <seealso cref="IBotCommand" />
 	public class RemoveCommand : IBotCommand
 	{
 		private readonly SchedulerBotContext context;
 		private readonly ILogger<RemoveCommand> logger;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="RemoveCommand"/> class.
+		/// </summary>
+		/// <param name="context">The context.</param>
+		/// <param name="logger">The logger.</param>
 		public RemoveCommand(SchedulerBotContext context, ILogger<RemoveCommand> logger)
 		{
 			this.context = context;
@@ -27,8 +36,10 @@ namespace SchedulerBot.Business.Commands
 			Name = "remove";
 		}
 
+		/// <inheritdoc />
 		public string Name { get; }
 
+		/// <inheritdoc />
 		public async Task<CommandExecutionResult> ExecuteAsync(Activity activity, string arguments)
 		{
 			logger.LogInformation("Executing '{0}' command with arguments '{1}'", Name, arguments);

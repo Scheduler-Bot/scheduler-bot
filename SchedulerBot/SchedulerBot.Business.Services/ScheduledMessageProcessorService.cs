@@ -16,8 +16,15 @@ using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
 namespace SchedulerBot.Business.Services
 {
+	/// <summary>
+	/// A service supposed to send out the scheduled messages to their recipients.
+	/// </summary>
+	/// <seealso cref="IHostedService" />
+	/// <seealso cref="IDisposable" />
 	public sealed class ScheduledMessageProcessorService : IHostedService, IDisposable
 	{
+		#region Private Fields
+
 		private readonly IServiceScopeFactory scopeFactory;
 		private readonly ILogger<ScheduledMessageProcessorService> logger;
 		private readonly IMessageProcessor messageProcessor;
@@ -26,6 +33,18 @@ namespace SchedulerBot.Business.Services
 		private readonly CancellationTokenSource serviceCancellationTokenSource;
 		private readonly CancellationToken serviceCancellationToken;
 
+		#endregion
+
+		#region Constructor
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ScheduledMessageProcessorService"/> class.
+		/// </summary>
+		/// <param name="scheduleParser">The schedule parser.</param>
+		/// <param name="scopeFactory">The scope factory.</param>
+		/// <param name="configuration">The configuration.</param>
+		/// <param name="logger">The logger.</param>
+		/// <param name="messageProcessor">The message processor.</param>
 		public ScheduledMessageProcessorService(
 			IScheduleParser scheduleParser,
 			IServiceScopeFactory scopeFactory,
@@ -43,6 +62,11 @@ namespace SchedulerBot.Business.Services
 			serviceCancellationToken = serviceCancellationTokenSource.Token;
 		}
 
+		#endregion
+
+		#region IHostedService Implementation
+
+		/// <inheritdoc />
 		public async Task StartAsync(CancellationToken cancellationToken)
 		{
 			logger.LogInformation("Starting polling");
@@ -66,6 +90,7 @@ namespace SchedulerBot.Business.Services
 			logger.LogInformation("Polling stopped");
 		}
 
+		/// <inheritdoc />
 		public Task StopAsync(CancellationToken cancellationToken)
 		{
 			logger.LogInformation("Stopping polling");
@@ -75,10 +100,19 @@ namespace SchedulerBot.Business.Services
 			return Task.CompletedTask;
 		}
 
+		#endregion
+
+		#region IDisposable Implementation
+
+		/// <inheritdoc />
 		public void Dispose()
 		{
 			serviceCancellationTokenSource?.Dispose();
 		}
+
+		#endregion
+
+		#region Private Methods
 
 		private async Task ProcessScheduledMessagesAsync()
 		{
@@ -152,5 +186,7 @@ namespace SchedulerBot.Business.Services
 				State = ScheduledMessageEventState.Pending
 			});
 		}
+
+		#endregion
 	}
 }
