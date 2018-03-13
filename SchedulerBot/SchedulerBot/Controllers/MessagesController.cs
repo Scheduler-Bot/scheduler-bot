@@ -1,34 +1,33 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Bot.Connector;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
-using Microsoft.Rest;
 using SchedulerBot.Business.Entities;
 using SchedulerBot.Business.Interfaces;
+using SchedulerBot.Infrastructure.Interfaces.BotConnector;
 
 namespace SchedulerBot.Controllers
 {
 	[Route("api/[controller]")]
 	public class MessagesController : Controller
 	{
-		private readonly ServiceClientCredentials credentials;
 		private readonly ICommandRequestParser commandRequestParser;
 		private readonly ICommandSelector commandSelector;
+		private readonly IMessageProcessor messageProcessor;
 		private readonly ILogger<MessagesController> logger;
 
 		public MessagesController(
-			ServiceClientCredentials credentials,
 			ICommandRequestParser commandRequestParser,
 			ICommandSelector commandSelector,
+			IMessageProcessor messageProcessor,
 			ILogger<MessagesController> logger)
 		{
-			this.credentials = credentials;
 			this.commandRequestParser = commandRequestParser;
 			this.commandSelector = commandSelector;
+			this.messageProcessor = messageProcessor;
 			this.logger = logger;
 		}
 
@@ -66,20 +65,10 @@ namespace SchedulerBot.Controllers
 
 				logger.LogInformation("Replying with '{0}'", replyText);
 
-				await ReplyAsync(activity, replyText);
+				await messageProcessor.ReplyAsync(activity, replyText, CancellationToken.None);
 			}
 
 			return Ok();
-		}
-
-		private Task<ResourceResponse> ReplyAsync(Activity activity, string replyText)
-		{
-			Activity reply = activity.CreateReply(replyText, activity.Locale);
-
-			using (ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl), credentials))
-			{
-				return connector.Conversations.ReplyToActivityAsync(reply);
-			}
 		}
 
 		private void DecodeActivityText(Activity activity)

@@ -2,7 +2,7 @@
 using SchedulerBot.Infrastructure.Interfaces;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
-namespace SchedulerBot.Infrastructure.Scheduler
+namespace SchedulerBot.Infrastructure.Schedule
 {
 	public class CronDescriptionFormatter : IScheduleDescriptionFormatter
 	{
