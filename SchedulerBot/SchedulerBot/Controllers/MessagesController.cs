@@ -11,6 +11,10 @@ using SchedulerBot.Infrastructure.Interfaces.BotConnector;
 
 namespace SchedulerBot.Controllers
 {
+	/// <summary>
+	/// The API controller for handling user messages.
+	/// </summary>
+	/// <seealso cref="Controller" />
 	[Route("api/[controller]")]
 	public class MessagesController : Controller
 	{
@@ -19,6 +23,13 @@ namespace SchedulerBot.Controllers
 		private readonly IMessageProcessor messageProcessor;
 		private readonly ILogger<MessagesController> logger;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MessagesController"/> class.
+		/// </summary>
+		/// <param name="commandRequestParser">The command request parser.</param>
+		/// <param name="commandSelector">The command selector.</param>
+		/// <param name="messageProcessor">The message processor.</param>
+		/// <param name="logger">The logger.</param>
 		public MessagesController(
 			ICommandRequestParser commandRequestParser,
 			ICommandSelector commandSelector,
@@ -31,12 +42,21 @@ namespace SchedulerBot.Controllers
 			this.logger = logger;
 		}
 
+		/// <summary>
+		/// Handles HTTP GET requests.
+		/// </summary>
+		/// <returns>The result of the method processing.</returns>
 		[HttpGet]
 		public IActionResult Get()
 		{
 			return Ok("MessagesController");
 		}
 
+		/// <summary>
+		/// Handles HTTP POST requests - user messages to the bot in particular.
+		/// </summary>
+		/// <param name="activity">The activity.</param>
+		/// <returns></returns>
 		[Authorize(Roles = "Bot")]
 		[HttpPost]
 		public async Task<OkResult> Post([FromBody] Activity activity)

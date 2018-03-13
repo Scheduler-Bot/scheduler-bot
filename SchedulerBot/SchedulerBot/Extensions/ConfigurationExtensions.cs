@@ -11,9 +11,17 @@ using SchedulerBot.Database.Core;
 
 namespace SchedulerBot.Extensions
 {
+	/// <summary>
+	/// Provides extension methods used during the application configuration.
+	/// </summary>
 	internal static class ConfigurationExtensions
 	{
-		internal static IConfigurationBuilder AddAzureSecrets(this IConfigurationBuilder builder)
+		/// <summary>
+		/// Adds the azure secrets.
+		/// </summary>
+		/// <param name="builder">The builder.</param>
+		/// <returns>The same <see cref="ConfigurationBinder"/> instance which has been passed to the method.</returns>
+		public static IConfigurationBuilder AddAzureSecrets(this IConfigurationBuilder builder)
 		{
 			string keyVaultEndpoint = GetKeyVaultEndpoint();
 
@@ -30,6 +38,11 @@ namespace SchedulerBot.Extensions
 			return builder;
 		}
 
+		/// <summary>
+		/// Verifies whether the database is migrated and applies migrations if not.
+		/// </summary>
+		/// <param name="host">The host.</param>
+		/// <returns>The same <see cref="IWebHost"/> instance which has been passed to the method.</returns>
 		internal static IWebHost EnsureDatabaseMigrated(this IWebHost host)
 		{
 			using (IServiceScope scope = host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
@@ -43,7 +56,12 @@ namespace SchedulerBot.Extensions
 			return host;
 		}
 
-		internal static string GetConnectionString(this IConfiguration configuration)
+		/// <summary>
+		/// Gets the connection string from the specified configuration.
+		/// </summary>
+		/// <param name="configuration">The configuration.</param>
+		/// <returns>The connection string</returns>
+		public static string GetConnectionString(this IConfiguration configuration)
 		{
 			string settingName = IsDevelopment() ? "ConnectionString" : "Secrets:ConnectionString";
 			string connectionString = configuration[settingName];
@@ -51,7 +69,12 @@ namespace SchedulerBot.Extensions
 			return connectionString;
 		}
 
-		internal static TimeSpan GetMessageProcessingInterval(this IConfiguration configuration)
+		/// <summary>
+		/// Gets the message processing interval from the specified configuration.
+		/// </summary>
+		/// <param name="configuration">The configuration.</param>
+		/// <returns>The message processing interval.</returns>
+		public static TimeSpan GetMessageProcessingInterval(this IConfiguration configuration)
 		{
 			string messageProcessingInterval = Environment.GetEnvironmentVariable("MESSAGE_PROCESSING_INTERVAL");
 
