@@ -11,11 +11,20 @@ using SchedulerBot.Infrastructure.Interfaces.BotConnector;
 
 namespace SchedulerBot.Infrastructure.BotConnector
 {
+	/// <summary>
+	/// Implements a way of processing messages.
+	/// </summary>
+	/// <seealso cref="IMessageProcessor" />
 	public class MessageProcessor : IMessageProcessor
 	{
 		private readonly AppCredentials appCredentials;
 		private readonly ILogger<MessageProcessor> logger;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="MessageProcessor"/> class.
+		/// </summary>
+		/// <param name="appCredentials">The application credentials.</param>
+		/// <param name="logger">The logger.</param>
 		public MessageProcessor(
 			AppCredentials appCredentials,
 			ILogger<MessageProcessor> logger)
@@ -24,6 +33,7 @@ namespace SchedulerBot.Infrastructure.BotConnector
 			this.logger = logger;
 		}
 
+		/// <inheritdoc />
 		public async Task SendMessageAsync(ScheduledMessage scheduledMessage, CancellationToken cancellationToken)
 		{
 			if (!cancellationToken.IsCancellationRequested)
@@ -45,6 +55,7 @@ namespace SchedulerBot.Infrastructure.BotConnector
 			}
 		}
 
+		/// <inheritdoc />
 		public Task<ResourceResponse> ReplyAsync(Activity activity, string replyText, CancellationToken cancellationToken)
 		{
 			if (!cancellationToken.IsCancellationRequested)
