@@ -36,7 +36,7 @@
 
   <Target Name="PublishBuildAngular" AfterTargets="ComputeFilesToPublish">
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
-    <Exec Command="npm install" WorkingDirectory="ClientApp" />
+    <CallTarget Targets="InstallNpmModules" />
     <Exec Command="node_modules\.bin\ng build -prod" WorkingDirectory="ClientApp" />
 
     <!-- Include the newly-built files in the publish output -->
@@ -47,6 +47,10 @@
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </ResolvedFileToPublish>
     </ItemGroup>
+  </Target>
+
+  <Target Name="InstallNpmModules" AfterTargets="Rebuild">
+    <Exec Command="npm install" WorkingDirectory="ClientApp" />
   </Target>
 
 </Project>
