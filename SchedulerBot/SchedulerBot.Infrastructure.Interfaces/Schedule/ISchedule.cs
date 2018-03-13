@@ -14,24 +14,24 @@ namespace SchedulerBot.Infrastructure.Interfaces.Schedule
 		string Text { get; }
 
 		/// <summary>
-		/// Gets the next event occurence.
+		/// Gets the next event occurrence.
 		/// </summary>
-		/// <returns>The time of the next event occurence.</returns>
+		/// <returns>The time of the next event occurrence.</returns>
 		DateTime GetNextOccurence();
 
 		/// <summary>
-		/// Gets the next event occurence relatively to the specified time.
+		/// Gets the next event occurrence relatively to the specified time.
 		/// </summary>
 		/// <param name="baseTime">The base time.</param>
-		/// <returns>The time of the next event occurence.</returns>
+		/// <returns>The time of the next event occurrence.</returns>
 		DateTime GetNextOccurence(DateTime baseTime);
 
 		/// <summary>
-		/// Gets the next event occurences between the specified base and end time.
+		/// Gets the next event occurrences between the specified base and end time.
 		/// </summary>
 		/// <param name="baseTime">The base time.</param>
 		/// <param name="endTime">The end time.</param>
-		/// <returns>A set of the next event occurences.</returns>
+		/// <returns>A set of the next event occurrences.</returns>
 		IEnumerable<DateTime> GetNextOccurences(DateTime baseTime, DateTime endTime);
 	}
 }

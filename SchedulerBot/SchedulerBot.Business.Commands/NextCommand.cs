@@ -20,7 +20,7 @@ using SchedulerBot.Infrastructure.Interfaces.Schedule;
 namespace SchedulerBot.Business.Commands
 {
 	/// <summary>
-	/// The command listing the next scheduled message occurences for the current conversation.
+	/// The command listing the next scheduled message occurrences for the current conversation.
 	/// </summary>
 	/// <seealso cref="IBotCommand" />
 	public class NextCommand : IBotCommand

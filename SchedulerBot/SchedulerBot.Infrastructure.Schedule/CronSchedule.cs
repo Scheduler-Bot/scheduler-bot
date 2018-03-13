@@ -7,7 +7,7 @@ using SchedulerBot.Infrastructure.Interfaces.Schedule;
 namespace SchedulerBot.Infrastructure.Schedule
 {
 	/// <summary>
-	/// An <see cref="ISchedule"/> implementation for a cronn expression format case.
+	/// An <see cref="ISchedule"/> implementation for a cron expression format case.
 	/// </summary>
 	/// <seealso cref="ISchedule" />
 	public class CronSchedule : ISchedule
@@ -20,7 +20,7 @@ namespace SchedulerBot.Infrastructure.Schedule
 		/// </summary>
 		/// <param name="crontabSchedule">The crontab schedule.</param>
 		/// <param name="text">The schedule in cron format.</param>
-		/// <param name="timeZoneOffset">The time zone offset. If not provided, no offset will be used for occurence calculation.</param>
+		/// <param name="timeZoneOffset">The time zone offset. If not provided, no offset will be used for occurrence calculation.</param>
 		public CronSchedule(CrontabSchedule crontabSchedule, string text, TimeSpan? timeZoneOffset)
 		{
 			this.crontabSchedule = crontabSchedule;
