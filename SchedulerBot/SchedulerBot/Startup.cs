@@ -20,7 +20,7 @@ using SchedulerBot.Extensions;
 using SchedulerBot.Infrastructure.BotConnector;
 using SchedulerBot.Infrastructure.Interfaces.BotConnector;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
-using SchedulerBot.Infrastructure.Scheduler;
+using SchedulerBot.Infrastructure.Schedule;
 
 namespace SchedulerBot
 {
