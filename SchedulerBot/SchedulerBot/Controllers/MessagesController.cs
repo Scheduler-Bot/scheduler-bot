@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -64,7 +65,7 @@ namespace SchedulerBot.Controllers
 
 				logger.LogInformation("Replying with '{0}'", replyText);
 
-				await messageProcessor.ReplyAsync(activity, replyText);
+				await messageProcessor.ReplyAsync(activity, replyText, CancellationToken.None);
 			}
 
 			return Ok();

@@ -26,28 +26,41 @@ namespace SchedulerBot.Infrastructure.BotConnector
 
 		public async Task SendMessageAsync(ScheduledMessage scheduledMessage, CancellationToken cancellationToken)
 		{
-			MicrosoftAppCredentials credentials = BuildMicrosoftAppCredentials();
-
-			Uri serviceUri = new Uri(scheduledMessage.Details.ServiceUrl);
-			Activity activity = CreateBotMessageActivity(scheduledMessage);
-
-			using (ConnectorClient connector = new ConnectorClient(serviceUri, credentials))
+			if (!cancellationToken.IsCancellationRequested)
 			{
-				logger.LogInformation($"Sending message to conversation RecipientId: ${activity.Recipient.Id}.");
-				await connector.Conversations.SendToConversationAsync(activity, cancellationToken);
+				MicrosoftAppCredentials credentials = BuildMicrosoftAppCredentials();
+
+				Uri serviceUri = new Uri(scheduledMessage.Details.ServiceUrl);
+				Activity activity = CreateBotMessageActivity(scheduledMessage);
+
+				using (ConnectorClient connector = new ConnectorClient(serviceUri, credentials))
+				{
+					logger.LogInformation($"Sending message to conversation RecipientId: ${activity.Recipient.Id}.");
+					await connector.Conversations.SendToConversationAsync(activity, cancellationToken);
+				}
+			}
+			else
+			{
+				logger.LogInformation("CancellationToken is in CancellationRequested state.");
 			}
 		}
 
-		public Task<ResourceResponse> ReplyAsync(Activity activity, string replyText)
+		public Task<ResourceResponse> ReplyAsync(Activity activity, string replyText, CancellationToken cancellationToken)
 		{
-			MicrosoftAppCredentials credentials = BuildMicrosoftAppCredentials();
-
-			Activity reply = activity.CreateReply(replyText, activity.Locale);
-
-			using (ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl), credentials))
+			if (!cancellationToken.IsCancellationRequested)
 			{
-				return connector.Conversations.ReplyToActivityAsync(reply);
+				MicrosoftAppCredentials credentials = BuildMicrosoftAppCredentials();
+
+				Activity reply = activity.CreateReply(replyText, activity.Locale);
+
+				using (ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl), credentials))
+				{
+					return connector.Conversations.ReplyToActivityAsync(reply, cancellationToken);
+				}
 			}
+
+			logger.LogInformation("CancellationToken is in CancellationRequested state.");
+			return null;
 		}
 
 		private MicrosoftAppCredentials BuildMicrosoftAppCredentials()

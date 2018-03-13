@@ -9,6 +9,6 @@ namespace SchedulerBot.Infrastructure.Interfaces.BotConnector
 	{
 		Task SendMessageAsync(ScheduledMessage scheduledMessage, CancellationToken cancellationToken);
 
-		Task<ResourceResponse> ReplyAsync(Activity activity, string replyText);
+		Task<ResourceResponse> ReplyAsync(Activity activity, string replyText, CancellationToken cancellationToken);
 	}
 }
