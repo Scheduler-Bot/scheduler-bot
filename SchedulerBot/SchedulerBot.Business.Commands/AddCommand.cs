@@ -6,12 +6,10 @@ using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Commands.Utils;
 using SchedulerBot.Business.Entities;
-using SchedulerBot.Business.Interfaces;
 using SchedulerBot.Business.Utils;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
-using SchedulerBot.Infrastructure.Interfaces;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
 namespace SchedulerBot.Business.Commands
@@ -20,15 +18,14 @@ namespace SchedulerBot.Business.Commands
 	/// The command for entering a new scheduled message.
 	/// </summary>
 	/// <example>Expected input: add 'Turn off the iron!' '0 * * * *'</example>
-	/// <seealso cref="IBotCommand" />
-	public class AddCommand : IBotCommand
+	/// <seealso cref="BotCommand" />
+	public class AddCommand : BotCommand
 	{
 		#region Private Fields
 
 		private readonly SchedulerBotContext context;
 		private readonly IScheduleParser scheduleParser;
 		private readonly IScheduleDescriptionFormatter scheduleDescriptionFormatter;
-		private readonly ILogger<AddCommand> logger;
 
 		#endregion
 
@@ -45,28 +42,20 @@ namespace SchedulerBot.Business.Commands
 			SchedulerBotContext context,
 			IScheduleParser scheduleParser,
 			IScheduleDescriptionFormatter scheduleDescriptionFormatter,
-			ILogger<AddCommand> logger)
+			ILogger<AddCommand> logger) : base("add", logger)
 		{
 			this.context = context;
 			this.scheduleParser = scheduleParser;
 			this.scheduleDescriptionFormatter = scheduleDescriptionFormatter;
-			this.logger = logger;
-
-			Name = "add";
 		}
 
 		#endregion
 
-		#region IBotCommand Implementation
+		#region Overrides
 
 		/// <inheritdoc />
-		public string Name { get; }
-
-		/// <inheritdoc />
-		public async Task<CommandExecutionResult> ExecuteAsync(Activity activity, string arguments)
+		protected override async Task<CommandExecutionResult> ExecuteCoreAsync(Activity activity, string arguments)
 		{
-			logger.LogInformation("Executing '{0}' command with arguments '{1}'", Name, arguments);
-
 			CommandExecutionResult result;
 			string[] splitArguments = ArgumentHelper.ParseArguments(arguments);
 			string text = splitArguments.ElementAtOrDefault(0);
@@ -74,11 +63,11 @@ namespace SchedulerBot.Business.Commands
 
 			if (!string.IsNullOrWhiteSpace(text) && !string.IsNullOrWhiteSpace(textSchedule) && splitArguments.Length == 2)
 			{
-				logger.LogInformation("Parsed the arguments to text '{0}' and schedule '{1}'", text, textSchedule);
+				Logger.LogInformation("Parsed the arguments to text '{0}' and schedule '{1}'", text, textSchedule);
 
 				if (scheduleParser.TryParse(textSchedule, activity.LocalTimestamp?.Offset, out ISchedule schedule))
 				{
-					logger.LogInformation("Creating a new scheduled message");
+					Logger.LogInformation("Creating a new scheduled message");
 
 					ScheduledMessage scheduledMessage = CreateScheduledMessageAsync(activity, text, schedule);
 					scheduledMessage = (await context.ScheduledMessages.AddAsync(scheduledMessage)).Entity;
@@ -90,18 +79,18 @@ namespace SchedulerBot.Business.Commands
 					string newLine = MessageUtils.NewLine;
 
 					result = $"New event has been created:{newLine}ID: '{createdMessageId}'{newLine}Schedule: {scheduleDescription}";
-					logger.LogInformation("Created a scheduled message with id '{0}'", createdMessageId);
+					Logger.LogInformation("Created a scheduled message with id '{0}'", createdMessageId);
 				}
 				else
 				{
 					result = CommandExecutionResult.Error($"Cannot recognize schedule \"{textSchedule}\"");
-					logger.LogWarning(result.Message);
+					Logger.LogWarning(result.Message);
 				}
 			}
 			else
 			{
 				result = CommandExecutionResult.Error("Command arguments are in incorrect format. Use the following pattern: add 'your text' 'your schedule'");
-				logger.LogWarning("Cannot parse the command arguments");
+				Logger.LogWarning("Cannot parse the command arguments");
 			}
 
 			return result;
