@@ -62,7 +62,7 @@ namespace SchedulerBot.Business.Commands
 		/// </summary>
 		/// <param name="activity">The activity.</param>
 		/// <param name="arguments">The arguments.</param>
-		/// <returns></returns>
+		/// <returns>The result of the command execution.</returns>
 		protected abstract Task<CommandExecutionResult> ExecuteCoreAsync(Activity activity, string arguments);
 
 		#endregion
