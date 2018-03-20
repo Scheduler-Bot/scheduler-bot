@@ -27,10 +27,23 @@ namespace SchedulerBot.Business.Commands
 
 		#endregion
 
-		#region IBotCommand Implementation
+		#region Public Properties
 
 		/// <inheritdoc />
 		public string Name { get; }
+
+		#endregion
+
+		#region Protected Properties
+
+		/// <summary>
+		/// Gets the logger.
+		/// </summary>
+		protected ILogger Logger { get; }
+
+		#endregion
+
+		#region Public Methods
 
 		/// <inheritdoc />
 		public async Task<CommandExecutionResult> ExecuteAsync(Activity activity, string arguments)
@@ -43,15 +56,6 @@ namespace SchedulerBot.Business.Commands
 
 			return executionResult;
 		}
-
-		#endregion
-
-		#region Protected Properties
-
-		/// <summary>
-		/// Gets the logger.
-		/// </summary>
-		protected ILogger Logger { get; }
 
 		#endregion
 
