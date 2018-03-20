@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Entities;
-using SchedulerBot.Business.Interfaces;
 using SchedulerBot.Business.Utils;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
@@ -17,15 +16,14 @@ namespace SchedulerBot.Business.Commands
 	/// <summary>
 	/// The command allowing to list the scheduled messages for the current conversation.
 	/// </summary>
-	/// <seealso cref="IBotCommand" />
-	public class ListCommand : IBotCommand
+	/// <seealso cref="BotCommand" />
+	public class ListCommand : BotCommand
 	{
 		#region Private Fields
 
 		private readonly SchedulerBotContext context;
 		private readonly IScheduleParser scheduleParser;
 		private readonly IScheduleDescriptionFormatter scheduleDescriptionFormatter;
-		private readonly ILogger<ListCommand> logger;
 
 		#endregion
 
@@ -42,33 +40,25 @@ namespace SchedulerBot.Business.Commands
 			SchedulerBotContext context,
 			IScheduleParser scheduleParser,
 			IScheduleDescriptionFormatter scheduleDescriptionFormatter,
-			ILogger<ListCommand> logger)
+			ILogger<ListCommand> logger) : base("list", logger)
 		{
 			this.context = context;
 			this.scheduleParser = scheduleParser;
 			this.scheduleDescriptionFormatter = scheduleDescriptionFormatter;
-			this.logger = logger;
-
-			Name = "list";
 		}
 
 		#endregion
 
-		#region IBotCommand Implementation
+		#region Overrides
 
 		/// <inheritdoc />
-		public string Name { get; }
-
-		/// <inheritdoc />
-		public Task<CommandExecutionResult> ExecuteAsync(Activity activity, string arguments)
+		protected override Task<CommandExecutionResult> ExecuteCoreAsync(Activity activity, string arguments)
 		{
-			logger.LogInformation("Executing '{0}' command", Name);
-
 			int messageCount = 0;
 			string conversationId = activity.Conversation.Id;
 			StringBuilder stringBuilder = new StringBuilder();
 
-			logger.LogInformation("Searching for the scheduled messages for the conversation with id '{0}'", conversationId);
+			Logger.LogInformation("Searching for the scheduled messages for the conversation with id '{0}'", conversationId);
 
 			foreach (ScheduledMessage message in GetConversationMessages(conversationId))
 			{
@@ -81,12 +71,12 @@ namespace SchedulerBot.Business.Commands
 			if (messageCount > 0)
 			{
 				result = stringBuilder.ToString().Trim();
-				logger.LogInformation("Found '{0}' scheduled messages for the conversation '{1}'", messageCount, conversationId);
+				Logger.LogInformation("Found '{0}' scheduled messages for the conversation '{1}'", messageCount, conversationId);
 			}
 			else
 			{
 				result = CommandExecutionResult.Success("No scheduled events for this conversation");
-				logger.LogInformation("No schedule messages found for the conversation '{1}'", conversationId);
+				Logger.LogInformation("No schedule messages found for the conversation '{1}'", conversationId);
 			}
 
 			return Task.FromResult(result);
