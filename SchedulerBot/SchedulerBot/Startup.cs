@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -45,6 +46,11 @@ namespace SchedulerBot
 		/// <param name="services">The services.</param>
 		public void ConfigureServices(IServiceCollection services)
 		{
+			// TODO Remove this
+			GC.Collect();
+			GC.Collect();
+			GC.Collect();
+
 			string appId = configuration["Secrets:MicrosoftAppIdKey"];
 			string appPassword = configuration["Secrets:MicrosoftAppPassword"];
 			SimpleCredentialProvider credentialProvider = new SimpleCredentialProvider(appId, appPassword);
