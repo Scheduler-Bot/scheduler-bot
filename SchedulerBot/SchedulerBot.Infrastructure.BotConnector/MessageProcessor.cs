@@ -40,8 +40,14 @@ namespace SchedulerBot.Infrastructure.BotConnector
 			{
 				MicrosoftAppCredentials credentials = BuildMicrosoftAppCredentials();
 
-				Uri serviceUri = new Uri(scheduledMessage.Details.ServiceUrl);
+				string serviceUrl = scheduledMessage.Details.ServiceUrl;
+				Uri serviceUri = new Uri(serviceUrl);
 				Activity activity = CreateBotMessageActivity(scheduledMessage);
+
+				if (!MicrosoftAppCredentials.IsTrustedServiceUrl(serviceUrl))
+				{
+					MicrosoftAppCredentials.TrustServiceUrl(serviceUrl);
+				}
 
 				using (ConnectorClient connector = new ConnectorClient(serviceUri, credentials))
 				{
