@@ -3,11 +3,14 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Rest.Serialization;
+using Newtonsoft.Json;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
@@ -137,6 +140,14 @@ namespace SchedulerBot.Business.Services
 						scheduledMessageEvent.State = ScheduledMessageEventState.Completed;
 						AddPendingEvent(scheduledMessage);
 						logger.LogInformation("Scheduled message '{0}' has been processed", scheduledMessageId);
+					}
+					// TODO: Added for debugging purposes, should be revisited.
+					catch (ErrorResponseException exception)
+					{
+						string serializedBody = SafeJsonConvert.SerializeObject(exception.Body, new JsonSerializerSettings { Formatting = Formatting.Indented });
+						string message = $"Sending message was failed due Exception Message: '{exception.Message}', StackTrace: '{exception.StackTrace}', Body: '{serializedBody}'";
+
+						logger.LogError(message);
 					}
 					catch (Exception exception)
 					{
