@@ -169,7 +169,9 @@ namespace SchedulerBot.Business.Services
 				.ScheduledMessageEvents
 				.Where(@event => @event.State == ScheduledMessageEventState.Pending && @event.NextOccurence < currentTime)
 				.Include(@event => @event.ScheduledMessage)
-				.ThenInclude(message => message.Details);
+				.ThenInclude(message => message.Details)
+				.ThenInclude(details => details.DetailsServiceUrls)
+				.ThenInclude(detailsServiceUrl => detailsServiceUrl.ServiceUrl);
 		}
 
 		private async Task WaitAsync()

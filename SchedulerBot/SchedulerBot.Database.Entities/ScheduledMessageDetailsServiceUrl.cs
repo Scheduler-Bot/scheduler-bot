@@ -26,5 +26,10 @@ namespace SchedulerBot.Database.Entities
 		/// Gets or sets the service URL.
 		/// </summary>
 		public ServiceUrl ServiceUrl { get; set; }
+
+		/// <summary>
+		/// Gets or sets the entity creation time.
+		/// </summary>
+		public DateTime CreatedOn { get; set; }
 	}
 }
