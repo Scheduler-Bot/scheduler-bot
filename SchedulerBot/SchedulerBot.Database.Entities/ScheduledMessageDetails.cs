@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SchedulerBot.Database.Entities
 {
@@ -16,11 +17,6 @@ namespace SchedulerBot.Database.Entities
 		/// Gets or sets the associated scheduled message.
 		/// </summary>
 		public ScheduledMessage ScheduledMessage { get; set; }
-
-		/// <summary>
-		/// Gets or sets the service URL.
-		/// </summary>
-		public string ServiceUrl { get; set; }
 
 		/// <summary>
 		/// Gets or sets the identifier of the message sender - the bot.
@@ -61,5 +57,11 @@ namespace SchedulerBot.Database.Entities
 		/// Gets or sets the UTC offset of the recipient time zone.
 		/// </summary>
 		public TimeSpan? TimeZoneOffset { get; set; }
+
+		/// <summary>
+		/// Gets or sets the collection of <see cref="ScheduledMessageDetailsServiceUrl"/> objects
+		/// connecting the current insance to corresponding <see cref="ServiceUrl"/> objects.
+		/// </summary>
+		public ICollection<ScheduledMessageDetailsServiceUrl> DetailsServiceUrls { get; set; }
 	}
 }
