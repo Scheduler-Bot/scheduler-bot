@@ -17,11 +17,14 @@ namespace SchedulerBot.Database.Core.Configurations
 			builder
 				.HasOne(entity => entity.Details)
 				.WithMany(details => details.DetailsServiceUrls)
-				.HasForeignKey(entity => entity.DetailsId);
+				.HasForeignKey(entity => entity.DetailsId)
+				.OnDelete(DeleteBehavior.Restrict);
 			builder
 				.HasOne(entity => entity.ServiceUrl)
 				.WithMany(url => url.ServiceUrlMessageDetails)
-				.HasForeignKey(entity => entity.ServiceUrlId);
+				.HasForeignKey(entity => entity.ServiceUrlId)
+				.OnDelete(DeleteBehavior.Restrict);
+			builder.HasIndex(entity => new { entity.DetailsId, entity.ServiceUrlId, entity.CreatedOn });
 		}
 	}
 }

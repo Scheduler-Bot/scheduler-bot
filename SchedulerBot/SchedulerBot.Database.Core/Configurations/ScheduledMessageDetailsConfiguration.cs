@@ -17,7 +17,8 @@ namespace SchedulerBot.Database.Core.Configurations
 			builder
 				.HasOne(details => details.ScheduledMessage)
 				.WithOne(message => message.Details)
-				.HasForeignKey<ScheduledMessageDetails>(details => details.ScheduledMessageId);
+				.HasForeignKey<ScheduledMessageDetails>(details => details.ScheduledMessageId)
+				.OnDelete(DeleteBehavior.Restrict);
 			builder.Property(details => details.FromId).IsRequired();
 			builder.Property(details => details.FromName).IsRequired();
 			builder.Property(details => details.RecipientId).IsRequired();
