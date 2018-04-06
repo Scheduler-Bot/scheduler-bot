@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using SchedulerBot.Database.Entities.Interfaces;
 
 namespace SchedulerBot.Database.Entities
 {
 	/// <summary>
 	/// Holds the information about a service URL used to deliver messages to a client.
 	/// </summary>
-	public class ServiceUrl
+	public class ServiceUrl : ICreatedOn
 	{
 		/// <summary>
 		/// Gets or sets the identifier.
@@ -25,7 +26,7 @@ namespace SchedulerBot.Database.Entities
 
 		/// <summary>
 		/// Gets or sets the collection of <see cref="ScheduledMessageDetailsServiceUrl"/> objects
-		/// connecting the current insance to corresponding <see cref="ScheduledMessageDetails"/> objects.
+		/// connecting the current instance to corresponding <see cref="ScheduledMessageDetails"/> objects.
 		/// </summary>
 		public ICollection<ScheduledMessageDetailsServiceUrl> ServiceUrlMessageDetails { get; set; }
 	}
