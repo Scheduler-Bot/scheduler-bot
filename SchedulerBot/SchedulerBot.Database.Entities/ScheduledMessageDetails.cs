@@ -60,7 +60,7 @@ namespace SchedulerBot.Database.Entities
 
 		/// <summary>
 		/// Gets or sets the collection of <see cref="ScheduledMessageDetailsServiceUrl"/> objects
-		/// connecting the current insance to corresponding <see cref="ServiceUrl"/> objects.
+		/// connecting the current instance to corresponding <see cref="ServiceUrl"/> objects.
 		/// </summary>
 		public ICollection<ScheduledMessageDetailsServiceUrl> DetailsServiceUrls { get; set; }
 	}
