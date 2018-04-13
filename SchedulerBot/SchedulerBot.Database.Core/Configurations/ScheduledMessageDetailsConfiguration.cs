@@ -17,14 +17,14 @@ namespace SchedulerBot.Database.Core.Configurations
 			builder
 				.HasOne(details => details.ScheduledMessage)
 				.WithOne(message => message.Details)
-				.HasForeignKey<ScheduledMessageDetails>(details => details.ScheduledMessageId);
+				.HasForeignKey<ScheduledMessageDetails>(details => details.ScheduledMessageId)
+				.OnDelete(DeleteBehavior.Restrict);
 			builder.Property(details => details.FromId).IsRequired();
 			builder.Property(details => details.FromName).IsRequired();
 			builder.Property(details => details.RecipientId).IsRequired();
 			builder.Property(details => details.RecipientName).IsRequired();
 			builder.Property(details => details.ChannelId).IsRequired();
 			builder.Property(details => details.ConversationId).IsRequired();
-			builder.Property(details => details.ServiceUrl).IsRequired();
 			builder.Property(details => details.Locale).IsRequired(false);
 			builder.Property(details => details.TimeZoneOffset).IsRequired(false);
 		}

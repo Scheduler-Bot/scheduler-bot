@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Connector;
@@ -40,7 +41,7 @@ namespace SchedulerBot.Infrastructure.BotConnector
 			{
 				MicrosoftAppCredentials credentials = BuildMicrosoftAppCredentials();
 
-				string serviceUrl = scheduledMessage.Details.ServiceUrl;
+				string serviceUrl = GetLastServiceUrl(scheduledMessage.Details);
 				Uri serviceUri = new Uri(serviceUrl);
 				Activity activity = CreateBotMessageActivity(scheduledMessage);
 
@@ -93,7 +94,7 @@ namespace SchedulerBot.Infrastructure.BotConnector
 			ScheduledMessageDetails details = scheduledMessage.Details;
 			Activity activity = (Activity)Activity.CreateMessageActivity();
 
-			activity.ServiceUrl = details.ServiceUrl;
+			activity.ServiceUrl = GetLastServiceUrl(details);
 			activity.From = new ChannelAccount(details.FromId, details.FromName);
 			activity.Recipient = new ChannelAccount(details.RecipientId, details.RecipientName);
 			activity.ChannelId = details.ChannelId;
@@ -102,6 +103,16 @@ namespace SchedulerBot.Infrastructure.BotConnector
 			activity.Text = scheduledMessage.Text;
 
 			return activity;
+		}
+
+		private static string GetLastServiceUrl(ScheduledMessageDetails messageDetails)
+		{
+			return messageDetails
+				.DetailsServiceUrls
+				.Select(detailsServiceUrl => detailsServiceUrl.ServiceUrl)
+				.OrderByDescending(serviceUrl => serviceUrl.CreatedOn)
+				.First()
+				.Address;
 		}
 	}
 }

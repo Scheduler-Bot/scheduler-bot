@@ -2,14 +2,16 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 
 namespace SchedulerBot.Database.Core.Migrations
 {
 	[DbContext(typeof(SchedulerBotContext))]
-	partial class SchedulerBotContextModelSnapshot : ModelSnapshot
+	[Migration("20180403142502_ServiceUrl")]
+	partial class ServiceUrl
 	{
-		protected override void BuildModel(ModelBuilder modelBuilder)
+		protected override void BuildTargetModel(ModelBuilder modelBuilder)
 		{
 #pragma warning disable 612, 618
 			modelBuilder
