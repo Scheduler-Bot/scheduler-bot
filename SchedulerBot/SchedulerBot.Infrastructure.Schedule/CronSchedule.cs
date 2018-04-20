@@ -34,27 +34,27 @@ namespace SchedulerBot.Infrastructure.Schedule
 		public string Text { get; }
 
 		/// <inheritdoc />
-		public DateTime GetNextOccurence() => GetNextOccurence(DateTime.UtcNow);
+		public DateTime GetNextOccurrence() => GetNextOccurrence(DateTime.UtcNow);
 
 		/// <inheritdoc />
-		public DateTime GetNextOccurence(DateTime baseTime)
+		public DateTime GetNextOccurrence(DateTime baseTime)
 		{
 			DateTime adjustedBaseTime = AdjustDateTime(baseTime);
-			DateTime nextOccurence = crontabSchedule.GetNextOccurrence(adjustedBaseTime);
-			DateTime adjustedNextOccurence = AdjustOccurence(nextOccurence);
+			DateTime nextOccurrence = crontabSchedule.GetNextOccurrence(adjustedBaseTime);
+			DateTime adjustedNextOccurrence = AdjustOccurrence(nextOccurrence);
 			
-			return adjustedNextOccurence;
+			return adjustedNextOccurrence;
 		}
 
 		/// <inheritdoc />
-		public IEnumerable<DateTime> GetNextOccurences(DateTime baseTime, DateTime endTime)
+		public IEnumerable<DateTime> GetNextOccurrences(DateTime baseTime, DateTime endTime)
 		{
 			DateTime adjustedBaseTime = AdjustDateTime(baseTime);
 			DateTime adjustedEndTime = AdjustDateTime(endTime);
 
 			return crontabSchedule
 				.GetNextOccurrences(adjustedBaseTime, adjustedEndTime)
-				.Select(AdjustOccurence);
+				.Select(AdjustOccurrence);
 		}
 
 		private DateTime AdjustDateTime(DateTime baseTime)
@@ -63,10 +63,10 @@ namespace SchedulerBot.Infrastructure.Schedule
 			return timeZoneOffset.HasValue && baseTime != DateTime.MaxValue ? baseTime.Add(timeZoneOffset.Value) : baseTime;
 		}
 
-		private DateTime AdjustOccurence(DateTime occurence)
+		private DateTime AdjustOccurrence(DateTime occurrence)
 		{
-			// if channel timeZoneOffset provided use it during calculation of nextOccurence in Utc
-			return timeZoneOffset.HasValue && occurence != DateTime.MinValue ? occurence.Add(-timeZoneOffset.Value) : occurence;
+			// if channel timeZoneOffset provided use it during calculation of nextOccurrence in Utc
+			return timeZoneOffset.HasValue && occurrence != DateTime.MinValue ? occurrence.Add(-timeZoneOffset.Value) : occurrence;
 		}
 	}
 }

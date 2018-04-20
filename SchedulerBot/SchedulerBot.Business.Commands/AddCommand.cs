@@ -149,7 +149,7 @@ namespace SchedulerBot.Business.Commands
 			return new ScheduledMessageEvent
 			{
 				CreatedOn = DateTime.UtcNow,
-				NextOccurence = schedule.GetNextOccurence(),
+				NextOccurrence = schedule.GetNextOccurrence(),
 				State = ScheduledMessageEventState.Pending
 			};
 		}
