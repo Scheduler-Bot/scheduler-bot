@@ -144,7 +144,7 @@ namespace SchedulerBot.Business.Commands
 			ScheduledMessageEvent nextEvent = message
 				.Events
 				.Where(@event => @event.State == ScheduledMessageEventState.Pending)
-				.OrderBy(@event => @event.NextOccurence)
+				.OrderBy(@event => @event.NextOccurrence)
 				.FirstOrDefault();
 			CommandExecutionResult executionResult = nextEvent != null
 				? ExecuteWithMessageAndCount(nextEvent.ScheduledMessage, defaultMessageCount, clientCulture)
@@ -168,11 +168,11 @@ namespace SchedulerBot.Business.Commands
 				if (hasPendingEvents)
 				{
 					ISchedule schedule = scheduleParser.Parse(message.Schedule, message.Details.TimeZoneOffset);
-					IEnumerable<DateTime> messageOccurences = schedule
-						.GetNextOccurences(DateTime.UtcNow, DateTime.MaxValue)
+					IEnumerable<DateTime> messageOccurrences = schedule
+						.GetNextOccurrences(DateTime.UtcNow, DateTime.MaxValue)
 						.Take(count);
 
-					executionResult = BuildResponseMessageText(message, messageOccurences, clientCulture);
+					executionResult = BuildResponseMessageText(message, messageOccurrences, clientCulture);
 				}
 				else
 				{
@@ -199,7 +199,7 @@ namespace SchedulerBot.Business.Commands
 					@event.State == ScheduledMessageEventState.Pending &&
 					@event.ScheduledMessage.State == ScheduledMessageState.Active &&
 					@event.ScheduledMessage.Details.ConversationId.Equals(conversationId, StringComparison.Ordinal))
-				.OrderBy(@event => @event.NextOccurence)
+				.OrderBy(@event => @event.NextOccurrence)
 				.FirstOrDefault();
 		}
 
@@ -220,7 +220,7 @@ namespace SchedulerBot.Business.Commands
 			return count > 0 && count <= maxMessageCount;
 		}
 
-		private static string BuildResponseMessageText(ScheduledMessage message, IEnumerable<DateTime> nextOccurences, CultureInfo clientCulture)
+		private static string BuildResponseMessageText(ScheduledMessage message, IEnumerable<DateTime> nextOccurrences, CultureInfo clientCulture)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
 			TimeSpan timeZoneOffset = message.Details.TimeZoneOffset.GetValueOrDefault();
@@ -233,13 +233,13 @@ namespace SchedulerBot.Business.Commands
 				.Append(newLine)
 				.Append("Occurrences:");
 
-			foreach (DateTime occurence in nextOccurences)
+			foreach (DateTime occurrence in nextOccurrences)
 			{
-				DateTime adjustedOccurence = occurence.Add(timeZoneOffset);
+				DateTime adjustedOccurrence = occurrence.Add(timeZoneOffset);
 
 				stringBuilder
 					.Append(newLine)
-					.Append(adjustedOccurence.ToString(clientCulture));
+					.Append(adjustedOccurrence.ToString(clientCulture));
 			}
 
 			return stringBuilder.ToString().Trim();

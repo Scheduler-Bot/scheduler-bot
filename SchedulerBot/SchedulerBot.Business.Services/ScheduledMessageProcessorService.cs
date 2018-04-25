@@ -167,7 +167,7 @@ namespace SchedulerBot.Business.Services
 
 			return context
 				.ScheduledMessageEvents
-				.Where(@event => @event.State == ScheduledMessageEventState.Pending && @event.NextOccurence < currentTime)
+				.Where(@event => @event.State == ScheduledMessageEventState.Pending && @event.NextOccurrence < currentTime)
 				.Include(@event => @event.ScheduledMessage)
 				.ThenInclude(message => message.Details)
 				.ThenInclude(details => details.DetailsServiceUrls)
@@ -195,7 +195,7 @@ namespace SchedulerBot.Business.Services
 			scheduledMessage.Events.Add(new ScheduledMessageEvent
 			{
 				CreatedOn = DateTime.UtcNow,
-				NextOccurence = schedule.GetNextOccurence(),
+				NextOccurrence = schedule.GetNextOccurrence(),
 				State = ScheduledMessageEventState.Pending
 			});
 		}
