@@ -78,13 +78,15 @@ namespace SchedulerBot
 			services.AddTransient<ListCommand>();
 			services.AddTransient<EchoCommand>();
 			services.AddTransient<NextCommand>();
+			services.AddTransient<ManageCommand>();
 			services.AddTransient<IList<IBotCommand>>(provider => new IBotCommand[]
 			{
 				provider.GetRequiredService<AddCommand>(),
 				provider.GetRequiredService<RemoveCommand>(),
 				provider.GetRequiredService<ListCommand>(),
 				provider.GetRequiredService<EchoCommand>(),
-				provider.GetRequiredService<NextCommand>()
+				provider.GetRequiredService<NextCommand>(),
+				provider.GetRequiredService<ManageCommand>()
 			});
 
 			services.AddSpaStaticFiles(options => options.RootPath = "wwwroot");
