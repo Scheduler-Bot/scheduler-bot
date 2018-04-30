@@ -19,7 +19,9 @@ using SchedulerBot.Extensions;
 using SchedulerBot.Infrastructure.BotConnector;
 using SchedulerBot.Infrastructure.Interfaces.BotConnector;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
+using SchedulerBot.Infrastructure.Interfaces.Utils;
 using SchedulerBot.Infrastructure.Schedule;
+using SchedulerBot.Infrastructure.Utils;
 
 namespace SchedulerBot
 {
@@ -73,6 +75,7 @@ namespace SchedulerBot
 			services.AddTransient<IScheduleDescriptionFormatter, CronDescriptionFormatter>();
 			services.AddTransient<ICommandSelector, CommandSelector>();
 			services.AddTransient<ICommandRequestParser, CommandRequestParser>();
+			services.AddTransient<IRandomByteGenerator, RandomByteGenerator>();
 			services.AddTransient<AddCommand>();
 			services.AddTransient<RemoveCommand>();
 			services.AddTransient<ListCommand>();
