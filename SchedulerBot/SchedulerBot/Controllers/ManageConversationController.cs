@@ -20,6 +20,12 @@ namespace SchedulerBot.Controllers
 	[Route("api/manage")]
 	public class ManageConversationController : Controller
 	{
+		#region Constants
+
+		private const int NextOccurrenceCount = 5;
+
+		#endregion
+
 		#region Private Fields
 
 		private readonly SchedulerBotContext context;
@@ -58,13 +64,25 @@ namespace SchedulerBot.Controllers
 		[HttpGet("{manageId}")]
 		public async Task<IActionResult> Get(string manageId)
 		{
+			logger.LogInformation("Attempting to gather managing information for the id '{0}'", manageId);
+
+			IActionResult actionResult;
 			ManageConversationLink manageLink = await context
 				.ManageConversationLinks
 				.FirstOrDefaultAsync(link => link.Text == manageId);
 
-			return manageLink != null && manageLink.ExpiresOn > DateTime.UtcNow
-				? Ok(GetConversationScheduledMessageModels(manageLink).ToList())
-				: (IActionResult)NotFound();
+			if (manageLink != null && manageLink.ExpiresOn > DateTime.UtcNow)
+			{
+				logger.LogInformation("Returning managing information for the id '{0}'", manageId);
+				actionResult = Ok(GetConversationScheduledMessageModels(manageLink).ToList());
+			}
+			else
+			{
+				logger.LogInformation("No managing information has been found for the id '{0}'. Either the link does not exist or is has expired", manageId);
+				actionResult = NotFound();
+			}
+
+			return actionResult;
 		}
 
 		#endregion
@@ -94,7 +112,7 @@ namespace SchedulerBot.Controllers
 				Text = scheduledMessage.Text,
 				State = scheduledMessage.State,
 				Locale = scheduledMessageDetails.Locale,
-				NextOccurrences = GetNextOccurrences(scheduledMessageDetails, 5)
+				NextOccurrences = GetNextOccurrences(scheduledMessageDetails, NextOccurrenceCount)
 			};
 		}
 
