@@ -22,6 +22,7 @@ namespace SchedulerBot.Business.Commands
 		private readonly SchedulerBotContext context;
 		private readonly IRandomByteGenerator randomByteGenerator;
 		private readonly TimeSpan linkExpirationPeriod;
+		private readonly int linkIdLength;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ManageCommand"/> class.
@@ -38,7 +39,9 @@ namespace SchedulerBot.Business.Commands
 		{
 			this.context = context;
 			this.randomByteGenerator = randomByteGenerator;
+
 			linkExpirationPeriod = TimeSpan.Parse(configuration["Commands:Manage:LinkExpirationPeriod"], CultureInfo.InvariantCulture);
+			linkIdLength = int.Parse(configuration["Commands:Manage:LinkIdLength"], CultureInfo.InvariantCulture);
 		}
 
 		/// <inheritdoc />
@@ -65,7 +68,7 @@ namespace SchedulerBot.Business.Commands
 
 		private ManageConversationLink CreateManageConversationLink(Activity activity)
 		{
-			string linkText = GenerateRandomString(64);
+			string linkText = GenerateRandomString(linkIdLength);
 			DateTime linkCreationTime = DateTime.UtcNow;
 			DateTime linkExpirationTime = linkCreationTime + linkExpirationPeriod;
 
