@@ -1,0 +1,123 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using SchedulerBot.Database.Core;
+using SchedulerBot.Database.Entities;
+using SchedulerBot.Database.Entities.Enums;
+using SchedulerBot.Infrastructure.Interfaces.Schedule;
+using SchedulerBot.Models;
+
+namespace SchedulerBot.Controllers
+{
+	/// <summary>
+	/// The API controller for managing conversations.
+	/// </summary>
+	/// <seealso cref="Controller" />
+	[Route("api/manage")]
+	public class ManageConversationController : Controller
+	{
+		#region Private Fields
+
+		private readonly SchedulerBotContext context;
+		private readonly IScheduleParser scheduleParser;
+		private readonly ILogger<ManageConversationController> logger;
+
+		#endregion
+
+		#region Constructor
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ManageConversationController"/> class.
+		/// </summary>
+		/// <param name="context">The context.</param>
+		/// <param name="scheduleParser">The schedule parser.</param>
+		/// <param name="logger">The logger.</param>
+		public ManageConversationController(
+			SchedulerBotContext context,
+			IScheduleParser scheduleParser,
+			ILogger<ManageConversationController> logger)
+		{
+			this.context = context;
+			this.scheduleParser = scheduleParser;
+			this.logger = logger;
+		}
+
+		#endregion
+
+		#region Actions
+
+		/// <summary>
+		/// Handles HTTP GET requests returning the information about a specific conversation.
+		/// </summary>
+		/// <param name="manageId">The temporary identifier assigned to a particular conversation.</param>
+		/// <returns>The result of the method processing.</returns>
+		[HttpGet("{manageId}")]
+		public async Task<IActionResult> Get(string manageId)
+		{
+			ManageConversationLink manageLink = await context
+				.ManageConversationLinks
+				.FirstOrDefaultAsync(link => link.Text == manageId);
+
+			return manageLink != null && manageLink.ExpiresOn > DateTime.UtcNow
+				? Ok(GetConversationScheduledMessageModels(manageLink).ToList())
+				: (IActionResult)NotFound();
+		}
+
+		#endregion
+
+		#region Private Methods
+
+		private IEnumerable<ScheduledMessageModel> GetConversationScheduledMessageModels(ManageConversationLink manageLink)
+		{
+			return context
+				.ScheduledMessageDetails
+				.Include(messageDetails => messageDetails.ScheduledMessage)
+				.ThenInclude(message => message.Events)
+				.Where(messageDetails =>
+					messageDetails.ChannelId == manageLink.ChannelId &&
+					messageDetails.ConversationId == manageLink.ConversationId)
+				.AsEnumerable()
+				.Select(CreateScheduledMessageModel);
+		}
+
+		private ScheduledMessageModel CreateScheduledMessageModel(ScheduledMessageDetails scheduledMessageDetails)
+		{
+			ScheduledMessage scheduledMessage = scheduledMessageDetails.ScheduledMessage;
+
+			return new ScheduledMessageModel
+			{
+				Id = scheduledMessageDetails.ScheduledMessageId,
+				Text = scheduledMessage.Text,
+				State = scheduledMessage.State,
+				Locale = scheduledMessageDetails.Locale,
+				NextOccurrences = GetNextOccurrences(scheduledMessageDetails, 5)
+			};
+		}
+
+		private IList<DateTime> GetNextOccurrences(ScheduledMessageDetails scheduledMessageDetails, int count)
+		{
+			IList<DateTime> nextOccurrences = null;
+			ScheduledMessage scheduledMessage = scheduledMessageDetails.ScheduledMessage;
+			bool hasPendingEvents = scheduledMessage
+				.Events
+				.Any(@event => @event.State == ScheduledMessageEventState.Pending);
+
+			if (hasPendingEvents)
+			{
+				ISchedule schedule = scheduleParser.Parse(scheduledMessage.Schedule, scheduledMessageDetails.TimeZoneOffset);
+				nextOccurrences = schedule
+					.GetNextOccurrences(DateTime.UtcNow, DateTime.MaxValue)
+					.Take(count)
+					.ToList();
+			}
+
+			return nextOccurrences ?? new DateTime[0];
+		}
+
+		#endregion
+	}
+}
