@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Configuration;
@@ -64,21 +65,70 @@ namespace SchedulerBot.Business.Commands
 
 		private ManageConversationLink CreateManageConversationLink(Activity activity)
 		{
-			string channelId = activity.ChannelId;
-			string conversationId = activity.Conversation.Id;
-			byte[] randomBytes = randomByteGenerator.Generate(64);
-			string linkText = Convert.ToBase64String(randomBytes);
+			string linkText = GenerateRandomString(64);
 			DateTime linkCreationTime = DateTime.UtcNow;
 			DateTime linkExpirationTime = linkCreationTime + linkExpirationPeriod;
 
 			return new ManageConversationLink
 			{
-				ChannelId = channelId,
-				ConversationId = conversationId,
+				ChannelId = activity.ChannelId,
+				ConversationId = activity.Conversation.Id,
 				Text = linkText,
 				CreatedOn = linkCreationTime,
 				ExpiresOn = linkExpirationTime
 			};
+		}
+
+		private string GenerateRandomString(int length)
+		{
+			string randomBase64String = GetRandomBase64String(length);
+			string randomUrlEncodedString = UrlEncodeBase64String(randomBase64String, length);
+
+			return randomUrlEncodedString;
+		}
+
+		private string GetRandomBase64String(int minLength)
+		{
+			byte[] randomBytes = randomByteGenerator.Generate(minLength);
+			string randomBase64String = Convert.ToBase64String(randomBytes);
+
+			return randomBase64String;
+		}
+
+		private static string UrlEncodeBase64String(string base64String, int length)
+		{
+			// Get rid of '=' chars at the end
+			while (length > 0 && base64String[length - 1] == '=')
+			{
+				--length;
+			}
+
+			StringBuilder stringBuilder = new StringBuilder();
+
+			for (int i = 0; i < length; i++)
+			{
+				char currentCharacter = base64String[i];
+				char characterToAppend;
+
+				switch (currentCharacter)
+				{
+					// '+' is not safe in url, so replace it with '-'
+					case '+':
+						characterToAppend = '-';
+						break;
+					// '/' is not safe in url, so replace it with '_'
+					case '/':
+						characterToAppend = '_';
+						break;
+					default:
+						characterToAppend = currentCharacter;
+						break;
+				}
+
+				stringBuilder.Append(characterToAppend);
+			}
+
+			return stringBuilder.ToString();
 		}
 	}
 }
