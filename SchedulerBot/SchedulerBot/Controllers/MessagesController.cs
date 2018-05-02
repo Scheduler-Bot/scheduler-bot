@@ -1,7 +1,9 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
@@ -75,6 +77,12 @@ namespace SchedulerBot.Controllers
 					if (command != null)
 					{
 						replyText = (await command.ExecuteAsync(activity, parsedCommandRequest.Arguments)).Message;
+
+						// TODO: Need to find a better way to handle this.
+						if ("manage".Equals(command.Name, StringComparison.OrdinalIgnoreCase))
+						{
+							replyText = GenerateManageUrl(Request, replyText);
+						}
 					}
 				}
 
@@ -96,6 +104,15 @@ namespace SchedulerBot.Controllers
 			logger.LogInformation("Received the message with the following text: '{0}'", activity.Text);
 			activity.Text = WebUtility.HtmlDecode(activity.Text);
 			logger.LogInformation("Decoded the text to '{0}'", activity.Text);
+		}
+
+		private static string GenerateManageUrl(HttpRequest request, string manageId)
+		{
+			string protocol = request.Scheme;
+			string host = request.Host.ToUriComponent();
+			string url = $"{protocol}://{host}/manage/{manageId}";
+
+			return url;
 		}
 	}
 }
