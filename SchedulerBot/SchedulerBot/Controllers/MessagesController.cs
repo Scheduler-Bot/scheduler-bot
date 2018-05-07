@@ -2,6 +2,7 @@
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -59,7 +60,7 @@ namespace SchedulerBot.Controllers
 		/// </summary>
 		/// <param name="activity">The activity.</param>
 		/// <returns></returns>
-		[Authorize(Roles = "Bot")]
+		[Authorize(Roles = "Bot", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 		[HttpPost]
 		public async Task<OkResult> Post([FromBody] Activity activity)
 		{
@@ -68,7 +69,7 @@ namespace SchedulerBot.Controllers
 				DecodeActivityText(activity);
 
 				string replyText = null;
-				CommandRequestParseResult parsedCommandRequest = commandRequestParser.Parse(activity);
+				ParsedCommandRequest parsedCommandRequest = commandRequestParser.Parse(activity);
 
 				if (parsedCommandRequest != null)
 				{

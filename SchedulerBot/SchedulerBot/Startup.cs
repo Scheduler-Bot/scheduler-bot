@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
@@ -51,13 +50,9 @@ namespace SchedulerBot
 			string appPassword = configuration["Secrets:MicrosoftAppPassword"];
 			SimpleCredentialProvider credentialProvider = new SimpleCredentialProvider(appId, appPassword);
 
-			services.AddAuthentication(
-				options =>
-				{
-					options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-					options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-				})
-				.AddBotAuthentication(credentialProvider);
+			services.AddAuthentication()
+				.AddBotAuthentication(credentialProvider)
+				.AddManageConversationAuthentication();
 
 			services.AddSingleton(new AppCredentials(appId, appPassword));
 
@@ -100,8 +95,7 @@ namespace SchedulerBot
 		/// </summary>
 		/// <param name="app">The application.</param>
 		/// <param name="env">The environment.</param>
-		/// <param name="scopeFactory">The scope factory.</param>
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceScopeFactory scopeFactory)
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
 			app.UseDefaultFiles();
 			app.UseStaticFiles();
