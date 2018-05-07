@@ -29,7 +29,7 @@ namespace SchedulerBot.Middleware
 		public Task InvokeAsync(HttpContext httpContext, IApplicationContext applicationContext)
 		{
 			applicationContext.Host = httpContext.Request.Host.ToUriComponent();
-			applicationContext.Protocol = httpContext.Request.Protocol;
+			applicationContext.Protocol = httpContext.Request.Scheme;
 
 			return next(httpContext);
 		}
