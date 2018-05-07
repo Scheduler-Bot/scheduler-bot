@@ -71,6 +71,7 @@ namespace SchedulerBot
 			services.AddTransient<ICommandSelector, CommandSelector>();
 			services.AddTransient<ICommandRequestParser, CommandRequestParser>();
 			services.AddTransient<IRandomByteGenerator, RandomByteGenerator>();
+			services.AddTransient<IWebUtility, WebUtility>();
 			services.AddTransient<AddCommand>();
 			services.AddTransient<RemoveCommand>();
 			services.AddTransient<ListCommand>();
