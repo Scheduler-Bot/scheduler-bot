@@ -15,12 +15,15 @@ using SchedulerBot.Business.Interfaces;
 using SchedulerBot.Business.Services;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Extensions;
+using SchedulerBot.Infrastructure.Application;
 using SchedulerBot.Infrastructure.BotConnector;
+using SchedulerBot.Infrastructure.Interfaces.Application;
 using SchedulerBot.Infrastructure.Interfaces.BotConnector;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
 using SchedulerBot.Infrastructure.Interfaces.Utils;
 using SchedulerBot.Infrastructure.Schedule;
 using SchedulerBot.Infrastructure.Utils;
+using SchedulerBot.Middleware;
 
 namespace SchedulerBot
 {
@@ -87,6 +90,7 @@ namespace SchedulerBot
 				provider.GetRequiredService<NextCommand>(),
 				provider.GetRequiredService<ManageCommand>()
 			});
+			services.AddScoped<IApplicationContext, ApplicationContext>();
 
 			services.AddSpaStaticFiles(options => options.RootPath = "wwwroot");
 		}
@@ -103,6 +107,7 @@ namespace SchedulerBot
 			app.UseAuthentication();
 			app.UseMvc();
 			app.UseExceptionHandler();
+			app.UseMiddleware<ApplicationContextMiddleware>();
 
 			bool isDevelopment = env.IsDevelopment();
 
