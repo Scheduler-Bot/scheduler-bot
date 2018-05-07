@@ -6,13 +6,13 @@
 	public interface IApplicationContext
 	{
 		/// <summary>
-		/// Gets the application host.
+		/// Gets or sets the application host.
 		/// </summary>
-		string Host { get; }
+		string Host { get; set; }
 
 		/// <summary>
-		/// Gets the protocol being used for accessing the application.
+		/// Gets or sets the protocol being used for accessing the application.
 		/// </summary>
-		string Protocol { get; }
+		string Protocol { get; set; }
 	}
 }
