@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Configuration;
@@ -19,30 +18,40 @@ namespace SchedulerBot.Business.Commands
 	/// <seealso cref="BotCommand" />
 	public class ManageCommand : BotCommand
 	{
+		#region Private Fields
+
 		private readonly SchedulerBotContext context;
-		private readonly IRandomByteGenerator randomByteGenerator;
+		private readonly IWebUtility webUtility;
 		private readonly TimeSpan linkExpirationPeriod;
 		private readonly int linkIdLength;
+
+		#endregion
+
+		#region Constructor
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ManageCommand"/> class.
 		/// </summary>
 		/// <param name="context">The context.</param>
-		/// <param name="randomByteGenerator">The random byte generator.</param>
+		/// <param name="webUtility">The web utility.</param>
 		/// <param name="configuration">The configuration.</param>
 		/// <param name="logger">The logger.</param>
 		public ManageCommand(
 			SchedulerBotContext context,
-			IRandomByteGenerator randomByteGenerator,
+			IWebUtility webUtility,
 			IConfiguration configuration,
 			ILogger<ManageCommand> logger) : base("manage", logger)
 		{
 			this.context = context;
-			this.randomByteGenerator = randomByteGenerator;
+			this.webUtility = webUtility;
 
 			linkExpirationPeriod = TimeSpan.Parse(configuration["Commands:Manage:LinkExpirationPeriod"], CultureInfo.InvariantCulture);
 			linkIdLength = int.Parse(configuration["Commands:Manage:LinkIdLength"], CultureInfo.InvariantCulture);
 		}
+
+		#endregion
+
+		#region Overrides
 
 		/// <inheritdoc />
 		protected override async Task<CommandExecutionResult> ExecuteCoreAsync(Activity activity, string arguments)
@@ -66,9 +75,13 @@ namespace SchedulerBot.Business.Commands
 			return CommandExecutionResult.Success(manageConversationLink.Text);
 		}
 
+		#endregion
+
+		#region Private Methods
+
 		private ManageConversationLink CreateManageConversationLink(Activity activity)
 		{
-			string linkText = GenerateRandomString(linkIdLength);
+			string linkText = webUtility.GenerateRandomUrlCompatibleString(linkIdLength);
 			DateTime linkCreationTime = DateTime.UtcNow;
 			DateTime linkExpirationTime = linkCreationTime + linkExpirationPeriod;
 
@@ -82,56 +95,6 @@ namespace SchedulerBot.Business.Commands
 			};
 		}
 
-		private string GenerateRandomString(int length)
-		{
-			string randomBase64String = GetRandomBase64String(length);
-			string randomUrlEncodedString = UrlEncodeBase64String(randomBase64String, length);
-
-			return randomUrlEncodedString;
-		}
-
-		private string GetRandomBase64String(int minLength)
-		{
-			byte[] randomBytes = randomByteGenerator.Generate(minLength);
-			string randomBase64String = Convert.ToBase64String(randomBytes);
-
-			return randomBase64String;
-		}
-
-		private static string UrlEncodeBase64String(string base64String, int length)
-		{
-			// Get rid of '=' chars at the end
-			while (length > 0 && base64String[length - 1] == '=')
-			{
-				--length;
-			}
-
-			StringBuilder stringBuilder = new StringBuilder();
-
-			for (int i = 0; i < length; i++)
-			{
-				char currentCharacter = base64String[i];
-				char characterToAppend;
-
-				switch (currentCharacter)
-				{
-					// '+' is not safe in url, so replace it with '-'
-					case '+':
-						characterToAppend = '-';
-						break;
-					// '/' is not safe in url, so replace it with '_'
-					case '/':
-						characterToAppend = '_';
-						break;
-					default:
-						characterToAppend = currentCharacter;
-						break;
-				}
-
-				stringBuilder.Append(characterToAppend);
-			}
-
-			return stringBuilder.ToString();
-		}
+		#endregion
 	}
 }
