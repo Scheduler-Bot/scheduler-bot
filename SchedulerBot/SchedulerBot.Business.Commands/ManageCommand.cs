@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Entities;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
+using SchedulerBot.Infrastructure.Interfaces.Application;
 using SchedulerBot.Infrastructure.Interfaces.Utils;
 
 namespace SchedulerBot.Business.Commands
@@ -22,6 +23,7 @@ namespace SchedulerBot.Business.Commands
 
 		private readonly SchedulerBotContext context;
 		private readonly IWebUtility webUtility;
+		private readonly IApplicationContext applicationContext;
 		private readonly TimeSpan linkExpirationPeriod;
 		private readonly int linkIdLength;
 
@@ -34,16 +36,19 @@ namespace SchedulerBot.Business.Commands
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="webUtility">The web utility.</param>
+		/// <param name="applicationContext">The application context.</param>
 		/// <param name="configuration">The configuration.</param>
 		/// <param name="logger">The logger.</param>
 		public ManageCommand(
 			SchedulerBotContext context,
 			IWebUtility webUtility,
+			IApplicationContext applicationContext,
 			IConfiguration configuration,
 			ILogger<ManageCommand> logger) : base("manage", logger)
 		{
 			this.context = context;
 			this.webUtility = webUtility;
+			this.applicationContext = applicationContext;
 
 			linkExpirationPeriod = TimeSpan.Parse(configuration["Commands:Manage:LinkExpirationPeriod"], CultureInfo.InvariantCulture);
 			linkIdLength = int.Parse(configuration["Commands:Manage:LinkIdLength"], CultureInfo.InvariantCulture);

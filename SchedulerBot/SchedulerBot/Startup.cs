@@ -104,10 +104,10 @@ namespace SchedulerBot
 		{
 			app.UseDefaultFiles();
 			app.UseStaticFiles();
-			app.UseAuthentication();
-			app.UseMvc();
 			app.UseExceptionHandler();
 			app.UseMiddleware<ApplicationContextMiddleware>();
+			app.UseAuthentication();
+			app.UseMvc();
 
 			bool isDevelopment = env.IsDevelopment();
 
