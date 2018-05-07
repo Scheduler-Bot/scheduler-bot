@@ -86,7 +86,7 @@ namespace SchedulerBot.Controllers
 						}
 					}
 				}
-
+				
 				if (replyText == null)
 				{
 					replyText = "Sorry, I don't understand you :(";
