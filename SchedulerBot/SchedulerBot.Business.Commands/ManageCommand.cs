@@ -66,7 +66,8 @@ namespace SchedulerBot.Business.Commands
 				activity.ChannelId,
 				activity.Conversation.Id);
 
-			ManageConversationLink manageConversationLink = CreateManageConversationLink(activity);
+			string linkId = webUtility.GenerateRandomUrlCompatibleString(linkIdLength);
+			ManageConversationLink manageConversationLink = CreateManageConversationLink(activity, linkId);
 
 			await context.ManageConversationLinks.AddAsync(manageConversationLink);
 			await context.SaveChangesAsync();
@@ -77,16 +78,21 @@ namespace SchedulerBot.Business.Commands
 				activity.ChannelId,
 				activity.Conversation.Id);
 
-			return CommandExecutionResult.Success(manageConversationLink.Text);
+			string manageUrl = webUtility.GenerateUrl(
+				applicationContext.Protocol,
+				applicationContext.Host,
+				"manage",
+				linkId);
+
+			return CommandExecutionResult.Success(manageUrl);
 		}
 
 		#endregion
 
 		#region Private Methods
 
-		private ManageConversationLink CreateManageConversationLink(Activity activity)
+		private ManageConversationLink CreateManageConversationLink(Activity activity, string linkId)
 		{
-			string linkText = webUtility.GenerateRandomUrlCompatibleString(linkIdLength);
 			DateTime linkCreationTime = DateTime.UtcNow;
 			DateTime linkExpirationTime = linkCreationTime + linkExpirationPeriod;
 
@@ -94,7 +100,7 @@ namespace SchedulerBot.Business.Commands
 			{
 				ChannelId = activity.ChannelId,
 				ConversationId = activity.Conversation.Id,
-				Text = linkText,
+				Text = linkId,
 				CreatedOn = linkCreationTime,
 				ExpiresOn = linkExpirationTime
 			};
