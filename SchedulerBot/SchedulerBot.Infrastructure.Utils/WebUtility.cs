@@ -42,6 +42,26 @@ namespace SchedulerBot.Infrastructure.Utils
 			return randomUrlEncodedString;
 		}
 
+		/// <inheritdoc />
+		public string GenerateUrl(string protocol, string host, params string[] routeParts)
+		{
+			StringBuilder stringBuilder = new StringBuilder();
+
+			stringBuilder
+				.Append(protocol)
+				.Append("://")
+				.Append(host);
+
+			foreach (string routePart in routeParts)
+			{
+				stringBuilder
+					.Append('/')
+					.Append(routePart);
+			}
+
+			return stringBuilder.ToString();
+		}
+
 		#endregion
 
 		#region Private Methods
