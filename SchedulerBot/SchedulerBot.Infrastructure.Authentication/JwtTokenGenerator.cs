@@ -29,10 +29,10 @@ namespace SchedulerBot.Infrastructure.Authentication
 		public JwtTokenGenerator(IConfiguration configuration)
 		{
 			// TODO: This is not generic. Revisit it.
-			base64SigningKey = configuration["Secrets:Authentication[0]:SigningKey"];
-			issuer = configuration["Secrets:Authentication[0]:Issuer"];
-			audience = configuration["Secrets:Authentication[0]:Audience"];
-			expirationPeriod = TimeSpan.Parse(configuration["Secrets:Authentication[0]:ExpirationPeriod"], CultureInfo.InvariantCulture);
+			base64SigningKey = configuration["Secrets:Authentication:0:SigningKey"];
+			issuer = configuration["Secrets:Authentication:0:Issuer"];
+			audience = configuration["Secrets:Authentication:0:Audience"];
+			expirationPeriod = TimeSpan.Parse(configuration["Secrets:Authentication:0:ExpirationPeriod"], CultureInfo.InvariantCulture);
 		}
 
 		#endregion
