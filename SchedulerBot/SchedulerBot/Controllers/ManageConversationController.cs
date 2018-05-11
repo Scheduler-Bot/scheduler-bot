@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SchedulerBot.Authentication;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
@@ -62,6 +64,7 @@ namespace SchedulerBot.Controllers
 		/// <param name="manageId">The temporary identifier assigned to a particular conversation.</param>
 		/// <returns>The result of the method processing.</returns>
 		[HttpGet("{manageId}")]
+		[Authorize(AuthenticationSchemes = ManageConversationAuthenticationConfiguration.AuthenticationSchemeName)]
 		public async Task<IActionResult> Get(string manageId)
 		{
 			logger.LogInformation("Attempting to gather managing information for the id '{0}'", manageId);
@@ -71,14 +74,14 @@ namespace SchedulerBot.Controllers
 				.ManageConversationLinks
 				.FirstOrDefaultAsync(link => link.Text == manageId);
 
-			if (manageLink != null && manageLink.ExpiresOn > DateTime.UtcNow)
+			if (manageLink != null)
 			{
 				logger.LogInformation("Returning managing information for the id '{0}'", manageId);
 				actionResult = Ok(GetConversationScheduledMessageModels(manageLink).ToList());
 			}
 			else
 			{
-				logger.LogInformation("No managing information has been found for the id '{0}'. Either the link does not exist or is has expired", manageId);
+				logger.LogInformation("No managing information has been found for the id '{0}'", manageId);
 				actionResult = NotFound();
 			}
 

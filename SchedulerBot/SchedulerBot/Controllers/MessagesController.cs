@@ -57,9 +57,9 @@ namespace SchedulerBot.Controllers
 		/// Handles HTTP POST requests - user messages to the bot in particular.
 		/// </summary>
 		/// <param name="activity">The activity.</param>
-		/// <returns></returns>
-		[Authorize(Roles = "Bot", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+		/// <returns>The action result.</returns>
 		[HttpPost]
+		[Authorize(Roles = "Bot", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 		public async Task<OkResult> Post([FromBody] Activity activity)
 		{
 			if (activity.Type == ActivityTypes.Message)
