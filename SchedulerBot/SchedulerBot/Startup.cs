@@ -57,7 +57,7 @@ namespace SchedulerBot
 
 			services.AddAuthentication()
 				.AddBotAuthentication(credentialProvider)
-				.AddManageConversationAuthentication();
+				.AddManageConversationAuthentication(configuration);
 
 			services.AddSingleton(new AppCredentials(appId, appPassword));
 

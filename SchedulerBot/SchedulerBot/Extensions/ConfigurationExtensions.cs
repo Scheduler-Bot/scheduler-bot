@@ -77,17 +77,20 @@ namespace SchedulerBot.Extensions
 		/// Configures the authentication scheme used for managing conversations.
 		/// </summary>
 		/// <param name="builder">The builder.</param>
+		/// <param name="configuration">The configuration.</param>
 		/// <returns>
 		/// The same authentication builder that is passed as an argument
 		/// so that it can be used in further configuration chain.
 		/// </returns>
-		public static AuthenticationBuilder AddManageConversationAuthentication(this AuthenticationBuilder builder)
+		public static AuthenticationBuilder AddManageConversationAuthentication(
+			this AuthenticationBuilder builder,
+			IConfiguration configuration)
 		{
 			return builder
 				.AddJwtBearer(
 					ManageConversationAuthenticationConfiguration.AuthenticationSchemeName,
 					ManageConversationAuthenticationConfiguration.AuthenticationSchemeDisplayName,
-					ConfigureJwtValidation);
+					options => ConfigureJwtValidation(options, configuration));
 		}
 
 		/// <summary>
@@ -119,7 +122,7 @@ namespace SchedulerBot.Extensions
 			return EnvironmentName.Development.Equals(currentEnvironmentName, StringComparison.Ordinal);
 		}
 
-		private static void ConfigureJwtValidation(JwtBearerOptions options)
+		private static void ConfigureJwtValidation(JwtBearerOptions options, IConfiguration configuration)
 		{
 			TokenValidationParameters validationParameters = options.TokenValidationParameters;
 
@@ -129,9 +132,9 @@ namespace SchedulerBot.Extensions
 			validationParameters.ValidateLifetime = true;
 			validationParameters.RequireSignedTokens = true;
 			validationParameters.RequireExpirationTime = true;
-			validationParameters.IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String("TLErwc5T7oF6i4qtQWoi7UMMxqQZRjf3gxn9jhghoa+TXnVLBZ39+8i4JJGXcHV22pUppRgchU/wu6oEIE6vyQ=="));
-			validationParameters.ValidAudience = "aud";
-			validationParameters.ValidIssuer = "iss";
+			validationParameters.IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(configuration["Secrets:Authentication:0:SigningKey"]));
+			validationParameters.ValidAudience = configuration["Secrets:Authentication:0:Audience"];
+			validationParameters.ValidIssuer = configuration["Secrets:Authentication:0:Issuer"];
 		}
 	}
 }
