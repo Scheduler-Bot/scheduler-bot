@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SchedulerBot.Infrastructure.Interfaces.Authentication
+﻿namespace SchedulerBot.Infrastructure.Interfaces.Authentication
 {
 	/// <summary>
 	/// Provides a way to generate a JWT token.
@@ -10,8 +8,8 @@ namespace SchedulerBot.Infrastructure.Interfaces.Authentication
 		/// <summary>
 		/// Generates the JWT token.
 		/// </summary>
-		/// <param name="claims">The claims to be included into a resulting token.</param>
+		/// <param name="username">The username.</param>
 		/// <returns>The generated JWT token.</returns>
-		string GenerateToken(IDictionary<string, string> claims);
+		string GenerateToken(string username);
 	}
 }

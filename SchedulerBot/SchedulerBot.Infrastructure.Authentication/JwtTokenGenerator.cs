@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -42,9 +40,9 @@ namespace SchedulerBot.Infrastructure.Authentication
 		#region Implementation of IJwtTokenGenerator
 
 		/// <inheritdoc />
-		public string GenerateToken(IDictionary<string, string> claims)
+		public string GenerateToken(string username)
 		{
-			SecurityTokenDescriptor tokenDescriptor = CreateTokenDescriptor(claims);
+			SecurityTokenDescriptor tokenDescriptor = CreateTokenDescriptor(username);
 			JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
 			JwtSecurityToken token = tokenHandler.CreateJwtSecurityToken(tokenDescriptor);
 
@@ -55,14 +53,14 @@ namespace SchedulerBot.Infrastructure.Authentication
 
 		#region Private Methods
 
-		private SecurityTokenDescriptor CreateTokenDescriptor(IDictionary<string, string> claims)
+		private SecurityTokenDescriptor CreateTokenDescriptor(string username)
 		{
 			SymmetricSecurityKey symmetricSecurityKey = new SymmetricSecurityKey(Convert.FromBase64String(base64SigningKey));
 			SigningCredentials credentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256Signature);
 			DateTime currentDateTime = DateTime.UtcNow;
 			SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
 			{
-				Subject = CreateIdentity(claims),
+				Subject = CreateIdentity(username),
 				Audience = audience,
 				Issuer = issuer,
 				IssuedAt = currentDateTime,
@@ -74,24 +72,13 @@ namespace SchedulerBot.Infrastructure.Authentication
 			return tokenDescriptor;
 		}
 
-		private static ClaimsIdentity CreateIdentity(IDictionary<string, string> claims)
+		private static ClaimsIdentity CreateIdentity(string username)
 		{
-			ClaimsIdentity identity = new ClaimsIdentity();
-
-			identity.AddClaims(CreateDefaultClaims());
-			identity.AddClaims(CreateUserDefinedClaims(claims));
-
-			return identity;
-		}
-
-		private static IEnumerable<Claim> CreateDefaultClaims()
-		{
-			yield return new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N"));
-		}
-
-		private static IEnumerable<Claim> CreateUserDefinedClaims(IDictionary<string, string> claimsDictionary)
-		{
-			return claimsDictionary.Select(pair => new Claim(pair.Key, pair.Value));
+			return new ClaimsIdentity(new[]
+			{
+				new Claim(JwtRegisteredClaimNames.Sub, Guid.NewGuid().ToString("N")),
+				new Claim(JwtRegisteredClaimNames.Jti, username)
+			});
 		}
 
 		#endregion
