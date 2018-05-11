@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
@@ -93,27 +92,7 @@ namespace SchedulerBot.Extensions
 					options => ConfigureJwtValidation(options, configuration));
 		}
 
-		/// <summary>
-		/// Gets the message processing interval from the specified configuration.
-		/// </summary>
-		/// <param name="configuration">The configuration.</param>
-		/// <returns>The message processing interval.</returns>
-		public static TimeSpan GetMessageProcessingInterval(this IConfiguration configuration)
-		{
-			string messageProcessingInterval = Environment.GetEnvironmentVariable("MESSAGE_PROCESSING_INTERVAL");
-
-			if (string.IsNullOrEmpty(messageProcessingInterval))
-			{
-				messageProcessingInterval = configuration["MessageProcessingInterval"];
-			}
-
-			TimeSpan result = TimeSpan.Parse(configuration["MessageProcessingInterval"], CultureInfo.InvariantCulture);
-			return result;
-		}
-
 		private static string GetKeyVaultEndpoint() => Environment.GetEnvironmentVariable("KEYVAULT_ENDPOINT");
-
-		private static string GetMessageProcessingInterval() => Environment.GetEnvironmentVariable("MESSAGE_PROCESSING_INTERVAL");
 
 		private static bool IsDevelopment()
 		{
