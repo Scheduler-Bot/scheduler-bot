@@ -16,8 +16,10 @@ using SchedulerBot.Business.Services;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Extensions;
 using SchedulerBot.Infrastructure.Application;
+using SchedulerBot.Infrastructure.Authentication;
 using SchedulerBot.Infrastructure.BotConnector;
 using SchedulerBot.Infrastructure.Interfaces.Application;
+using SchedulerBot.Infrastructure.Interfaces.Authentication;
 using SchedulerBot.Infrastructure.Interfaces.BotConnector;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
 using SchedulerBot.Infrastructure.Interfaces.Utils;
@@ -75,6 +77,7 @@ namespace SchedulerBot
 			services.AddTransient<ICommandRequestParser, CommandRequestParser>();
 			services.AddTransient<IRandomByteGenerator, RandomByteGenerator>();
 			services.AddTransient<IWebUtility, WebUtility>();
+			services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
 			services.AddTransient<AddCommand>();
 			services.AddTransient<RemoveCommand>();
 			services.AddTransient<ListCommand>();
