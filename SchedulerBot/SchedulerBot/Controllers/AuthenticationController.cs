@@ -51,11 +51,13 @@ namespace SchedulerBot.Controllers
 		/// <summary>
 		/// Handles user requests for temporary authentication to manage conversations.
 		/// </summary>
-		/// <param name="manageId">The manage conversation identifier.</param>
+		/// <param name="request">The manage conversation authentication request.</param>
 		/// <returns>The action result.</returns>
-		[HttpPost("signin/{manageId}")]
-		public async Task<IActionResult> SignIn(string manageId)
+		[HttpPost("signin")]
+		public async Task<IActionResult> SignIn([FromBody] ManageConversationAuthenticationRequest request)
 		{
+			string manageId = request.ManageId;
+
 			logger.LogInformation("Attempting to gather managing information for the id '{0}'", manageId);
 
 			IActionResult actionResult;
