@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Bot.Schema;
@@ -56,9 +57,9 @@ namespace SchedulerBot.Controllers
 		/// Handles HTTP POST requests - user messages to the bot in particular.
 		/// </summary>
 		/// <param name="activity">The activity.</param>
-		/// <returns></returns>
-		[Authorize(Roles = "Bot")]
+		/// <returns>The action result.</returns>
 		[HttpPost]
+		[Authorize(Roles = "Bot", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 		public async Task<OkResult> Post([FromBody] Activity activity)
 		{
 			if (activity.Type == ActivityTypes.Message)
@@ -66,7 +67,7 @@ namespace SchedulerBot.Controllers
 				DecodeActivityText(activity);
 
 				string replyText = null;
-				CommandRequestParseResult parsedCommandRequest = commandRequestParser.Parse(activity);
+				ParsedCommandRequest parsedCommandRequest = commandRequestParser.Parse(activity);
 
 				if (parsedCommandRequest != null)
 				{
@@ -77,7 +78,7 @@ namespace SchedulerBot.Controllers
 						replyText = (await command.ExecuteAsync(activity, parsedCommandRequest.Arguments)).Message;
 					}
 				}
-
+				
 				if (replyText == null)
 				{
 					replyText = "Sorry, I don't understand you :(";

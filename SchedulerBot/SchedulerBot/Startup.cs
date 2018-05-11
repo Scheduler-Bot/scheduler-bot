@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
@@ -16,10 +15,17 @@ using SchedulerBot.Business.Interfaces;
 using SchedulerBot.Business.Services;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Extensions;
+using SchedulerBot.Infrastructure.Application;
+using SchedulerBot.Infrastructure.Authentication;
 using SchedulerBot.Infrastructure.BotConnector;
+using SchedulerBot.Infrastructure.Interfaces.Application;
+using SchedulerBot.Infrastructure.Interfaces.Authentication;
 using SchedulerBot.Infrastructure.Interfaces.BotConnector;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
+using SchedulerBot.Infrastructure.Interfaces.Utils;
 using SchedulerBot.Infrastructure.Schedule;
+using SchedulerBot.Infrastructure.Utils;
+using SchedulerBot.Middleware;
 
 namespace SchedulerBot
 {
@@ -49,13 +55,9 @@ namespace SchedulerBot
 			string appPassword = configuration["Secrets:MicrosoftAppPassword"];
 			SimpleCredentialProvider credentialProvider = new SimpleCredentialProvider(appId, appPassword);
 
-			services.AddAuthentication(
-				options =>
-				{
-					options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-					options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-				})
-				.AddBotAuthentication(credentialProvider);
+			services.AddAuthentication()
+				.AddBotAuthentication(credentialProvider)
+				.AddManageConversationAuthentication(configuration);
 
 			services.AddSingleton(new AppCredentials(appId, appPassword));
 
@@ -73,19 +75,25 @@ namespace SchedulerBot
 			services.AddTransient<IScheduleDescriptionFormatter, CronDescriptionFormatter>();
 			services.AddTransient<ICommandSelector, CommandSelector>();
 			services.AddTransient<ICommandRequestParser, CommandRequestParser>();
+			services.AddTransient<IRandomByteGenerator, RandomByteGenerator>();
+			services.AddTransient<IWebUtility, WebUtility>();
+			services.AddTransient<IJwtTokenGenerator, JwtTokenGenerator>();
 			services.AddTransient<AddCommand>();
 			services.AddTransient<RemoveCommand>();
 			services.AddTransient<ListCommand>();
 			services.AddTransient<EchoCommand>();
 			services.AddTransient<NextCommand>();
+			services.AddTransient<ManageCommand>();
 			services.AddTransient<IList<IBotCommand>>(provider => new IBotCommand[]
 			{
 				provider.GetRequiredService<AddCommand>(),
 				provider.GetRequiredService<RemoveCommand>(),
 				provider.GetRequiredService<ListCommand>(),
 				provider.GetRequiredService<EchoCommand>(),
-				provider.GetRequiredService<NextCommand>()
+				provider.GetRequiredService<NextCommand>(),
+				provider.GetRequiredService<ManageCommand>()
 			});
+			services.AddScoped<IApplicationContext, ApplicationContext>();
 
 			services.AddSpaStaticFiles(options => options.RootPath = "wwwroot");
 		}
@@ -95,14 +103,14 @@ namespace SchedulerBot
 		/// </summary>
 		/// <param name="app">The application.</param>
 		/// <param name="env">The environment.</param>
-		/// <param name="scopeFactory">The scope factory.</param>
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceScopeFactory scopeFactory)
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
 			app.UseDefaultFiles();
 			app.UseStaticFiles();
+			app.UseExceptionHandler();
+			app.UseMiddleware<ApplicationContextMiddleware>();
 			app.UseAuthentication();
 			app.UseMvc();
-			app.UseExceptionHandler();
 
 			bool isDevelopment = env.IsDevelopment();
 

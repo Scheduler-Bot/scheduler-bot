@@ -14,7 +14,9 @@ namespace SchedulerBot.Database.Core.Configurations
 		public void Configure(EntityTypeBuilder<ServiceUrl> builder)
 		{
 			builder.HasKey(url => url.Id);
-			builder.Property(url => url.Id).ValueGeneratedOnAdd();
+			builder
+				.Property(url => url.Id)
+				.ValueGeneratedOnAdd();
 			builder
 				.Property(url => url.Address)
 				.IsRequired();

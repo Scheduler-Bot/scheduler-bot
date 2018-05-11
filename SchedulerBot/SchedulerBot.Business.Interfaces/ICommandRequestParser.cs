@@ -9,10 +9,10 @@ namespace SchedulerBot.Business.Interfaces
 	public interface ICommandRequestParser
 	{
 		/// <summary>
-		/// Parses the specified activity to a <see cref="CommandRequestParseResult"/> instance.
+		/// Parses the specified activity to a <see cref="ParsedCommandRequest"/> instance.
 		/// </summary>
 		/// <param name="activity">The activity.</param>
-		/// <returns><see cref="CommandRequestParseResult"/> instance describing which command should be invoked and how.</returns>
-		CommandRequestParseResult Parse(Activity activity);
+		/// <returns><see cref="ParsedCommandRequest"/> instance describing which command should be invoked and how.</returns>
+		ParsedCommandRequest Parse(Activity activity);
 	}
 }
