@@ -16,11 +16,13 @@ using SchedulerBot.Business.Services;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Extensions;
 using SchedulerBot.Infrastructure.Application;
+using SchedulerBot.Infrastructure.Application.Configuration;
 using SchedulerBot.Infrastructure.Authentication;
 using SchedulerBot.Infrastructure.BotConnector;
 using SchedulerBot.Infrastructure.Interfaces.Application;
 using SchedulerBot.Infrastructure.Interfaces.Authentication;
 using SchedulerBot.Infrastructure.Interfaces.BotConnector;
+using SchedulerBot.Infrastructure.Interfaces.Configuration;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
 using SchedulerBot.Infrastructure.Interfaces.Utils;
 using SchedulerBot.Infrastructure.Schedule;
@@ -51,17 +53,33 @@ namespace SchedulerBot
 		/// <param name="services">The services.</param>
 		public void ConfigureServices(IServiceCollection services)
 		{
-			string appId = configuration["Secrets:MicrosoftAppIdKey"];
-			string appPassword = configuration["Secrets:MicrosoftAppPassword"];
+			IManageCommandConfiguration manageCommandConfiguration = new ManageCommandConfiguration();
+			INextCommandConfiguration nextCommandConfiguration = new NextCommandConfiguration();
+			ICommandConfiguration commandConfiguration = new CommandConfiguration(manageCommandConfiguration, nextCommandConfiguration);
+			IAuthenticationConfiguration authenticationConfiguration = new AuthenticationConfiguration();
+			ISecretConfiguration secretConfiguration = new SecretConfiguration(authenticationConfiguration);
+			IApplicationConfiguration applicationConfiguration = new ApplicationConfiguration(secretConfiguration, commandConfiguration);
+
+			configuration.Bind(applicationConfiguration);
+
+			services.AddSingleton(authenticationConfiguration);
+			services.AddSingleton(commandConfiguration);
+			services.AddSingleton(manageCommandConfiguration);
+			services.AddSingleton(nextCommandConfiguration);
+			services.AddSingleton(secretConfiguration);
+			services.AddSingleton(applicationConfiguration);
+
+			string appId = secretConfiguration.MicrosoftAppId;
+			string appPassword = secretConfiguration.MicrosoftAppPassword;
 			SimpleCredentialProvider credentialProvider = new SimpleCredentialProvider(appId, appPassword);
 
 			services.AddAuthentication()
 				.AddBotAuthentication(credentialProvider)
-				.AddManageConversationAuthentication(configuration);
+				.AddManageConversationAuthentication(authenticationConfiguration);
 
 			services.AddSingleton(new AppCredentials(appId, appPassword));
 
-			string connectionString = configuration.GetConnectionString();
+			string connectionString = secretConfiguration.ConnectionString;
 
 			services.AddDbContext<SchedulerBotContext>(builder => builder.UseSqlServer(connectionString));
 

@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Entities;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Infrastructure.Interfaces.Application;
+using SchedulerBot.Infrastructure.Interfaces.Configuration;
 using SchedulerBot.Infrastructure.Interfaces.Utils;
 
 namespace SchedulerBot.Business.Commands
@@ -43,15 +42,15 @@ namespace SchedulerBot.Business.Commands
 			SchedulerBotContext context,
 			IWebUtility webUtility,
 			IApplicationContext applicationContext,
-			IConfiguration configuration,
+			IManageCommandConfiguration configuration,
 			ILogger<ManageCommand> logger) : base("manage", logger)
 		{
 			this.context = context;
 			this.webUtility = webUtility;
 			this.applicationContext = applicationContext;
 
-			linkExpirationPeriod = TimeSpan.Parse(configuration["Commands:Manage:LinkExpirationPeriod"], CultureInfo.InvariantCulture);
-			linkIdLength = int.Parse(configuration["Commands:Manage:LinkIdLength"], CultureInfo.InvariantCulture);
+			linkExpirationPeriod = configuration.LinkExpirationPeriod;
+			linkIdLength = configuration.LinkIdLength;
 		}
 
 		#endregion

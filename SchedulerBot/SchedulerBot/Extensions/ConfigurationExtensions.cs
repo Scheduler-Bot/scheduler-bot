@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SchedulerBot.Authentication;
 using SchedulerBot.Database.Core;
+using SchedulerBot.Infrastructure.Interfaces.Configuration;
 
 namespace SchedulerBot.Extensions
 {
@@ -60,19 +61,6 @@ namespace SchedulerBot.Extensions
 		}
 
 		/// <summary>
-		/// Gets the connection string from the specified configuration.
-		/// </summary>
-		/// <param name="configuration">The configuration.</param>
-		/// <returns>The connection string</returns>
-		public static string GetConnectionString(this IConfiguration configuration)
-		{
-			string settingName = IsDevelopment() ? "ConnectionString" : "Secrets:ConnectionString";
-			string connectionString = configuration[settingName];
-
-			return connectionString;
-		}
-
-		/// <summary>
 		/// Configures the authentication scheme used for managing conversations.
 		/// </summary>
 		/// <param name="builder">The builder.</param>
@@ -83,7 +71,7 @@ namespace SchedulerBot.Extensions
 		/// </returns>
 		public static AuthenticationBuilder AddManageConversationAuthentication(
 			this AuthenticationBuilder builder,
-			IConfiguration configuration)
+			IAuthenticationConfiguration configuration)
 		{
 			return builder
 				.AddJwtBearer(
@@ -101,7 +89,7 @@ namespace SchedulerBot.Extensions
 			return EnvironmentName.Development.Equals(currentEnvironmentName, StringComparison.Ordinal);
 		}
 
-		private static void ConfigureJwtValidation(JwtBearerOptions options, IConfiguration configuration)
+		private static void ConfigureJwtValidation(JwtBearerOptions options, IAuthenticationConfiguration configuration)
 		{
 			TokenValidationParameters validationParameters = options.TokenValidationParameters;
 
@@ -111,9 +99,9 @@ namespace SchedulerBot.Extensions
 			validationParameters.ValidateLifetime = true;
 			validationParameters.RequireSignedTokens = true;
 			validationParameters.RequireExpirationTime = true;
-			validationParameters.IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(configuration["Secrets:Authentication:0:SigningKey"]));
-			validationParameters.ValidAudience = configuration["Secrets:Authentication:0:Audience"];
-			validationParameters.ValidIssuer = configuration["Secrets:Authentication:0:Issuer"];
+			validationParameters.IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(configuration.SigningKey));
+			validationParameters.ValidAudience = configuration.Audience;
+			validationParameters.ValidIssuer = configuration.Issuer;
 		}
 	}
 }

@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SchedulerBot.Infrastructure.Interfaces.Authentication;
+using SchedulerBot.Infrastructure.Interfaces.Configuration;
 
 namespace SchedulerBot.Infrastructure.Authentication
 {
@@ -13,10 +12,7 @@ namespace SchedulerBot.Infrastructure.Authentication
 	{
 		#region Private Fields
 
-		private readonly string base64SigningKey;
-		private readonly string issuer;
-		private readonly string audience;
-		private readonly TimeSpan expirationPeriod;
+		private readonly IAuthenticationConfiguration configuration;
 
 		#endregion
 
@@ -26,13 +22,9 @@ namespace SchedulerBot.Infrastructure.Authentication
 		/// Initializes a new instance of the <see cref="JwtTokenGenerator"/> class.
 		/// </summary>
 		/// <param name="configuration">The configuration.</param>
-		public JwtTokenGenerator(IConfiguration configuration)
+		public JwtTokenGenerator(IAuthenticationConfiguration configuration)
 		{
-			// TODO: This is not generic. Revisit it.
-			base64SigningKey = configuration["Secrets:Authentication:0:SigningKey"];
-			issuer = configuration["Secrets:Authentication:0:Issuer"];
-			audience = configuration["Secrets:Authentication:0:Audience"];
-			expirationPeriod = TimeSpan.Parse(configuration["Secrets:Authentication:0:ExpirationPeriod"], CultureInfo.InvariantCulture);
+			this.configuration = configuration;
 		}
 
 		#endregion
@@ -55,17 +47,17 @@ namespace SchedulerBot.Infrastructure.Authentication
 
 		private SecurityTokenDescriptor CreateTokenDescriptor(string username)
 		{
-			SymmetricSecurityKey symmetricSecurityKey = new SymmetricSecurityKey(Convert.FromBase64String(base64SigningKey));
+			SymmetricSecurityKey symmetricSecurityKey = new SymmetricSecurityKey(Convert.FromBase64String(configuration.SigningKey));
 			SigningCredentials credentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256Signature);
 			DateTime currentDateTime = DateTime.UtcNow;
 			SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
 			{
 				Subject = CreateIdentity(username),
-				Audience = audience,
-				Issuer = issuer,
+				Audience = configuration.Audience,
+				Issuer = configuration.Audience,
 				IssuedAt = currentDateTime,
 				NotBefore = currentDateTime,
-				Expires = currentDateTime + expirationPeriod,
+				Expires = currentDateTime + configuration.ExpirationPeriod,
 				SigningCredentials = credentials
 			};
 
