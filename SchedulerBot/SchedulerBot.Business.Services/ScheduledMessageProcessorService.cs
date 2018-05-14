@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -15,6 +13,7 @@ using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
 using SchedulerBot.Infrastructure.Interfaces.BotConnector;
+using SchedulerBot.Infrastructure.Interfaces.Configuration;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
 namespace SchedulerBot.Business.Services
@@ -51,7 +50,7 @@ namespace SchedulerBot.Business.Services
 		public ScheduledMessageProcessorService(
 			IScheduleParser scheduleParser,
 			IServiceScopeFactory scopeFactory,
-			IConfiguration configuration,
+			IApplicationConfiguration configuration,
 			ILogger<ScheduledMessageProcessorService> logger,
 			IMessageProcessor messageProcessor)
 		{
@@ -60,7 +59,7 @@ namespace SchedulerBot.Business.Services
 			this.logger = logger;
 			this.messageProcessor = messageProcessor;
 
-			pollingInterval = TimeSpan.Parse(configuration["MessageProcessingInterval"], CultureInfo.InvariantCulture);
+			pollingInterval = configuration.MessageProcessingInterval;
 			serviceCancellationTokenSource = new CancellationTokenSource();
 			serviceCancellationToken = serviceCancellationTokenSource.Token;
 		}

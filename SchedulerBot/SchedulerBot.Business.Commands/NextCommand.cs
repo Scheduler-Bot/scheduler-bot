@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Commands.Utils;
 using SchedulerBot.Business.Entities;
@@ -14,6 +13,7 @@ using SchedulerBot.Business.Utils;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
+using SchedulerBot.Infrastructure.Interfaces.Configuration;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
 namespace SchedulerBot.Business.Commands
@@ -45,14 +45,14 @@ namespace SchedulerBot.Business.Commands
 		public NextCommand(
 			SchedulerBotContext context,
 			IScheduleParser scheduleParser,
-			IConfiguration configuration,
+			INextCommandConfiguration configuration,
 			ILogger<ListCommand> logger) : base("next", logger)
 		{
 			this.context = context;
 			this.scheduleParser = scheduleParser;
 
-			defaultMessageCount = int.Parse(configuration["Commands:Next:DefaultMessageCount"], CultureInfo.InvariantCulture);
-			maxMessageCount = int.Parse(configuration["Commands:Next:MaxMessageCount"], CultureInfo.InvariantCulture);
+			defaultMessageCount = configuration.DefaultMessageCount;
+			maxMessageCount = configuration.MaxMessageCount;
 		}
 
 		#endregion
