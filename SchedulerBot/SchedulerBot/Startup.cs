@@ -69,7 +69,7 @@ namespace SchedulerBot
 			services.AddSingleton(secretConfiguration);
 			services.AddSingleton(applicationConfiguration);
 
-			string appId = secretConfiguration.MicrosoftAppId;
+			string appId = secretConfiguration.MicrosoftAppIdKey;
 			string appPassword = secretConfiguration.MicrosoftAppPassword;
 			SimpleCredentialProvider credentialProvider = new SimpleCredentialProvider(appId, appPassword);
 
