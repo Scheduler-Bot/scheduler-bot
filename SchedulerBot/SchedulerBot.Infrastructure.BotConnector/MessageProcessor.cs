@@ -6,9 +6,9 @@ using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
-using SchedulerBot.Business.Entities;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Infrastructure.Interfaces.BotConnector;
+using SchedulerBot.Infrastructure.Interfaces.Configuration;
 
 namespace SchedulerBot.Infrastructure.BotConnector
 {
@@ -18,19 +18,19 @@ namespace SchedulerBot.Infrastructure.BotConnector
 	/// <seealso cref="IMessageProcessor" />
 	public class MessageProcessor : IMessageProcessor
 	{
-		private readonly AppCredentials appCredentials;
+		private readonly IMicrosoftCredentialConfiguration microsoftCredentialConfiguration;
 		private readonly ILogger<MessageProcessor> logger;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MessageProcessor"/> class.
 		/// </summary>
-		/// <param name="appCredentials">The application credentials.</param>
+		/// <param name="microsoftCredentialConfiguration">The Microsoft credential configuration.</param>
 		/// <param name="logger">The logger.</param>
 		public MessageProcessor(
-			AppCredentials appCredentials,
+			IMicrosoftCredentialConfiguration microsoftCredentialConfiguration,
 			ILogger<MessageProcessor> logger)
 		{
-			this.appCredentials = appCredentials;
+			this.microsoftCredentialConfiguration = microsoftCredentialConfiguration;
 			this.logger = logger;
 		}
 
@@ -84,8 +84,8 @@ namespace SchedulerBot.Infrastructure.BotConnector
 		private MicrosoftAppCredentials BuildMicrosoftAppCredentials()
 		{
 			MicrosoftAppCredentials credentials = new MicrosoftAppCredentials(
-				appCredentials.AppId,
-				appCredentials.AppPassword);
+				microsoftCredentialConfiguration.Id,
+				microsoftCredentialConfiguration.Password);
 			return credentials;
 		}
 

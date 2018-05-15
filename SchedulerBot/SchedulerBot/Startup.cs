@@ -10,7 +10,6 @@ using Microsoft.Bot.Connector;
 using Microsoft.Bot.Connector.Authentication;
 using SchedulerBot.Business.Commands;
 using SchedulerBot.Business.Commands.Utils;
-using SchedulerBot.Business.Entities;
 using SchedulerBot.Business.Interfaces;
 using SchedulerBot.Business.Services;
 using SchedulerBot.Database.Core;
@@ -57,7 +56,8 @@ namespace SchedulerBot
 			INextCommandConfiguration nextCommandConfiguration = new NextCommandConfiguration();
 			ICommandConfiguration commandConfiguration = new CommandConfiguration(manageCommandConfiguration, nextCommandConfiguration);
 			IAuthenticationConfiguration authenticationConfiguration = new AuthenticationConfiguration();
-			ISecretConfiguration secretConfiguration = new SecretConfiguration(authenticationConfiguration);
+			IMicrosoftCredentialConfiguration microsoftCredentialConfiguration = new MicrosoftCredentialConfiguration();
+			ISecretConfiguration secretConfiguration = new SecretConfiguration(authenticationConfiguration, microsoftCredentialConfiguration);
 			IApplicationConfiguration applicationConfiguration = new ApplicationConfiguration(secretConfiguration, commandConfiguration);
 
 			configuration.Bind(applicationConfiguration);
@@ -66,18 +66,16 @@ namespace SchedulerBot
 			services.AddSingleton(commandConfiguration);
 			services.AddSingleton(manageCommandConfiguration);
 			services.AddSingleton(nextCommandConfiguration);
+			services.AddSingleton(microsoftCredentialConfiguration);
 			services.AddSingleton(secretConfiguration);
 			services.AddSingleton(applicationConfiguration);
 
-			string appId = secretConfiguration.MicrosoftAppIdKey;
-			string appPassword = secretConfiguration.MicrosoftAppPassword;
-			SimpleCredentialProvider credentialProvider = new SimpleCredentialProvider(appId, appPassword);
+			SimpleCredentialProvider credentialProvider = new SimpleCredentialProvider(
+				microsoftCredentialConfiguration.Id, microsoftCredentialConfiguration.Password);
 
 			services.AddAuthentication()
 				.AddBotAuthentication(credentialProvider)
 				.AddManageConversationAuthentication(authenticationConfiguration);
-
-			services.AddSingleton(new AppCredentials(appId, appPassword));
 
 			string connectionString = secretConfiguration.ConnectionString;
 
