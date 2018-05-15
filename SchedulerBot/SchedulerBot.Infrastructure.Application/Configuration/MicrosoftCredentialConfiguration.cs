@@ -3,12 +3,12 @@
 namespace SchedulerBot.Infrastructure.Application.Configuration
 {
 	/// <inheritdoc />
-	public class NextCommandConfiguration : INextCommandConfiguration
+	public class MicrosoftCredentialConfiguration : IMicrosoftCredentialConfiguration
 	{
 		/// <inheritdoc />
-		public int MaxMessageCount { get; set; }
+		public string Id { get; set; }
 
 		/// <inheritdoc />
-		public int DefaultMessageCount { get; set; }
+		public string Password { get; set; }
 	}
 }

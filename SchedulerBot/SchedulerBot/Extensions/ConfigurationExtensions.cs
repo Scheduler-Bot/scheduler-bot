@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Bot.Connector;
+using Microsoft.Bot.Connector.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
@@ -20,6 +22,8 @@ namespace SchedulerBot.Extensions
 	/// </summary>
 	internal static class ConfigurationExtensions
 	{
+		#region Public Methods
+
 		/// <summary>
 		/// Adds the azure secrets.
 		/// </summary>
@@ -47,7 +51,7 @@ namespace SchedulerBot.Extensions
 		/// </summary>
 		/// <param name="host">The host.</param>
 		/// <returns>The same <see cref="IWebHost"/> instance which has been passed to the method.</returns>
-		internal static IWebHost EnsureDatabaseMigrated(this IWebHost host)
+		public static IWebHost EnsureDatabaseMigrated(this IWebHost host)
 		{
 			using (IServiceScope scope = host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
 			{
@@ -61,6 +65,26 @@ namespace SchedulerBot.Extensions
 		}
 
 		/// <summary>
+		/// Configures the authentication for the bot.
+		/// </summary>
+		/// <param name="builder">The builder.</param>
+		/// <param name="configuration">The configuration.</param>
+		/// <returns>
+		/// The same authentication builder that is passed as an argument
+		/// so that it can be used in further configuration chain.
+		/// </returns>
+		public static AuthenticationBuilder AddBotAuthentication(
+			this AuthenticationBuilder builder,
+			IConfiguration configuration)
+		{
+			SimpleCredentialProvider credentialProvider = new SimpleCredentialProvider(
+				configuration["Secrets:MicrosoftAppCredentials:Id"],
+				configuration["Secrets:MicrosoftAppCredentials:Password"]);
+
+			return builder.AddBotAuthentication(credentialProvider);
+		}
+
+		/// <summary>
 		/// Configures the authentication scheme used for managing conversations.
 		/// </summary>
 		/// <param name="builder">The builder.</param>
@@ -71,7 +95,7 @@ namespace SchedulerBot.Extensions
 		/// </returns>
 		public static AuthenticationBuilder AddManageConversationAuthentication(
 			this AuthenticationBuilder builder,
-			IAuthenticationConfiguration configuration)
+			IConfiguration configuration)
 		{
 			return builder
 				.AddJwtBearer(
@@ -80,16 +104,32 @@ namespace SchedulerBot.Extensions
 					options => ConfigureJwtValidation(options, configuration));
 		}
 
-		private static string GetKeyVaultEndpoint() => Environment.GetEnvironmentVariable("KEYVAULT_ENDPOINT");
-
-		private static bool IsDevelopment()
+		/// <summary>
+		/// Registers the database context.
+		/// </summary>
+		/// <param name="services">The services.</param>
+		/// <returns>
+		/// The same service collection that is passed as an argument
+		/// so that it can be used in further configuration chain.
+		/// </returns>
+		public static IServiceCollection AddDbContext(this IServiceCollection services)
 		{
-			string currentEnvironmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+			return services.AddDbContext<SchedulerBotContext>((provider, builder) =>
+			{
+				ISecretConfiguration secretConfiguration = provider.GetRequiredService<ISecretConfiguration>();
+				string connectionString = secretConfiguration.ConnectionString;
 
-			return EnvironmentName.Development.Equals(currentEnvironmentName, StringComparison.Ordinal);
+				builder.UseSqlServer(connectionString);
+			});
 		}
 
-		private static void ConfigureJwtValidation(JwtBearerOptions options, IAuthenticationConfiguration configuration)
+		#endregion
+
+		#region Private Methods
+
+		private static string GetKeyVaultEndpoint() => Environment.GetEnvironmentVariable("KEYVAULT_ENDPOINT");
+		
+		private static void ConfigureJwtValidation(JwtBearerOptions options, IConfiguration configuration)
 		{
 			TokenValidationParameters validationParameters = options.TokenValidationParameters;
 
@@ -99,9 +139,11 @@ namespace SchedulerBot.Extensions
 			validationParameters.ValidateLifetime = true;
 			validationParameters.RequireSignedTokens = true;
 			validationParameters.RequireExpirationTime = true;
-			validationParameters.IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(configuration.SigningKey));
-			validationParameters.ValidAudience = configuration.Audience;
-			validationParameters.ValidIssuer = configuration.Issuer;
+			validationParameters.IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(configuration["Secrets:Authentication:SigningKey"]));
+			validationParameters.ValidAudience = configuration["Secrets:Authentication:Audience"];
+			validationParameters.ValidIssuer = configuration["Secrets:Authentication:Issuer"];
 		}
+
+		#endregion
 	}
 }
