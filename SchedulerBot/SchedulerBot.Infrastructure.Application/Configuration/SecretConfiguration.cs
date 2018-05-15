@@ -9,13 +9,13 @@ namespace SchedulerBot.Infrastructure.Application.Configuration
 		/// Initializes a new instance of the <see cref="SecretConfiguration"/> class.
 		/// </summary>
 		/// <param name="authentication">The authentication.</param>
-		/// <param name="microsoftCredentials">The Microsoft application credentials.</param>
+		/// <param name="microsoftAppCredentials">The Microsoft application credentials.</param>
 		public SecretConfiguration(
 			IAuthenticationConfiguration authentication,
-			IMicrosoftCredentialConfiguration microsoftCredentials)
+			IMicrosoftCredentialConfiguration microsoftAppCredentials)
 		{
 			Authentication = authentication;
-			MicrosoftCredentials = microsoftCredentials;
+			MicrosoftAppCredentials = microsoftAppCredentials;
 		}
 
 		/// <inheritdoc />
@@ -25,6 +25,6 @@ namespace SchedulerBot.Infrastructure.Application.Configuration
 		public IAuthenticationConfiguration Authentication { get; }
 
 		/// <inheritdoc />
-		public IMicrosoftCredentialConfiguration MicrosoftCredentials { get; }
+		public IMicrosoftCredentialConfiguration MicrosoftAppCredentials { get; }
 	}
 }

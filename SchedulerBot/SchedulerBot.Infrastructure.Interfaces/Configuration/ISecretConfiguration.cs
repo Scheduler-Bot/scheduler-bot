@@ -18,6 +18,6 @@
 		/// <summary>
 		/// Gets the Microsoft application credentials.
 		/// </summary>
-		IMicrosoftCredentialConfiguration MicrosoftCredentials { get; }
+		IMicrosoftCredentialConfiguration MicrosoftAppCredentials { get; }
 	}
 }
