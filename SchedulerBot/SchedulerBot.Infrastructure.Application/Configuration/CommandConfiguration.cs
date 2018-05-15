@@ -19,9 +19,9 @@ namespace SchedulerBot.Infrastructure.Application.Configuration
 		}
 
 		/// <inheritdoc />
-		public IManageCommandConfiguration Manage { get; set; }
+		public IManageCommandConfiguration Manage { get; }
 
 		/// <inheritdoc />
-		public INextCommandConfiguration Next { get; set; }
+		public INextCommandConfiguration Next { get; }
 	}
 }

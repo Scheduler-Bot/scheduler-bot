@@ -23,8 +23,8 @@ namespace SchedulerBot.Infrastructure.Interfaces.Configuration
 		ISecretConfiguration Secrets { get; }
 
 		/// <summary>
-		/// Gets or sets the command configuration.
+		/// Gets the command configuration.
 		/// </summary>
-		ICommandConfiguration Commands { get; set; }
+		ICommandConfiguration Commands { get; }
 	}
 }

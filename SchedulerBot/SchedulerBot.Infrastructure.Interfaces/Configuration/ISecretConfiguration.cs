@@ -11,18 +11,13 @@
 		string ConnectionString { get; set; }
 
 		/// <summary>
-		/// Gets or sets the Microsoft application identifier.
+		/// Gets the authentication configuration.
 		/// </summary>
-		string MicrosoftAppIdKey { get; set; }
+		IAuthenticationConfiguration Authentication { get; }
 
 		/// <summary>
-		/// Gets or sets the Microsoft application password.
+		/// Gets the Microsoft application credentials.
 		/// </summary>
-		string MicrosoftAppPassword { get; set; }
-
-		/// <summary>
-		/// Gets or sets the authentication configuration.
-		/// </summary>
-		IAuthenticationConfiguration Authentication { get; set; }
+		IMicrosoftCredentialConfiguration MicrosoftCredentials { get; }
 	}
 }

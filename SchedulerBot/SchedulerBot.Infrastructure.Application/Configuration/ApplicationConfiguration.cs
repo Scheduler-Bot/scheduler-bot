@@ -29,6 +29,6 @@ namespace SchedulerBot.Infrastructure.Application.Configuration
 		public ISecretConfiguration Secrets { get; }
 
 		/// <inheritdoc />
-		public ICommandConfiguration Commands { get; set; }
+		public ICommandConfiguration Commands { get; }
 	}
 }

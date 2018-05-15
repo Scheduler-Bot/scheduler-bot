@@ -6,13 +6,13 @@
 	public interface ICommandConfiguration
 	{
 		/// <summary>
-		/// Gets or sets the manage command configuration.
+		/// Gets the manage command configuration.
 		/// </summary>
-		IManageCommandConfiguration Manage { get; set; }
+		IManageCommandConfiguration Manage { get; }
 
 		/// <summary>
-		/// Gets or sets the next.
+		/// Gets the next command configuration.
 		/// </summary>
-		INextCommandConfiguration Next { get; set; }
+		INextCommandConfiguration Next { get; }
 	}
 }
