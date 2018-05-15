@@ -24,6 +24,7 @@
     <ProjectReference Include="..\SchedulerBot.Business.Interfaces\SchedulerBot.Business.Interfaces.csproj" />
     <ProjectReference Include="..\SchedulerBot.Business.Services\SchedulerBot.Business.Services.csproj" />
     <ProjectReference Include="..\SchedulerBot.Database.Core\SchedulerBot.Database.Core.csproj" />
+    <ProjectReference Include="..\SchedulerBot.DependencyInjection\SchedulerBot.DependencyInjection.csproj" />
     <ProjectReference Include="..\SchedulerBot.Infrastructure.Application\SchedulerBot.Infrastructure.Application.csproj" />
     <ProjectReference Include="..\SchedulerBot.Infrastructure.Authentication\SchedulerBot.Infrastructure.Authentication.csproj" />
     <ProjectReference Include="..\SchedulerBot.Infrastructure.BotConnector\SchedulerBot.Infrastructure.BotConnector.csproj" />

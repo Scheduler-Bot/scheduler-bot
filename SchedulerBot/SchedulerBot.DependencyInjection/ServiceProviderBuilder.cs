@@ -2,9 +2,7 @@
 using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SchedulerBot.Infrastructure.Interfaces.Configuration;
 
 namespace SchedulerBot.DependencyInjection
 {
@@ -28,18 +26,7 @@ namespace SchedulerBot.DependencyInjection
 			IContainer container = builder.Build();
 			IServiceProvider serviceProvider = new AutofacServiceProvider(container);
 
-			InitializeConfiguration(serviceProvider);
-
 			return serviceProvider;
-		}
-
-		private static void InitializeConfiguration(IServiceProvider serviceProvider)
-		{
-			IConfiguration configuration = serviceProvider.GetRequiredService<IConfiguration>();
-			IApplicationConfiguration applicationConfiguration = serviceProvider.GetRequiredService<IApplicationConfiguration>();
-
-			// Initialize application configuration.
-			configuration.Bind(applicationConfiguration);
 		}
 	}
 }
