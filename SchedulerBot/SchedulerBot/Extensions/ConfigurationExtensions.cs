@@ -68,18 +68,18 @@ namespace SchedulerBot.Extensions
 		/// Configures the authentication for the bot.
 		/// </summary>
 		/// <param name="builder">The builder.</param>
-		/// <param name="microsoftCredentialConfiguration">The Microsoft application credential configuration.</param>
+		/// <param name="configuration">The configuration.</param>
 		/// <returns>
 		/// The same authentication builder that is passed as an argument
 		/// so that it can be used in further configuration chain.
 		/// </returns>
 		public static AuthenticationBuilder AddBotAuthentication(
 			this AuthenticationBuilder builder,
-			IMicrosoftCredentialConfiguration microsoftCredentialConfiguration)
+			IConfiguration configuration)
 		{
 			SimpleCredentialProvider credentialProvider = new SimpleCredentialProvider(
-				microsoftCredentialConfiguration.Id,
-				microsoftCredentialConfiguration.Password);
+				configuration["Secrets:MicrosoftAppCredentials:Id"],
+				configuration["Secrets:MicrosoftAppCredentials:Password"]);
 
 			return builder.AddBotAuthentication(credentialProvider);
 		}
@@ -95,7 +95,7 @@ namespace SchedulerBot.Extensions
 		/// </returns>
 		public static AuthenticationBuilder AddManageConversationAuthentication(
 			this AuthenticationBuilder builder,
-			IAuthenticationConfiguration configuration)
+			IConfiguration configuration)
 		{
 			return builder
 				.AddJwtBearer(
@@ -108,18 +108,19 @@ namespace SchedulerBot.Extensions
 		/// Registers the database context.
 		/// </summary>
 		/// <param name="services">The services.</param>
-		/// <param name="secretConfiguration">The secret configuration.</param>
 		/// <returns>
 		/// The same service collection that is passed as an argument
 		/// so that it can be used in further configuration chain.
 		/// </returns>
-		public static IServiceCollection AddDbContext(
-			this IServiceCollection services,
-			ISecretConfiguration secretConfiguration)
+		public static IServiceCollection AddDbContext(this IServiceCollection services)
 		{
-			string connectionString = secretConfiguration.ConnectionString;
+			return services.AddDbContext<SchedulerBotContext>((provider, builder) =>
+			{
+				ISecretConfiguration secretConfiguration = provider.GetRequiredService<ISecretConfiguration>();
+				string connectionString = secretConfiguration.ConnectionString;
 
-			return services.AddDbContext<SchedulerBotContext>(builder => builder.UseSqlServer(connectionString));
+				builder.UseSqlServer(connectionString);
+			});
 		}
 
 		#endregion
@@ -128,7 +129,7 @@ namespace SchedulerBot.Extensions
 
 		private static string GetKeyVaultEndpoint() => Environment.GetEnvironmentVariable("KEYVAULT_ENDPOINT");
 		
-		private static void ConfigureJwtValidation(JwtBearerOptions options, IAuthenticationConfiguration configuration)
+		private static void ConfigureJwtValidation(JwtBearerOptions options, IConfiguration configuration)
 		{
 			TokenValidationParameters validationParameters = options.TokenValidationParameters;
 
@@ -138,9 +139,9 @@ namespace SchedulerBot.Extensions
 			validationParameters.ValidateLifetime = true;
 			validationParameters.RequireSignedTokens = true;
 			validationParameters.RequireExpirationTime = true;
-			validationParameters.IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(configuration.SigningKey));
-			validationParameters.ValidAudience = configuration.Audience;
-			validationParameters.ValidIssuer = configuration.Issuer;
+			validationParameters.IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(configuration["Secrets:Authentication:SigningKey"]));
+			validationParameters.ValidAudience = configuration["Secrets:Authentication:Audience"];
+			validationParameters.ValidIssuer = configuration["Secrets:Authentication:Issuer"];
 		}
 
 		#endregion

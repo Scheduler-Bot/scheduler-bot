@@ -35,17 +35,17 @@ namespace SchedulerBot
 		/// <returns>The service provider.</returns>
 		public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
+			services.AddDbContext();
+			services.AddAuthentication()
+				.AddBotAuthentication(configuration)
+				.AddManageConversationAuthentication(configuration);
+			services.AddMvc(options => options.Filters.Add<TrustServiceUrlAttribute>());
+			services.AddSpaStaticFiles(options => options.RootPath = "wwwroot");
+
 			ServiceProviderBuilder serviceProviderBuilder = new ServiceProviderBuilder();
 			IServiceProvider serviceProvider = serviceProviderBuilder.Build(services);
 
 			configuration.Bind(serviceProvider.GetRequiredService<IApplicationConfiguration>());
-
-			services.AddAuthentication()
-				.AddBotAuthentication(serviceProvider.GetRequiredService<IMicrosoftCredentialConfiguration>())
-				.AddManageConversationAuthentication(serviceProvider.GetRequiredService<IAuthenticationConfiguration>());
-			services.AddDbContext(serviceProvider.GetRequiredService<ISecretConfiguration>());
-			services.AddMvc(options => options.Filters.Add<TrustServiceUrlAttribute>());
-			services.AddSpaStaticFiles(options => options.RootPath = "wwwroot");
 
 			return serviceProvider;
 		}
