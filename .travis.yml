@@ -9,8 +9,6 @@ addons:
       organization: "scheduler-bot"
       token:
         secure: "DCkzkqskGRnUOsWNvV6/HaMOE5qaVPLZmshK1uy6ZlG9uBV+PCjSgRXtpIbqL0Isa1w1Ghyda4cjFZCCHZtVF8WCL0g4DirJvt1cHODl2gdorhmCQ1lL3FkMp+E9F5npM8psDi4AhZXk3s8B/j3YSJCKyI+YRBl6si1BIRh749dQrzCurTIILmkWa+4S2y7B+4YzjK44MAEw4GeYJuWZySttCyafiOXncjfR3YJgBwvTTF6fc6RNZ2rxHc7yq0qNgNA4VV6lOh+dhMrRbCFj4g3JBTel4tGZF/pZS6CNzSB5jsDJU2IOduP8zX0RDyzCJwIgiK2HExQWfc5Kq53GCGgiWC5FNs8KGlq5L09KraaYb+K8KxpYZoVQZp8lavkJ+nrd2263+NcLG193vffwhn6QWL/6kDvma0ZC2duLoNxEfI0d/WCpDZHSOZVe9M12CSFsnGDnocQmuUvFTCSnkFF9ZbWt2gEOESgcGKBQ22LfdIDgBqVHwgbO6bPk1ghADid+SkyQlx8stTcRxEYGQV6Lncb5PwxaIIebTeKnC88gPbyPGg9RCV6e3NRjBnmw8cDIb2fOG2xpT8XyPXnSCwboTGQ5NCUSHq38lwaD4LyNW/IuhFZVwPlwF+w7DC53dsCdZga5nUHAYDoSkOnC5OTOmWUoOawDMpMvy5Mc9NE="
-      branches:
-        - travis-ci-plus-sonarcloud
 before_script:
   - cd SchedulerBot
 script:
