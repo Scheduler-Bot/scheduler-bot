@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Commands.Utils;
 using SchedulerBot.Business.Entities;
@@ -100,7 +102,7 @@ namespace SchedulerBot.Business.Commands
 
 		#region Private Methods
 
-		private static ScheduledMessage CreateScheduledMessageAsync(Activity activity, string text, ISchedule schedule)
+		private ScheduledMessage CreateScheduledMessageAsync(Activity activity, string text, ISchedule schedule)
 		{
 			return new ScheduledMessage
 			{
@@ -115,11 +117,10 @@ namespace SchedulerBot.Business.Commands
 			};
 		}
 
-		private static ScheduledMessageDetails CreateMessageDetails(Activity activity)
+		private ScheduledMessageDetails CreateMessageDetails(Activity activity)
 		{
-			return new ScheduledMessageDetails
+			ScheduledMessageDetails scheduledMessageDetails = new ScheduledMessageDetails
 			{
-				ServiceUrl = activity.ServiceUrl,
 				FromId = activity.Recipient.Id,
 				FromName = activity.Recipient.Name,
 				RecipientId = activity.From.Id,
@@ -129,6 +130,18 @@ namespace SchedulerBot.Business.Commands
 				Locale = activity.Locale,
 				TimeZoneOffset = activity.LocalTimestamp?.Offset
 			};
+
+			scheduledMessageDetails.DetailsServiceUrls = new List<ScheduledMessageDetailsServiceUrl>
+			{
+				new ScheduledMessageDetailsServiceUrl
+				{
+					Details = scheduledMessageDetails,
+					ServiceUrl = GetOrCreateServiceUrl(activity),
+					CreatedOn = DateTime.UtcNow
+				}
+			};
+
+			return scheduledMessageDetails;
 		}
 
 		private static ScheduledMessageEvent CreateMessageEvent(ISchedule schedule)
@@ -136,9 +149,110 @@ namespace SchedulerBot.Business.Commands
 			return new ScheduledMessageEvent
 			{
 				CreatedOn = DateTime.UtcNow,
-				NextOccurence = schedule.GetNextOccurence(),
+				NextOccurrence = schedule.GetNextOccurrence(),
 				State = ScheduledMessageEventState.Pending
 			};
+		}
+
+		private ServiceUrl GetOrCreateServiceUrl(Activity activity)
+		{
+			ServiceUrl serviceUrl = context.ServiceUrls.FirstOrDefault(url => url.Address == activity.ServiceUrl);
+
+			return serviceUrl == null
+				? CreateNewServiceUrl(activity.ServiceUrl, activity.ChannelId, activity.Conversation.Id)
+				: UpdateExistingServiceUrl(serviceUrl, activity.ChannelId, activity.Conversation.Id);
+		}
+
+		private ServiceUrl CreateNewServiceUrl(string serviceUrlAddress, string channelId, string conversationId)
+		{
+			ServiceUrl serviceUrl = context
+				.ServiceUrls
+				.Add(new ServiceUrl
+				{
+					Address = serviceUrlAddress,
+					CreatedOn = DateTime.UtcNow
+				})
+				.Entity;
+
+			// If there are messages from the same conversation, update their service URLs.
+			IQueryable<ScheduledMessageDetails> detailsFromSameConversation = GetConversationDetails(
+				context,
+				channelId,
+				conversationId,
+				includeServiceUrls: false);
+
+			foreach (ScheduledMessageDetails messageDetails in detailsFromSameConversation)
+			{
+				messageDetails
+					.DetailsServiceUrls
+					.Add(new ScheduledMessageDetailsServiceUrl
+					{
+						Details = messageDetails,
+						ServiceUrl = serviceUrl,
+						CreatedOn = DateTime.UtcNow
+					});
+			}
+
+			return serviceUrl;
+		}
+
+		private ServiceUrl UpdateExistingServiceUrl(ServiceUrl serviceUrl, string channelId, string conversationId)
+		{
+			// If there are messages from the same conversation, update their service URLs.
+			IQueryable<ScheduledMessageDetails> detailsFromSameConversation = GetConversationDetails(
+				context,
+				channelId,
+				conversationId,
+				includeServiceUrls: true);
+
+			foreach (ScheduledMessageDetails messageDetails in detailsFromSameConversation)
+			{
+				ScheduledMessageDetailsServiceUrl lastDetailsServiceUrl = messageDetails
+					.DetailsServiceUrls
+					.OrderByDescending(detailsServiceUrl => detailsServiceUrl.CreatedOn)
+					.First();
+
+				if (lastDetailsServiceUrl.ServiceUrl != serviceUrl)
+				{
+					messageDetails
+						.DetailsServiceUrls
+						.Add(new ScheduledMessageDetailsServiceUrl
+						{
+							Details = messageDetails,
+							ServiceUrl = serviceUrl,
+							CreatedOn = DateTime.UtcNow
+						});
+				}
+			}
+
+			return serviceUrl;
+		}
+
+		private static IQueryable<ScheduledMessageDetails> GetConversationDetails(
+			SchedulerBotContext context,
+			string channelId,
+			string conversationId,
+			bool includeServiceUrls)
+		{
+			IIncludableQueryable<ScheduledMessageDetails, ICollection<ScheduledMessageDetailsServiceUrl>> scheduledMessageDetails =
+				context
+					.ScheduledMessageDetails
+					.Include(details => details.DetailsServiceUrls);
+
+			return includeServiceUrls
+				? FilterByConversation(scheduledMessageDetails.ThenInclude(detailsServiceUrl => detailsServiceUrl.ServiceUrl), channelId, conversationId)
+				: FilterByConversation(scheduledMessageDetails, channelId, conversationId);
+		}
+
+		private static IQueryable<ScheduledMessageDetails> FilterByConversation(
+			IQueryable<ScheduledMessageDetails> scheduledMessageDetails,
+			string channelId,
+			string conversationId)
+		{
+			return scheduledMessageDetails
+				.Where(details =>
+					details.ChannelId == channelId &&
+					details.ConversationId == conversationId);
 		}
 
 		#endregion

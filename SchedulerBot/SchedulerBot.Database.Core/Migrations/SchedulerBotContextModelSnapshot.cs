@@ -2,113 +2,179 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore.Storage.Internal;
-using SchedulerBot.Database.Core;
-using SchedulerBot.Database.Entities.Enums;
 using System;
 
 namespace SchedulerBot.Database.Core.Migrations
 {
-    [DbContext(typeof(SchedulerBotContext))]
-    partial class SchedulerBotContextModelSnapshot : ModelSnapshot
-    {
-        protected override void BuildModel(ModelBuilder modelBuilder)
-        {
+	[DbContext(typeof(SchedulerBotContext))]
+	partial class SchedulerBotContextModelSnapshot : ModelSnapshot
+	{
+		protected override void BuildModel(ModelBuilder modelBuilder)
+		{
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "2.0.1-rtm-125")
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+			modelBuilder
+				.HasAnnotation("ProductVersion", "2.0.1-rtm-125")
+				.HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessage", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+			modelBuilder.Entity("SchedulerBot.Database.Entities.ManageConversationLink", b =>
+				{
+					b.Property<Guid>("Id")
+						.ValueGeneratedOnAdd();
 
-                    b.Property<string>("Schedule")
-                        .IsRequired();
+					b.Property<string>("ChannelId")
+						.IsRequired();
 
-                    b.Property<int>("State");
+					b.Property<string>("ConversationId")
+						.IsRequired();
 
-                    b.Property<string>("Text")
-                        .IsRequired();
+					b.Property<DateTime>("CreatedOn");
 
-                    b.HasKey("Id");
+					b.Property<DateTime>("ExpiresOn");
 
-                    b.ToTable("ScheduledMessages");
-                });
+					b.Property<bool>("IsVisited");
 
-            modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageDetails", b =>
-                {
-                    b.Property<Guid>("ScheduledMessageId");
+					b.Property<string>("Text")
+						.IsRequired()
+						.HasMaxLength(64);
 
-                    b.Property<string>("ChannelId")
-                        .IsRequired();
+					b.HasKey("Id");
 
-                    b.Property<string>("ConversationId")
-                        .IsRequired();
+					b.ToTable("ManageConversationLinks");
+				});
 
-                    b.Property<string>("FromId")
-                        .IsRequired();
+			modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessage", b =>
+				{
+					b.Property<Guid>("Id")
+						.ValueGeneratedOnAdd();
 
-                    b.Property<string>("FromName")
-                        .IsRequired();
+					b.Property<string>("Schedule")
+						.IsRequired();
 
-                    b.Property<string>("Locale");
+					b.Property<int>("State");
 
-                    b.Property<string>("RecipientId")
-                        .IsRequired();
+					b.Property<string>("Text")
+						.IsRequired();
 
-                    b.Property<string>("RecipientName")
-                        .IsRequired();
+					b.HasKey("Id");
 
-                    b.Property<string>("ServiceUrl")
-                        .IsRequired();
+					b.ToTable("ScheduledMessages");
+				});
 
-                    b.Property<TimeSpan?>("TimeZoneOffset");
+			modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageDetails", b =>
+				{
+					b.Property<Guid>("ScheduledMessageId");
 
-                    b.HasKey("ScheduledMessageId");
+					b.Property<string>("ChannelId")
+						.IsRequired();
 
-                    b.ToTable("ScheduledMessageDetails");
-                });
+					b.Property<string>("ConversationId")
+						.IsRequired();
 
-            modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageEvent", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
+					b.Property<string>("FromId")
+						.IsRequired();
 
-                    b.Property<DateTime>("CreatedOn");
+					b.Property<string>("FromName")
+						.IsRequired();
 
-                    b.Property<DateTime>("NextOccurence");
+					b.Property<string>("Locale");
 
-                    b.Property<Guid>("ScheduledMessageId");
+					b.Property<string>("RecipientId")
+						.IsRequired();
 
-                    b.Property<int>("State");
+					b.Property<string>("RecipientName")
+						.IsRequired();
 
-                    b.HasKey("Id");
+					b.Property<TimeSpan?>("TimeZoneOffset");
 
-                    b.HasIndex("ScheduledMessageId");
+					b.HasKey("ScheduledMessageId");
 
-                    b.ToTable("ScheduledMessageEvents");
-                });
+					b.ToTable("ScheduledMessageDetails");
+				});
 
-            modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageDetails", b =>
-                {
-                    b.HasOne("SchedulerBot.Database.Entities.ScheduledMessage", "ScheduledMessage")
-                        .WithOne("Details")
-                        .HasForeignKey("SchedulerBot.Database.Entities.ScheduledMessageDetails", "ScheduledMessageId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
+			modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageDetailsServiceUrl", b =>
+				{
+					b.Property<Guid>("DetailsId");
 
-            modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageEvent", b =>
-                {
-                    b.HasOne("SchedulerBot.Database.Entities.ScheduledMessage", "ScheduledMessage")
-                        .WithMany("Events")
-                        .HasForeignKey("ScheduledMessageId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
+					b.Property<Guid>("ServiceUrlId");
+
+					b.Property<DateTime>("CreatedOn");
+
+					b.HasKey("DetailsId", "ServiceUrlId");
+
+					b.HasIndex("ServiceUrlId");
+
+					b.HasIndex("DetailsId", "ServiceUrlId", "CreatedOn");
+
+					b.ToTable("ScheduledMessageDetailsServiceUrls");
+				});
+
+			modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageEvent", b =>
+				{
+					b.Property<Guid>("Id")
+						.ValueGeneratedOnAdd();
+
+					b.Property<DateTime>("CreatedOn");
+
+					b.Property<DateTime>("NextOccurrence");
+
+					b.Property<Guid>("ScheduledMessageId");
+
+					b.Property<int>("State");
+
+					b.HasKey("Id");
+
+					b.HasIndex("ScheduledMessageId");
+
+					b.ToTable("ScheduledMessageEvents");
+				});
+
+			modelBuilder.Entity("SchedulerBot.Database.Entities.ServiceUrl", b =>
+				{
+					b.Property<Guid>("Id")
+						.ValueGeneratedOnAdd();
+
+					b.Property<string>("Address")
+						.IsRequired();
+
+					b.Property<DateTime>("CreatedOn");
+
+					b.HasKey("Id");
+
+					b.HasIndex("Address")
+						.IsUnique();
+
+					b.ToTable("ServiceUrls");
+				});
+
+			modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageDetails", b =>
+				{
+					b.HasOne("SchedulerBot.Database.Entities.ScheduledMessage", "ScheduledMessage")
+						.WithOne("Details")
+						.HasForeignKey("SchedulerBot.Database.Entities.ScheduledMessageDetails", "ScheduledMessageId")
+						.OnDelete(DeleteBehavior.Restrict);
+				});
+
+			modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageDetailsServiceUrl", b =>
+				{
+					b.HasOne("SchedulerBot.Database.Entities.ScheduledMessageDetails", "Details")
+						.WithMany("DetailsServiceUrls")
+						.HasForeignKey("DetailsId")
+						.OnDelete(DeleteBehavior.Restrict);
+
+					b.HasOne("SchedulerBot.Database.Entities.ServiceUrl", "ServiceUrl")
+						.WithMany("ServiceUrlMessageDetails")
+						.HasForeignKey("ServiceUrlId")
+						.OnDelete(DeleteBehavior.Restrict);
+				});
+
+			modelBuilder.Entity("SchedulerBot.Database.Entities.ScheduledMessageEvent", b =>
+				{
+					b.HasOne("SchedulerBot.Database.Entities.ScheduledMessage", "ScheduledMessage")
+						.WithMany("Events")
+						.HasForeignKey("ScheduledMessageId")
+						.OnDelete(DeleteBehavior.Restrict);
+				});
 #pragma warning restore 612, 618
-        }
-    }
+		}
+	}
 }

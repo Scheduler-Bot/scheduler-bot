@@ -1,13 +1,19 @@
 ﻿using System;
-using System.Globalization;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Bot.Connector;
+using Microsoft.Bot.Connector.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using SchedulerBot.Authentication;
 using SchedulerBot.Database.Core;
+using SchedulerBot.Infrastructure.Interfaces.Configuration;
 
 namespace SchedulerBot.Extensions
 {
@@ -16,6 +22,8 @@ namespace SchedulerBot.Extensions
 	/// </summary>
 	internal static class ConfigurationExtensions
 	{
+		#region Public Methods
+
 		/// <summary>
 		/// Adds the azure secrets.
 		/// </summary>
@@ -43,7 +51,7 @@ namespace SchedulerBot.Extensions
 		/// </summary>
 		/// <param name="host">The host.</param>
 		/// <returns>The same <see cref="IWebHost"/> instance which has been passed to the method.</returns>
-		internal static IWebHost EnsureDatabaseMigrated(this IWebHost host)
+		public static IWebHost EnsureDatabaseMigrated(this IWebHost host)
 		{
 			using (IServiceScope scope = host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
 			{
@@ -57,45 +65,85 @@ namespace SchedulerBot.Extensions
 		}
 
 		/// <summary>
-		/// Gets the connection string from the specified configuration.
+		/// Configures the authentication for the bot.
 		/// </summary>
+		/// <param name="builder">The builder.</param>
 		/// <param name="configuration">The configuration.</param>
-		/// <returns>The connection string</returns>
-		public static string GetConnectionString(this IConfiguration configuration)
+		/// <returns>
+		/// The same authentication builder that is passed as an argument
+		/// so that it can be used in further configuration chain.
+		/// </returns>
+		public static AuthenticationBuilder AddBotAuthentication(
+			this AuthenticationBuilder builder,
+			IConfiguration configuration)
 		{
-			string settingName = IsDevelopment() ? "ConnectionString" : "Secrets:ConnectionString";
-			string connectionString = configuration[settingName];
+			SimpleCredentialProvider credentialProvider = new SimpleCredentialProvider(
+				configuration["Secrets:MicrosoftAppCredentials:Id"],
+				configuration["Secrets:MicrosoftAppCredentials:Password"]);
 
-			return connectionString;
+			return builder.AddBotAuthentication(credentialProvider);
 		}
 
 		/// <summary>
-		/// Gets the message processing interval from the specified configuration.
+		/// Configures the authentication scheme used for managing conversations.
 		/// </summary>
+		/// <param name="builder">The builder.</param>
 		/// <param name="configuration">The configuration.</param>
-		/// <returns>The message processing interval.</returns>
-		public static TimeSpan GetMessageProcessingInterval(this IConfiguration configuration)
+		/// <returns>
+		/// The same authentication builder that is passed as an argument
+		/// so that it can be used in further configuration chain.
+		/// </returns>
+		public static AuthenticationBuilder AddManageConversationAuthentication(
+			this AuthenticationBuilder builder,
+			IConfiguration configuration)
 		{
-			string messageProcessingInterval = Environment.GetEnvironmentVariable("MESSAGE_PROCESSING_INTERVAL");
-
-			if (string.IsNullOrEmpty(messageProcessingInterval))
-			{
-				messageProcessingInterval = configuration["MessageProcessingInterval"];
-			}
-
-			TimeSpan result = TimeSpan.Parse(configuration["MessageProcessingInterval"], CultureInfo.InvariantCulture);
-			return result;
+			return builder
+				.AddJwtBearer(
+					ManageConversationAuthenticationConfiguration.AuthenticationSchemeName,
+					ManageConversationAuthenticationConfiguration.AuthenticationSchemeDisplayName,
+					options => ConfigureJwtValidation(options, configuration));
 		}
+
+		/// <summary>
+		/// Registers the database context.
+		/// </summary>
+		/// <param name="services">The services.</param>
+		/// <returns>
+		/// The same service collection that is passed as an argument
+		/// so that it can be used in further configuration chain.
+		/// </returns>
+		public static IServiceCollection AddDbContext(this IServiceCollection services)
+		{
+			return services.AddDbContext<SchedulerBotContext>((provider, builder) =>
+			{
+				ISecretConfiguration secretConfiguration = provider.GetRequiredService<ISecretConfiguration>();
+				string connectionString = secretConfiguration.ConnectionString;
+
+				builder.UseSqlServer(connectionString);
+			});
+		}
+
+		#endregion
+
+		#region Private Methods
 
 		private static string GetKeyVaultEndpoint() => Environment.GetEnvironmentVariable("KEYVAULT_ENDPOINT");
-
-		private static string GetMessageProcessingInterval() => Environment.GetEnvironmentVariable("MESSAGE_PROCESSING_INTERVAL");
-
-		private static bool IsDevelopment()
+		
+		private static void ConfigureJwtValidation(JwtBearerOptions options, IConfiguration configuration)
 		{
-			string currentEnvironmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+			TokenValidationParameters validationParameters = options.TokenValidationParameters;
 
-			return EnvironmentName.Development.Equals(currentEnvironmentName, StringComparison.Ordinal);
+			validationParameters.ValidateIssuer = true;
+			validationParameters.ValidateIssuerSigningKey = true;
+			validationParameters.ValidateAudience = true;
+			validationParameters.ValidateLifetime = true;
+			validationParameters.RequireSignedTokens = true;
+			validationParameters.RequireExpirationTime = true;
+			validationParameters.IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(configuration["Secrets:Authentication:SigningKey"]));
+			validationParameters.ValidAudience = configuration["Secrets:Authentication:Audience"];
+			validationParameters.ValidIssuer = configuration["Secrets:Authentication:Issuer"];
 		}
+
+		#endregion
 	}
 }

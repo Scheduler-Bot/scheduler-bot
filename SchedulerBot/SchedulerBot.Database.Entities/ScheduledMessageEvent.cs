@@ -1,12 +1,13 @@
 ﻿using System;
 using SchedulerBot.Database.Entities.Enums;
+using SchedulerBot.Database.Entities.Interfaces;
 
 namespace SchedulerBot.Database.Entities
 {
 	/// <summary>
-	/// Represents a single occurence of the scheduled message.
+	/// Represents a single occurrence of the scheduled message.
 	/// </summary>
-	public class ScheduledMessageEvent
+	public class ScheduledMessageEvent : ICreatedOn
 	{
 		/// <summary>
 		/// Gets or sets the identifier.
@@ -19,9 +20,9 @@ namespace SchedulerBot.Database.Entities
 		public DateTime CreatedOn { get; set; }
 
 		/// <summary>
-		/// Gets or sets the next event occurence.
+		/// Gets or sets the next event occurrence.
 		/// </summary>
-		public DateTime NextOccurence { get; set; }
+		public DateTime NextOccurrence { get; set; }
 
 		/// <summary>
 		/// Gets or sets the event state.

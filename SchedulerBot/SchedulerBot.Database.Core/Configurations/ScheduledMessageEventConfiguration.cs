@@ -18,7 +18,8 @@ namespace SchedulerBot.Database.Core.Configurations
 			builder
 				.HasOne(@event => @event.ScheduledMessage)
 				.WithMany(message => message.Events)
-				.HasForeignKey(@event => @event.ScheduledMessageId);
+				.HasForeignKey(@event => @event.ScheduledMessageId)
+				.OnDelete(DeleteBehavior.Restrict);
 		}
 	}
 }

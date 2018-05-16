@@ -43,13 +43,13 @@ namespace SchedulerBot.Business.Commands.Utils
 		#region ICommandRequestParser Implementation
 
 		/// <inheritdoc />
-		public CommandRequestParseResult Parse(Activity activity)
+		public ParsedCommandRequest Parse(Activity activity)
 		{
 			string commandRequestText = RemoveRecipientMention(activity);
 
 			logger.LogInformation("Parsing command request '{0}'", commandRequestText);
 
-			CommandRequestParseResult parseResult = null;
+			ParsedCommandRequest parseResult = null;
 			Match match = CommandRegex.Match(commandRequestText);
 
 			if (match.Success)
@@ -57,7 +57,7 @@ namespace SchedulerBot.Business.Commands.Utils
 				string name = match.Groups[NameGroup].Value;
 				string arguments = match.Groups[ArgumentsGroup]?.Value ?? string.Empty;
 
-				parseResult = new CommandRequestParseResult(name, arguments);
+				parseResult = new ParsedCommandRequest(name, arguments);
 				logger.LogInformation("Command request parsed to command '{0}' with arguments '{1}'", name, arguments);
 			}
 

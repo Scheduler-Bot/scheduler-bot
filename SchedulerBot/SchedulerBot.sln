@@ -31,6 +31,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Infrastructure
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Infrastructure.Schedule", "SchedulerBot.Infrastructure.Schedule\SchedulerBot.Infrastructure.Schedule.csproj", "{E0F9936D-E03D-42CD-B478-B7CA44754EB6}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Infrastructure.Utils", "SchedulerBot.Infrastructure.Utils\SchedulerBot.Infrastructure.Utils.csproj", "{EDFB284C-DA49-49C1-98BF-D002283B5544}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Infrastructure.Application", "SchedulerBot.Infrastructure.Application\SchedulerBot.Infrastructure.Application.csproj", "{C40D0FEF-FF67-403E-8E5C-B84AFF2FA8B9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Infrastructure.Authentication", "SchedulerBot.Infrastructure.Authentication\SchedulerBot.Infrastructure.Authentication.csproj", "{D8E00B46-6E13-4B99-B91A-7224606ED410}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchedulerBot.DependencyInjection", "SchedulerBot.DependencyInjection\SchedulerBot.DependencyInjection.csproj", "{8C66F544-D619-47DD-B1A3-7A7665F7BFD2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +89,22 @@ Global
 		{E0F9936D-E03D-42CD-B478-B7CA44754EB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0F9936D-E03D-42CD-B478-B7CA44754EB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0F9936D-E03D-42CD-B478-B7CA44754EB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDFB284C-DA49-49C1-98BF-D002283B5544}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDFB284C-DA49-49C1-98BF-D002283B5544}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDFB284C-DA49-49C1-98BF-D002283B5544}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDFB284C-DA49-49C1-98BF-D002283B5544}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C40D0FEF-FF67-403E-8E5C-B84AFF2FA8B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C40D0FEF-FF67-403E-8E5C-B84AFF2FA8B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C40D0FEF-FF67-403E-8E5C-B84AFF2FA8B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C40D0FEF-FF67-403E-8E5C-B84AFF2FA8B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8E00B46-6E13-4B99-B91A-7224606ED410}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8E00B46-6E13-4B99-B91A-7224606ED410}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8E00B46-6E13-4B99-B91A-7224606ED410}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8E00B46-6E13-4B99-B91A-7224606ED410}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C66F544-D619-47DD-B1A3-7A7665F7BFD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C66F544-D619-47DD-B1A3-7A7665F7BFD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C66F544-D619-47DD-B1A3-7A7665F7BFD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C66F544-D619-47DD-B1A3-7A7665F7BFD2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -96,6 +120,9 @@ Global
 		{DB48D24D-236F-4FF8-BA47-3CC2D8B44452} = {24104A42-CB02-4E91-9555-320CBCB33F01}
 		{74F5D8BD-5A1F-4FA7-B0A9-B18792FB67AA} = {98AA3A8F-C420-4110-832A-5631BCC183F2}
 		{E0F9936D-E03D-42CD-B478-B7CA44754EB6} = {98AA3A8F-C420-4110-832A-5631BCC183F2}
+		{EDFB284C-DA49-49C1-98BF-D002283B5544} = {98AA3A8F-C420-4110-832A-5631BCC183F2}
+		{C40D0FEF-FF67-403E-8E5C-B84AFF2FA8B9} = {98AA3A8F-C420-4110-832A-5631BCC183F2}
+		{D8E00B46-6E13-4B99-B91A-7224606ED410} = {98AA3A8F-C420-4110-832A-5631BCC183F2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CCF3E0B7-D57A-4B5C-93BE-9ACA4D593E1E}

@@ -19,6 +19,11 @@ namespace SchedulerBot.Database.Core
 		}
 
 		/// <summary>
+		/// Gets or sets the manage conversation links.
+		/// </summary>
+		public DbSet<ManageConversationLink> ManageConversationLinks { get; set; }
+
+		/// <summary>
 		/// Gets or sets the scheduled messages.
 		/// </summary>
 		public DbSet<ScheduledMessage> ScheduledMessages { get; set; }
@@ -33,14 +38,27 @@ namespace SchedulerBot.Database.Core
 		/// </summary>
 		public DbSet<ScheduledMessageDetails> ScheduledMessageDetails { get; set; }
 
+		/// <summary>
+		/// Gets or sets the scheduled message details service urls.
+		/// </summary>
+		public DbSet<ScheduledMessageDetailsServiceUrl> ScheduledMessageDetailsServiceUrls { get; set; }
+
+		/// <summary>
+		/// Gets or sets the service urls.
+		/// </summary>
+		public DbSet<ServiceUrl> ServiceUrls { get; set; }
+
 		/// <inheritdoc />
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
 
+			modelBuilder.ApplyConfiguration(new ManageConversationLinkConfiguration());
 			modelBuilder.ApplyConfiguration(new ScheduledMessageConfiguration());
 			modelBuilder.ApplyConfiguration(new ScheduledMessageEventConfiguration());
 			modelBuilder.ApplyConfiguration(new ScheduledMessageDetailsConfiguration());
+			modelBuilder.ApplyConfiguration(new ScheduledMessageDetailsServiceUrlConfiguration());
+			modelBuilder.ApplyConfiguration(new ServiceUrlConfiguration());
 		}
 	}
 }
