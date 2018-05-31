@@ -62,7 +62,7 @@ namespace SchedulerBot.Business.Commands
 		/// <inheritdoc />
 		protected override Task<CommandExecutionResult> ExecuteCoreAsync(Activity activity, string arguments)
 		{
-			CultureInfo clientCulture = GetCultureInfoOrDefault(activity.Locale);
+			CultureInfo clientCulture = CultureUtils.GetCultureInfoOrDefault(activity.Locale);
 			CommandExecutionResult result = string.IsNullOrWhiteSpace(arguments)
 				? ExecuteWithNoArguments(activity, clientCulture)
 				: ExecuteWithArguments(activity, arguments, clientCulture);
@@ -248,22 +248,6 @@ namespace SchedulerBot.Business.Commands
 		private static CommandExecutionResult GetNoScheduledMessagesResult()
 		{
 			return CommandExecutionResult.Success("No scheduled events for this conversation");
-		}
-
-		private static CultureInfo GetCultureInfoOrDefault(string name)
-		{
-			CultureInfo cultureInfo;
-
-			try
-			{
-				cultureInfo = CultureInfo.GetCultureInfo(name);
-			}
-			catch (CultureNotFoundException)
-			{
-				cultureInfo = CultureInfo.InvariantCulture;
-			}
-
-			return cultureInfo;
 		}
 
 		#endregion
