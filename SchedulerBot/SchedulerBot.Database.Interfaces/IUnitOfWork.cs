@@ -38,7 +38,7 @@ namespace SchedulerBot.Database.Interfaces
 		IServiceUrlRepository ServiceUrls { get; }
 
 		/// <summary>
-		/// Saves changes.
+		/// Save pending changes to the database.
 		/// </summary>
 		void SaveChanges();
 	}
