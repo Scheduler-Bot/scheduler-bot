@@ -5,11 +5,11 @@ using SchedulerBot.Database.Interfaces.Repositories;
 namespace SchedulerBot.Database.Repositories
 {
 	/// <summary>
-	/// Repository for <see cref = "ServiceUrl" />.
+	/// Repository for <see cref = "ScheduledMessage" />.
 	/// </summary >
-	public class ServiceUrlRepository : BaseRepository<ServiceUrl>, IServiceUrlRepository
+	public class ScheduledMessageRepository : BaseRepository<ScheduledMessage>, IScheduledMessageRepository
 	{
-		public ServiceUrlRepository(DbContext dbContext)
+		public ScheduledMessageRepository(DbContext dbContext)
 			: base(dbContext)
 		{
 		}
