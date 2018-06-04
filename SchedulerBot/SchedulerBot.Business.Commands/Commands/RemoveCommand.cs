@@ -9,6 +9,7 @@ using SchedulerBot.Business.Entities;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
+using SchedulerBot.Database.Interfaces;
 
 namespace SchedulerBot.Business.Commands
 {
@@ -22,12 +23,15 @@ namespace SchedulerBot.Business.Commands
 		private readonly SchedulerBotContext context;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="RemoveCommand"/> class.
+		/// Initializes a new instance of the <see cref="RemoveCommand" /> class.
 		/// </summary>
 		/// <param name="context">The context.</param>
+		/// <param name="unitOfWork">The unit of work.</param>
 		/// <param name="logger">The logger.</param>
-		public RemoveCommand(SchedulerBotContext context, ILogger<RemoveCommand> logger)
-			: base("remove", logger)
+		public RemoveCommand(
+			SchedulerBotContext context,
+			IUnitOfWork unitOfWork,
+			ILogger<RemoveCommand> logger) : base("remove", unitOfWork, logger)
 		{
 			this.context = context;
 		}

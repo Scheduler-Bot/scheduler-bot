@@ -13,6 +13,7 @@ using SchedulerBot.Business.Utils;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
+using SchedulerBot.Database.Interfaces;
 using SchedulerBot.Infrastructure.Interfaces.Configuration;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
@@ -36,17 +37,19 @@ namespace SchedulerBot.Business.Commands
 		#region Constructor
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="NextCommand"/> class.
+		/// Initializes a new instance of the <see cref="NextCommand" /> class.
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="scheduleParser">The schedule parser.</param>
 		/// <param name="configuration">The configuration.</param>
+		/// <param name="unitOfWork">The unit of work.</param>
 		/// <param name="logger">The logger.</param>
 		public NextCommand(
 			SchedulerBotContext context,
 			IScheduleParser scheduleParser,
 			INextCommandConfiguration configuration,
-			ILogger<ListCommand> logger) : base("next", logger)
+			IUnitOfWork unitOfWork,
+			ILogger<ListCommand> logger) : base("next", unitOfWork, logger)
 		{
 			this.context = context;
 			this.scheduleParser = scheduleParser;

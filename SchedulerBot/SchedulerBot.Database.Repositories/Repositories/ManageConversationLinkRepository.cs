@@ -4,9 +4,7 @@ using SchedulerBot.Database.Interfaces.Repositories;
 
 namespace SchedulerBot.Database.Repositories
 {
-	/// <summary>
-	/// Repository for <see cref = "ManageConversationLink" />.
-	/// </summary >
+	/// <inheritdoc cref="IManageConversationLinkRepository"/>
 	public class ManageConversationLinkRepository : BaseRepository<ManageConversationLink>, IManageConversationLinkRepository
 	{
 		public ManageConversationLinkRepository(DbContext dbContext)

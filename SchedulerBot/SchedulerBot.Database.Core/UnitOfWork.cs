@@ -6,10 +6,7 @@ using SchedulerBot.Database.Interfaces.Repositories;
 
 namespace SchedulerBot.Database.Core
 {
-	/// <summary>
-	/// Unit of Work.
-	/// </summary>
-	/// <seealso cref="SchedulerBot.Database.Interfaces.IUnitOfWork" />
+	/// <inheritdoc/>
 	public class UnitOfWork : IUnitOfWork
 	{
 		private readonly DbContext dbContext;

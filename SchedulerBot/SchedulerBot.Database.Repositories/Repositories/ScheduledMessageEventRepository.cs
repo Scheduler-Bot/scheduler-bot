@@ -4,9 +4,7 @@ using SchedulerBot.Database.Interfaces.Repositories;
 
 namespace SchedulerBot.Database.Repositories
 {
-	/// <summary>
-	/// Repository for <see cref = "ScheduledMessageEvent" />.
-	/// </summary >
+	/// <inheritdoc cref="IScheduledMessageEventRepository"/>
 	public class ScheduledMessageEventRepository : BaseRepository<ScheduledMessageEvent>, IScheduledMessageEventRepository
 	{
 		public ScheduledMessageEventRepository(DbContext dbContext)

@@ -4,9 +4,7 @@ using SchedulerBot.Database.Interfaces.Repositories;
 
 namespace SchedulerBot.Database.Repositories
 {
-	/// <summary>
-	/// Repository for <see cref = "ServiceUrl" />.
-	/// </summary >
+	/// <inheritdoc cref="IServiceUrlRepository"/>
 	public class ServiceUrlRepository : BaseRepository<ServiceUrl>, IServiceUrlRepository
 	{
 		public ServiceUrlRepository(DbContext dbContext)

@@ -9,6 +9,7 @@ using SchedulerBot.Business.Utils;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
+using SchedulerBot.Database.Interfaces;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
 namespace SchedulerBot.Business.Commands
@@ -27,20 +28,22 @@ namespace SchedulerBot.Business.Commands
 
 		#endregion
 
-		#region Constuctor
+		#region Constructor
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ListCommand"/> class.
+		/// Initializes a new instance of the <see cref="ListCommand" /> class.
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="scheduleParser">The schedule parser.</param>
 		/// <param name="scheduleDescriptionFormatter">The schedule description formatter.</param>
+		/// <param name="unitOfWork">The unit of work.</param>
 		/// <param name="logger">The logger.</param>
 		public ListCommand(
 			SchedulerBotContext context,
 			IScheduleParser scheduleParser,
 			IScheduleDescriptionFormatter scheduleDescriptionFormatter,
-			ILogger<ListCommand> logger) : base("list", logger)
+			IUnitOfWork unitOfWork,
+			ILogger<ListCommand> logger) : base("list", unitOfWork, logger)
 		{
 			this.context = context;
 			this.scheduleParser = scheduleParser;

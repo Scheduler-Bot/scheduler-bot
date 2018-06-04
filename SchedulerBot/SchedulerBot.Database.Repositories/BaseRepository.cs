@@ -19,28 +19,33 @@ namespace SchedulerBot.Database.Repositories
 			DbSet = DbContext.Set<T>();
 		}
 
+		/// <inheritdoc />
 		public virtual IQueryable<T> GetAll()
 		{
 			return DbSet;
 		}
 
+		/// <inheritdoc />
 		public virtual T GetById(long id)
 		{
 			return DbSet.Find(id);
 		}
 
+		/// <inheritdoc />
 		public virtual void Create(T entity)
 		{
 			EntityEntry dbEntityEntry = DbContext.Entry(entity);
 			dbEntityEntry.State = EntityState.Added;
 		}
 
+		/// <inheritdoc />
 		public virtual void Update(T entity)
 		{
 			EntityEntry dbEntityEntry = DbContext.Entry(entity);
 			dbEntityEntry.State = EntityState.Modified;
 		}
 
+		/// <inheritdoc />
 		public virtual bool Delete(long id)
 		{
 			T entity = GetById(id);
@@ -52,6 +57,7 @@ namespace SchedulerBot.Database.Repositories
 			return false;
 		}
 
+		/// <inheritdoc />
 		public void Delete(T entity)
 		{
 			EntityEntry dbEntityEntry = DbContext.Entry(entity);

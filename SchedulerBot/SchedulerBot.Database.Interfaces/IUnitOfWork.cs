@@ -3,7 +3,7 @@
 namespace SchedulerBot.Database.Interfaces
 {
 	/// <summary>
-	/// Unit of Work for a Database access
+	/// Unit of Work for a Database access.
 	/// </summary>
 	public interface IUnitOfWork
 	{

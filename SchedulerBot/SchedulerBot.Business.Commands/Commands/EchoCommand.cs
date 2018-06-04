@@ -4,6 +4,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Commands.Utils;
 using SchedulerBot.Business.Entities;
+using SchedulerBot.Database.Interfaces;
 
 namespace SchedulerBot.Business.Commands
 {
@@ -18,10 +19,13 @@ namespace SchedulerBot.Business.Commands
 	public class EchoCommand : BotCommand
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="EchoCommand"/> class.
+		/// Initializes a new instance of the <see cref="EchoCommand" /> class.
 		/// </summary>
+		/// <param name="unitOfWork">The unit of work.</param>
 		/// <param name="logger">The logger.</param>
-		public EchoCommand(ILogger<EchoCommand> logger) : base("echo", logger)
+		public EchoCommand(
+			IUnitOfWork unitOfWork,
+			ILogger<EchoCommand> logger) : base("echo", unitOfWork, logger)
 		{
 		}
 

@@ -3,7 +3,7 @@
 namespace SchedulerBot.Database.Interfaces
 {
 	/// <summary>
-	/// Base Repositories interface.
+	/// Base Repositories functionality.
 	/// </summary>
 	/// <typeparam name="T">Entity type.</typeparam>
 	public interface IRepository<T> where T : class
