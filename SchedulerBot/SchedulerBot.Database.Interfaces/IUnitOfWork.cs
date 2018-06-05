@@ -1,4 +1,5 @@
-﻿using SchedulerBot.Database.Interfaces.Repositories;
+﻿using System.Threading.Tasks;
+using SchedulerBot.Database.Interfaces.Repositories;
 
 namespace SchedulerBot.Database.Interfaces
 {
@@ -38,8 +39,17 @@ namespace SchedulerBot.Database.Interfaces
 		IServiceUrlRepository ServiceUrls { get; }
 
 		/// <summary>
-		/// Save pending changes to the database.
+		/// Saves all changes made in this context to the database.
 		/// </summary>
 		void SaveChanges();
+
+		/// <summary>
+		/// Asynchronously saves all changes made in this context to the database.
+		/// </summary>
+		/// <returns>
+		///     A task that represents the asynchronous save operation. The task result contains the
+		///     number of state entries written to the database.
+		/// </returns>
+		Task<int> SaveChangesAsync();
 	}
 }

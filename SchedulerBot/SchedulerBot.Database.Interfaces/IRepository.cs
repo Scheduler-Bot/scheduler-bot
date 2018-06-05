@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 
 namespace SchedulerBot.Database.Interfaces
 {
@@ -25,7 +26,7 @@ namespace SchedulerBot.Database.Interfaces
 		/// Creates the specified entity.
 		/// </summary>
 		/// <param name="entity">The entity.</param>
-		void Create(T entity);
+		Task<T> AddAsync(T entity);
 
 		/// <summary>
 		/// Updates the specified entity.

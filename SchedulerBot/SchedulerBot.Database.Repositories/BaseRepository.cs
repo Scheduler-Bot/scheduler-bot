@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SchedulerBot.Database.Interfaces;
@@ -32,10 +33,10 @@ namespace SchedulerBot.Database.Repositories
 		}
 
 		/// <inheritdoc />
-		public virtual void Create(T entity)
+		public virtual async Task<T> AddAsync(T entity)
 		{
-			EntityEntry dbEntityEntry = DbContext.Entry(entity);
-			dbEntityEntry.State = EntityState.Added;
+			EntityEntry<T> entityEntry = await DbContext.AddAsync(entity);
+			return entityEntry.Entity;
 		}
 
 		/// <inheritdoc />

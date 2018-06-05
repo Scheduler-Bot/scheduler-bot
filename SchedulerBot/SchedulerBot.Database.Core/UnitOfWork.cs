@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Autofac;
 using Microsoft.EntityFrameworkCore;
 using SchedulerBot.Database.Interfaces;
@@ -56,20 +57,16 @@ namespace SchedulerBot.Database.Core
 
 		#endregion
 
-		/// <summary>
-		/// Save pending changes to the database
-		/// </summary>
+		/// <inheritdoc/>
 		public void SaveChanges()
 		{
-			try
-			{
-				dbContext.SaveChanges();
-			}
-			catch (Exception e)
-			{
-				//TODO: Log Error
-				throw;
-			}
+			dbContext.SaveChanges();
+		}
+
+		/// <inheritdoc/>
+		public async Task<int> SaveChangesAsync()
+		{
+			return await dbContext.SaveChangesAsync();
 		}
 
 		private T GetRepository<T>() where T : class
