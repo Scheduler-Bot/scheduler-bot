@@ -48,7 +48,16 @@
 		/// <returns>A <see cref="CommandExecutionResult"/> instance with <see cref="IsSuccess"/> set to <c>true</c>.</returns>
 		public static CommandExecutionResult Success(string message)
 		{
-			return new CommandExecutionResult(false, message);
+			return new CommandExecutionResult(true, message);
+		}
+
+		/// <summary>
+		/// Creates the successful command execution result.
+		/// </summary>
+		/// <returns>A <see cref="CommandExecutionResult"/> instance with <see cref="IsSuccess"/> set to <c>true</c>.</returns>
+		public static CommandExecutionResult Success()
+		{
+			return new CommandExecutionResult(true, string.Empty);
 		}
 	}
 }

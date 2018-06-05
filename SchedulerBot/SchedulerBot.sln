@@ -39,11 +39,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Infrastructure
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.DependencyInjection", "SchedulerBot.DependencyInjection\SchedulerBot.DependencyInjection.csproj", "{8C66F544-D619-47DD-B1A3-7A7665F7BFD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchedulerBot.Database.Interfaces", "SchedulerBot.Database.Interfaces\SchedulerBot.Database.Interfaces.csproj", "{70D8DF4F-C22F-4540-970E-7DF46518D8B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Database.Interfaces", "SchedulerBot.Database.Interfaces\SchedulerBot.Database.Interfaces.csproj", "{70D8DF4F-C22F-4540-970E-7DF46518D8B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchedulerBot.Database.Repositories", "SchedulerBot.Database.Repositories\SchedulerBot.Database.Repositories.csproj", "{54B86812-D53E-449D-89E9-B7552C65CD85}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerBot.Database.Repositories", "SchedulerBot.Database.Repositories\SchedulerBot.Database.Repositories.csproj", "{54B86812-D53E-449D-89E9-B7552C65CD85}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Generic", "Generic", "{58DDF420-FE81-4125-AB91-5E50435ABF5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchedulerBot.Processors", "SchedulerBot.Processors\SchedulerBot.Processors.csproj", "{42B1FA01-1F87-4E93-8C0E-9AF2A0E61730}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -119,6 +121,10 @@ Global
 		{54B86812-D53E-449D-89E9-B7552C65CD85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54B86812-D53E-449D-89E9-B7552C65CD85}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54B86812-D53E-449D-89E9-B7552C65CD85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42B1FA01-1F87-4E93-8C0E-9AF2A0E61730}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42B1FA01-1F87-4E93-8C0E-9AF2A0E61730}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42B1FA01-1F87-4E93-8C0E-9AF2A0E61730}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42B1FA01-1F87-4E93-8C0E-9AF2A0E61730}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

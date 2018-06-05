@@ -16,6 +16,7 @@
     <ProjectReference Include="..\SchedulerBot.Infrastructure.BotConnector\SchedulerBot.Infrastructure.BotConnector.csproj" />
     <ProjectReference Include="..\SchedulerBot.Infrastructure.Schedule\SchedulerBot.Infrastructure.Schedule.csproj" />
     <ProjectReference Include="..\SchedulerBot.Infrastructure.Utils\SchedulerBot.Infrastructure.Utils.csproj" />
+    <ProjectReference Include="..\SchedulerBot.Processors\SchedulerBot.Processors.csproj" />
   </ItemGroup>
 
 </Project>

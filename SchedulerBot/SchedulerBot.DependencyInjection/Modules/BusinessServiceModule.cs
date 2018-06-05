@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using Microsoft.Extensions.Hosting;
-using SchedulerBot.Business.Services;
+using SchedulerBot.Processors;
 
 namespace SchedulerBot.DependencyInjection.Modules
 {
@@ -16,7 +16,7 @@ namespace SchedulerBot.DependencyInjection.Modules
 			base.Load(builder);
 
 			builder
-				.RegisterType<ScheduledMessageProcessorService>()
+				.RegisterType<ScheduledMessageProcessor>()
 				.As<IHostedService>()
 				.SingleInstance();
 		}
