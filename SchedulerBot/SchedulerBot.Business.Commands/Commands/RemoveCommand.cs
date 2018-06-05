@@ -2,11 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Commands.Utils;
 using SchedulerBot.Business.Entities;
-using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
 using SchedulerBot.Database.Interfaces;
@@ -20,20 +18,15 @@ namespace SchedulerBot.Business.Commands
 	/// <seealso cref="BotCommand" />
 	public class RemoveCommand : BotCommand
 	{
-		private readonly SchedulerBotContext context;
-
 		/// <summary>
 		/// Initializes a new instance of the <see cref="RemoveCommand" /> class.
 		/// </summary>
-		/// <param name="context">The context.</param>
 		/// <param name="unitOfWork">The unit of work.</param>
 		/// <param name="logger">The logger.</param>
 		public RemoveCommand(
-			SchedulerBotContext context,
 			IUnitOfWork unitOfWork,
 			ILogger<RemoveCommand> logger) : base("remove", unitOfWork, logger)
 		{
-			this.context = context;
 		}
 
 		/// <inheritdoc />
@@ -47,18 +40,15 @@ namespace SchedulerBot.Business.Commands
 			{
 				Logger.LogInformation("Parsed the arguments to message id '{0}'", messageId);
 
-				ScheduledMessage scheduledMessage = await context
+				ScheduledMessage scheduledMessage = await UnitOfWork
 					.ScheduledMessages
-					.Where(message => message.Id == messageId && message.State == ScheduledMessageState.Active)
-					.Include(message => message.Details)
-					.Include(message => message.Events)
-					.FirstOrDefaultAsync();
+					.GetActiveByIdWithEventsAsync(messageId);
 
 				if (scheduledMessage != null)
 				{
 					Logger.LogInformation("Removing scheduled message with id '{0}'", messageId);
 					scheduledMessage.State = ScheduledMessageState.Deleted;
-					context.Update(scheduledMessage);
+					UnitOfWork.ScheduledMessages.Update(scheduledMessage);
 
 					foreach (ScheduledMessageEvent scheduledMessageEvent
 						in scheduledMessage.Events.Where(@event => @event.State == ScheduledMessageEventState.Pending))
@@ -66,10 +56,10 @@ namespace SchedulerBot.Business.Commands
 						Logger.LogInformation("Removing scheduled message event with id '{0}'", scheduledMessageEvent.Id);
 						scheduledMessageEvent.State = ScheduledMessageEventState.Deleted;
 						// TODO: Do we need this update operation below?
-						context.Update(scheduledMessageEvent);
+						UnitOfWork.ScheduledMessageEvents.Update(scheduledMessageEvent);
 					}
 
-					await context.SaveChangesAsync();
+					await UnitOfWork.SaveChangesAsync();
 
 					result = "The event has been removed";
 					Logger.LogInformation("The scheduled message '{0}' has been removed", messageId);

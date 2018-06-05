@@ -29,7 +29,6 @@ namespace SchedulerBot.Business.Commands
 
 		private readonly int defaultMessageCount;
 		private readonly int maxMessageCount;
-		private readonly SchedulerBotContext context;
 		private readonly IScheduleParser scheduleParser;
 
 		#endregion
@@ -45,13 +44,11 @@ namespace SchedulerBot.Business.Commands
 		/// <param name="unitOfWork">The unit of work.</param>
 		/// <param name="logger">The logger.</param>
 		public NextCommand(
-			SchedulerBotContext context,
 			IScheduleParser scheduleParser,
 			INextCommandConfiguration configuration,
 			IUnitOfWork unitOfWork,
 			ILogger<ListCommand> logger) : base("next", unitOfWork, logger)
 		{
-			this.context = context;
 			this.scheduleParser = scheduleParser;
 
 			defaultMessageCount = configuration.DefaultMessageCount;
@@ -63,25 +60,28 @@ namespace SchedulerBot.Business.Commands
 		#region Overrides
 
 		/// <inheritdoc />
-		protected override Task<CommandExecutionResult> ExecuteCoreAsync(Activity activity, string arguments)
+		protected override async Task<CommandExecutionResult> ExecuteCoreAsync(Activity activity, string arguments)
 		{
 			CultureInfo clientCulture = CultureUtils.GetCultureInfoOrDefault(activity.Locale);
-			CommandExecutionResult result = string.IsNullOrWhiteSpace(arguments)
-				? ExecuteWithNoArguments(activity, clientCulture)
-				: ExecuteWithArguments(activity, arguments, clientCulture);
 
-			return Task.FromResult(result);
+			CommandExecutionResult result = string.IsNullOrWhiteSpace(arguments)
+				? await ExecuteWithNoArgumentsAsync(activity, clientCulture)
+				: await ExecuteWithArguments(activity, arguments, clientCulture);
+
+			return result;
 		}
 
 		#endregion
 
 		#region Private Methods
 
-		private CommandExecutionResult ExecuteWithNoArguments(Activity activity, CultureInfo clientCulture)
+		private async Task<CommandExecutionResult> ExecuteWithNoArgumentsAsync(Activity activity, CultureInfo clientCulture)
 		{
 			Logger.LogInformation("No arguments provided");
 
-			ScheduledMessageEvent nextEvent = GetNextMessageEvent(activity.Conversation.Id);
+			ScheduledMessageEvent nextEvent = 
+				await UnitOfWork.ScheduledMessageEvents.GetNextMessageEventAsync(activity.Conversation.Id);
+
 			CommandExecutionResult executionResult = nextEvent != null
 				? ExecuteWithMessageAndCount(nextEvent.ScheduledMessage, defaultMessageCount, clientCulture)
 				: GetNoScheduledMessagesResult();
@@ -89,7 +89,7 @@ namespace SchedulerBot.Business.Commands
 			return executionResult;
 		}
 
-		private CommandExecutionResult ExecuteWithArguments(
+		private async Task<CommandExecutionResult> ExecuteWithArguments(
 			Activity activity,
 			string arguments,
 			CultureInfo clientCulture)
@@ -102,7 +102,8 @@ namespace SchedulerBot.Business.Commands
 
 			if (Guid.TryParse(messageIdArgument, out Guid messageId))
 			{
-				ScheduledMessage scheduledMessage = GetMessageById(activity.Conversation.Id, messageId);
+				ScheduledMessage scheduledMessage = await UnitOfWork.ScheduledMessages
+					.GetActiveByIdAndConversationIdAsync(activity.Conversation.Id, messageId);
 
 				if (scheduledMessage != null)
 				{
@@ -190,32 +191,6 @@ namespace SchedulerBot.Business.Commands
 			}
 
 			return executionResult;
-		}
-
-		private ScheduledMessageEvent GetNextMessageEvent(string conversationId)
-		{
-			return context
-				.ScheduledMessageEvents
-				.Include(@event => @event.ScheduledMessage)
-				.ThenInclude(message => message.Details)
-				.Where(@event =>
-					@event.State == ScheduledMessageEventState.Pending &&
-					@event.ScheduledMessage.State == ScheduledMessageState.Active &&
-					@event.ScheduledMessage.Details.ConversationId.Equals(conversationId, StringComparison.Ordinal))
-				.OrderBy(@event => @event.NextOccurrence)
-				.FirstOrDefault();
-		}
-
-		private ScheduledMessage GetMessageById(string conversationId, Guid messageId)
-		{
-			return context
-				.ScheduledMessages
-				.Include(message => message.Details)
-				.Include(message => message.Events)
-				.FirstOrDefault(message =>
-					message.Id == messageId &&
-					message.State == ScheduledMessageState.Active &&
-					message.Details.ConversationId.Equals(conversationId, StringComparison.Ordinal));
 		}
 
 		private bool IsRequestedCountValid(int count)

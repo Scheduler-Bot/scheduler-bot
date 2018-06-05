@@ -30,5 +30,30 @@ namespace SchedulerBot.Database.Repositories
 
 			return result;
 		}
+
+		/// <inheritdoc/>
+		public async Task<ScheduledMessage> GetActiveByIdAndConversationIdAsync(
+			string conversationId,
+			Guid messageId)
+		{
+			ScheduledMessage result = await DbSet
+				.Include(message => message.Details)
+				.Include(message => message.Events)
+				.FirstOrDefaultAsync(message =>
+					message.Id == messageId &&
+					message.State == ScheduledMessageState.Active &&
+					message.Details.ConversationId.Equals(conversationId, StringComparison.Ordinal));
+
+			return result;
+		}
+
+		/// <inheritdoc/>
+		public async Task<ScheduledMessage> GetActiveByIdWithEventsAsync(Guid messageId)
+		{
+			ScheduledMessage result = await DbSet
+				.Include(message => message.Events)
+				.FirstOrDefaultAsync(message => message.Id == messageId && message.State == ScheduledMessageState.Active);
+			return result;
+		}
 	}
 }

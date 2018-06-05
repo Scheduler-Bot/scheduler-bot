@@ -42,8 +42,7 @@ namespace SchedulerBot.Database.Repositories
 		/// <inheritdoc />
 		public virtual void Update(T entity)
 		{
-			EntityEntry dbEntityEntry = DbContext.Entry(entity);
-			dbEntityEntry.State = EntityState.Modified;
+			DbContext.Update(entity);
 		}
 
 		/// <inheritdoc />
