@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,20 @@ namespace SchedulerBot.Database.Repositories
 					@event.ScheduledMessage.Details.ConversationId.Equals(conversationId, StringComparison.Ordinal))
 				.OrderBy(@event => @event.NextOccurrence)
 				.FirstOrDefaultAsync();
+			return result;
+		}
+
+		/// <inheritdoc/>
+		public async Task<IList<ScheduledMessageEvent>> GetAllPendingWithScheduledMessages(DateTime tillTime)
+		{
+			List<ScheduledMessageEvent> result = await DbSet
+				.Where(@event => @event.State == ScheduledMessageEventState.Pending && @event.NextOccurrence < tillTime)
+				.Include(@event => @event.ScheduledMessage)
+				.ThenInclude(message => message.Details)
+				.ThenInclude(details => details.DetailsServiceUrls)
+				.ThenInclude(detailsServiceUrl => detailsServiceUrl.ServiceUrl)
+				.ToListAsync();
+
 			return result;
 		}
 	}

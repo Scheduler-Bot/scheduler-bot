@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Microsoft.EntityFrameworkCore;
@@ -58,15 +59,9 @@ namespace SchedulerBot.Database.Core
 		#endregion
 
 		/// <inheritdoc/>
-		public void SaveChanges()
+		public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
-			dbContext.SaveChanges();
-		}
-
-		/// <inheritdoc/>
-		public async Task<int> SaveChangesAsync()
-		{
-			return await dbContext.SaveChangesAsync();
+			return await dbContext.SaveChangesAsync(cancellationToken);
 		}
 
 		private T GetRepository<T>() where T : class

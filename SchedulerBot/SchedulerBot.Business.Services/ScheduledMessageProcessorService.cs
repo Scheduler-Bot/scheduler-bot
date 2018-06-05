@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Rest.Serialization;
 using Newtonsoft.Json;
-using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
+using SchedulerBot.Database.Interfaces;
 using SchedulerBot.Infrastructure.Interfaces.BotConnector;
 using SchedulerBot.Infrastructure.Interfaces.Configuration;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
@@ -122,10 +121,12 @@ namespace SchedulerBot.Business.Services
 
 			using (IServiceScope scope = scopeFactory.CreateScope())
 			{
-				SchedulerBotContext context = scope.ServiceProvider.GetRequiredService<SchedulerBotContext>();
+				IUnitOfWork unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
 				// TODO: there can be used parallel foreach
-				foreach (ScheduledMessageEvent scheduledMessageEvent in GetPendingEvents(context))
+				IList<ScheduledMessageEvent> scheduledMessageEvents =
+					await unitOfWork.ScheduledMessageEvents.GetAllPendingWithScheduledMessages(DateTime.UtcNow);
+				foreach (ScheduledMessageEvent scheduledMessageEvent in scheduledMessageEvents)
 				{
 					try
 					{
@@ -154,23 +155,10 @@ namespace SchedulerBot.Business.Services
 					}
 				}
 
-				await context.SaveChangesAsync(serviceCancellationToken);
+				await unitOfWork.SaveChangesAsync(serviceCancellationToken);
 			}
 
 			logger.LogInformation("Finished processing scheduled messages queue");
-		}
-
-		private static IQueryable<ScheduledMessageEvent> GetPendingEvents(SchedulerBotContext context)
-		{
-			DateTime currentTime = DateTime.UtcNow;
-
-			return context
-				.ScheduledMessageEvents
-				.Where(@event => @event.State == ScheduledMessageEventState.Pending && @event.NextOccurrence < currentTime)
-				.Include(@event => @event.ScheduledMessage)
-				.ThenInclude(message => message.Details)
-				.ThenInclude(details => details.DetailsServiceUrls)
-				.ThenInclude(detailsServiceUrl => detailsServiceUrl.ServiceUrl);
 		}
 
 		private async Task WaitAsync()
