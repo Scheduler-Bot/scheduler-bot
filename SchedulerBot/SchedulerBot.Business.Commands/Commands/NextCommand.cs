@@ -5,12 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Commands.Utils;
 using SchedulerBot.Business.Entities;
 using SchedulerBot.Business.Utils;
-using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
 using SchedulerBot.Database.Interfaces;
@@ -38,7 +36,6 @@ namespace SchedulerBot.Business.Commands
 		/// <summary>
 		/// Initializes a new instance of the <see cref="NextCommand" /> class.
 		/// </summary>
-		/// <param name="context">The context.</param>
 		/// <param name="scheduleParser">The schedule parser.</param>
 		/// <param name="configuration">The configuration.</param>
 		/// <param name="unitOfWork">The unit of work.</param>

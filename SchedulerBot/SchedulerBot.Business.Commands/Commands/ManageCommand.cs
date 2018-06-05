@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Entities;
-using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Interfaces;
 using SchedulerBot.Infrastructure.Interfaces.Application;
