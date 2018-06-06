@@ -12,6 +12,10 @@ namespace SchedulerBot.Database.Repositories
 	/// <inheritdoc cref="IScheduledMessageEventRepository"/>
 	public class ScheduledMessageEventRepository : BaseRepository<ScheduledMessageEvent>, IScheduledMessageEventRepository
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ScheduledMessageEventRepository"/> class.
+		/// </summary>
+		/// <param name="dbContext">The database context.</param>
 		public ScheduledMessageEventRepository(DbContext dbContext)
 			: base(dbContext)
 		{
@@ -26,9 +30,10 @@ namespace SchedulerBot.Database.Repositories
 				.Where(@event =>
 					@event.State == ScheduledMessageEventState.Pending &&
 					@event.ScheduledMessage.State == ScheduledMessageState.Active &&
-					@event.ScheduledMessage.Details.ConversationId.Equals(conversationId, StringComparison.Ordinal))
+					@event.ScheduledMessage.Details.ConversationId == conversationId)
 				.OrderBy(@event => @event.NextOccurrence)
 				.FirstOrDefaultAsync();
+
 			return result;
 		}
 

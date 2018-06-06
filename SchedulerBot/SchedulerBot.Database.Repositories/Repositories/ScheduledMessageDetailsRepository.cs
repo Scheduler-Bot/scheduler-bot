@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Interfaces.Repositories;
 
@@ -11,11 +10,16 @@ namespace SchedulerBot.Database.Repositories
 	/// <inheritdoc cref="IScheduledMessageDetailsRepository"/>
 	public class ScheduledMessageDetailsRepository : BaseRepository<ScheduledMessageDetails>, IScheduledMessageDetailsRepository
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ScheduledMessageDetailsRepository"/> class.
+		/// </summary>
+		/// <param name="dbContext">The database context.</param>
 		public ScheduledMessageDetailsRepository(DbContext dbContext)
 			: base(dbContext)
 		{
 		}
 
+		/// <inheritdoc />
 		public async Task<IList<ScheduledMessageDetails>> GetScheduledMessageDetails(
 			string channelId,
 			string conversationId,

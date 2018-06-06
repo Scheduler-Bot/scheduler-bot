@@ -8,17 +8,29 @@ using SchedulerBot.Database.Interfaces;
 
 namespace SchedulerBot.Database.Repositories
 {
+	/// <inheritdoc />
 	public class BaseRepository<T> : IRepository<T> where T : class
 	{
-		protected DbContext DbContext { get; set; }
-
-		protected DbSet<T> DbSet { get; set; }
-
+		/// <summary>
+		/// Initializes a new instance of the <see cref="BaseRepository{T}"/> class.
+		/// </summary>
+		/// <param name="dbContext">The database context.</param>
+		/// <exception cref="ArgumentNullException">dbContext</exception>
 		public BaseRepository(DbContext dbContext)
 		{
 			DbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 			DbSet = DbContext.Set<T>();
 		}
+
+		/// <summary>
+		/// Gets the database context.
+		/// </summary>
+		protected DbContext DbContext { get; }
+
+		/// <summary>
+		/// Gets the database set.
+		/// </summary>
+		protected DbSet<T> DbSet { get; }
 
 		/// <inheritdoc />
 		public virtual IQueryable<T> GetAll()
@@ -48,13 +60,16 @@ namespace SchedulerBot.Database.Repositories
 		/// <inheritdoc />
 		public virtual bool Delete(long id)
 		{
+			bool deleted = false;
 			T entity = GetById(id);
+
 			if (entity != null)
 			{
 				Delete(entity);
-				return true;
+				deleted = true;
 			}
-			return false;
+
+			return deleted;
 		}
 
 		/// <inheritdoc />
@@ -64,6 +79,9 @@ namespace SchedulerBot.Database.Repositories
 			dbEntityEntry.State = EntityState.Deleted;
 		}
 
+		/// <summary>
+		/// Rolls back the changes in context.
+		/// </summary>
 		protected void RollBackChangesInContext()
 		{
 			List<EntityEntry> changedEntries = DbContext.ChangeTracker.Entries().Where(x => x.State != EntityState.Unchanged).ToList();
