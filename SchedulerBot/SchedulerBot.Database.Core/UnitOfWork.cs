@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Microsoft.EntityFrameworkCore;
@@ -14,54 +13,54 @@ namespace SchedulerBot.Database.Core
 		private readonly DbContext dbContext;
 		private readonly ILifetimeScope lifetimeScope;
 
-		public UnitOfWork(ILifetimeScope lifetimeScope, DbContext dbContext)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="UnitOfWork"/> class.
+		/// </summary>
+		/// <param name="dbContext">The database context.</param>
+		/// <param name="lifetimeScope">The lifetime scope.</param>
+		public UnitOfWork(DbContext dbContext, ILifetimeScope lifetimeScope)
 		{
 			this.dbContext = dbContext;
 			this.lifetimeScope = lifetimeScope;
+
+			ManageConversationLinks = GetRepository<IManageConversationLinkRepository>();
+			ScheduledMessageDetails = GetRepository<IScheduledMessageDetailsRepository>();
+			ScheduledMessageDetailsServiceUrls = GetRepository<IScheduledMessageDetailsServiceUrlRepository>();
+			ScheduledMessageEvents = GetRepository<IScheduledMessageEventRepository>();
+			ScheduledMessages = GetRepository<IScheduledMessageRepository>();
+			ServiceUrls = GetRepository<IServiceUrlRepository>();
 		}
 
 		#region Repositories
 
 		#region MS SQL
 
-		/// <summary>
-		/// Gets <see cref="T:SchedulerBot.Database.Interfaces.Repositories.IManageConversationLinkRepository" />.
-		/// </summary>
-		public IManageConversationLinkRepository ManageConversationLinks => GetRepository<IManageConversationLinkRepository>();
+		/// <inheritdoc/>
+		public IManageConversationLinkRepository ManageConversationLinks { get; }
 
-		/// <summary>
-		/// Gets <see cref="T:SchedulerBot.Database.Interfaces.Repositories.IScheduledMessageDetailsRepository" />.
-		/// </summary>
-		public IScheduledMessageDetailsRepository ScheduledMessageDetails => GetRepository<IScheduledMessageDetailsRepository>();
+		/// <inheritdoc/>
+		public IScheduledMessageDetailsRepository ScheduledMessageDetails { get; }
 
-		/// <summary>
-		/// Gets <see cref="T:SchedulerBot.Database.Interfaces.Repositories.IScheduledMessageDetailsServiceUrlRepository" />.
-		/// </summary>
-		public IScheduledMessageDetailsServiceUrlRepository ScheduledMessageDetailsServiceUrls => GetRepository<IScheduledMessageDetailsServiceUrlRepository>();
+		/// <inheritdoc/>
+		public IScheduledMessageDetailsServiceUrlRepository ScheduledMessageDetailsServiceUrls { get; }
 
-		/// <summary>
-		/// Gets <see cref="T:SchedulerBot.Database.Interfaces.Repositories.IScheduledMessageEventRepository" />.
-		/// </summary>
-		public IScheduledMessageEventRepository ScheduledMessageEvents => GetRepository<IScheduledMessageEventRepository>();
+		/// <inheritdoc/>
+		public IScheduledMessageEventRepository ScheduledMessageEvents { get; }
 
-		/// <summary>
-		/// Gets <see cref="T:SchedulerBot.Database.Interfaces.Repositories.IScheduledMessageRepository" />.
-		/// </summary>
-		public IScheduledMessageRepository ScheduledMessages => GetRepository<IScheduledMessageRepository>();
+		/// <inheritdoc/>
+		public IScheduledMessageRepository ScheduledMessages { get; }
 
-		/// <summary>
-		/// Gets <see cref="T:SchedulerBot.Database.Interfaces.Repositories.IServiceUrlRepository" />.
-		/// </summary>
-		public IServiceUrlRepository ServiceUrls => GetRepository<IServiceUrlRepository>();
+		/// <inheritdoc/>
+		public IServiceUrlRepository ServiceUrls { get; }
 
 		#endregion MsSQL
 
 		#endregion
 
 		/// <inheritdoc/>
-		public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+		public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
 		{
-			return await dbContext.SaveChangesAsync(cancellationToken);
+			return dbContext.SaveChangesAsync(cancellationToken);
 		}
 
 		private T GetRepository<T>() where T : class
