@@ -12,7 +12,10 @@ namespace SchedulerBot.Database.Interfaces.Repositories
 		/// Gets <see cref="ServiceUrl"/> by <paramref name="address"/>.
 		/// </summary>
 		/// <param name="address">The address.</param>
-		/// <returns></returns>
+		/// <returns>
+		/// A task that represents the asynchronous operation.
+		/// The task result contains the found <see cref="ServiceUrl"/> instance.
+		/// </returns>
 		Task<ServiceUrl> GetByAddressAsync(string address);
 	}
 }
