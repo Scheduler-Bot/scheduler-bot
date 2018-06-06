@@ -39,12 +39,6 @@ namespace SchedulerBot.Database.Repositories
 		}
 
 		/// <inheritdoc />
-		public virtual T GetById(long id)
-		{
-			return DbSet.Find(id);
-		}
-
-		/// <inheritdoc />
 		public virtual async Task<T> AddAsync(T entity)
 		{
 			EntityEntry<T> entityEntry = await DbContext.AddAsync(entity);
@@ -58,25 +52,9 @@ namespace SchedulerBot.Database.Repositories
 		}
 
 		/// <inheritdoc />
-		public virtual bool Delete(long id)
-		{
-			bool deleted = false;
-			T entity = GetById(id);
-
-			if (entity != null)
-			{
-				Delete(entity);
-				deleted = true;
-			}
-
-			return deleted;
-		}
-
-		/// <inheritdoc />
 		public void Delete(T entity)
 		{
-			EntityEntry dbEntityEntry = DbContext.Entry(entity);
-			dbEntityEntry.State = EntityState.Deleted;
+			DbContext.Remove(entity);
 		}
 
 		/// <summary>

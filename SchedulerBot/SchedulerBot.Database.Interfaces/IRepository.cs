@@ -16,13 +16,6 @@ namespace SchedulerBot.Database.Interfaces
 		IQueryable<T> GetAll();
 
 		/// <summary>
-		/// Gets the entity by an identifier.
-		/// </summary>
-		/// <param name="id">The identifier.</param>
-		/// <returns>The found entity.</returns>
-		T GetById(long id);
-
-		/// <summary>
 		/// Creates the specified entity.
 		/// </summary>
 		/// <param name="entity">The entity.</param>
@@ -36,13 +29,6 @@ namespace SchedulerBot.Database.Interfaces
 		/// </summary>
 		/// <param name="entity">The entity.</param>
 		void Update(T entity);
-
-		/// <summary>
-		/// Deletes entity with the specified identifier.
-		/// </summary>
-		/// <param name="id">The identifier.</param>
-		/// <returns>The value indicating whether the entity has been deleted.</returns>
-		bool Delete(long id);
 
 		/// <summary>
 		/// Deletes the specified entity.
