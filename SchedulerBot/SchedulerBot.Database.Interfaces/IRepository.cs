@@ -28,12 +28,14 @@ namespace SchedulerBot.Database.Interfaces
 		/// Updates the specified entity.
 		/// </summary>
 		/// <param name="entity">The entity.</param>
-		void Update(T entity);
+		/// <returns>The updated entity.</returns>
+		T Update(T entity);
 
 		/// <summary>
 		/// Deletes the specified entity.
 		/// </summary>
 		/// <param name="entity">The entity.</param>
-		void Delete(T entity);
+		/// <returns>The deleted entity.</returns>
+		T Delete(T entity);
 	}
 }

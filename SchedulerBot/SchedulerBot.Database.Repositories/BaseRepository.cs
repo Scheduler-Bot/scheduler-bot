@@ -42,19 +42,24 @@ namespace SchedulerBot.Database.Repositories
 		public virtual async Task<T> AddAsync(T entity)
 		{
 			EntityEntry<T> entityEntry = await DbContext.AddAsync(entity);
+
 			return entityEntry.Entity;
 		}
 
 		/// <inheritdoc />
-		public virtual void Update(T entity)
+		public virtual T Update(T entity)
 		{
-			DbContext.Update(entity);
+			EntityEntry<T> entityEntry = DbContext.Update(entity);
+
+			return entityEntry.Entity;
 		}
 
 		/// <inheritdoc />
-		public void Delete(T entity)
+		public virtual T Delete(T entity)
 		{
-			DbContext.Remove(entity);
+			EntityEntry<T> entityEntry = DbContext.Remove(entity);
+
+			return entityEntry.Entity;
 		}
 
 		/// <summary>
