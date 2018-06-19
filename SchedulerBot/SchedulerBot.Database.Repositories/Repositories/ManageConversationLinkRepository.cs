@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Interfaces.Repositories;
 
@@ -12,7 +13,7 @@ namespace SchedulerBot.Database.Repositories
 		/// Initializes a new instance of the <see cref="ManageConversationLinkRepository"/> class.
 		/// </summary>
 		/// <param name="dbContext">The database context.</param>
-		public ManageConversationLinkRepository(DbContext dbContext)
+		public ManageConversationLinkRepository(SchedulerBotContext dbContext)
 			: base(dbContext)
 		{
 		}

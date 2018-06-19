@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Interfaces;
 
 namespace SchedulerBot.Database.Repositories
@@ -16,7 +17,7 @@ namespace SchedulerBot.Database.Repositories
 		/// </summary>
 		/// <param name="dbContext">The database context.</param>
 		/// <exception cref="ArgumentNullException">dbContext</exception>
-		protected BaseRepository(DbContext dbContext)
+		protected BaseRepository(SchedulerBotContext dbContext)
 		{
 			DbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 			DbSet = DbContext.Set<T>();
@@ -25,7 +26,7 @@ namespace SchedulerBot.Database.Repositories
 		/// <summary>
 		/// Gets the database context.
 		/// </summary>
-		protected DbContext DbContext { get; }
+		protected SchedulerBotContext DbContext { get; }
 
 		/// <summary>
 		/// Gets the database set.

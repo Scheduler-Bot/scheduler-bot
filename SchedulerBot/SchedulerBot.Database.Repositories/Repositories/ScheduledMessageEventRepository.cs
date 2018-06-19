@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
 using SchedulerBot.Database.Interfaces.Repositories;
@@ -16,7 +17,7 @@ namespace SchedulerBot.Database.Repositories
 		/// Initializes a new instance of the <see cref="ScheduledMessageEventRepository"/> class.
 		/// </summary>
 		/// <param name="dbContext">The database context.</param>
-		public ScheduledMessageEventRepository(DbContext dbContext)
+		public ScheduledMessageEventRepository(SchedulerBotContext dbContext)
 			: base(dbContext)
 		{
 		}
