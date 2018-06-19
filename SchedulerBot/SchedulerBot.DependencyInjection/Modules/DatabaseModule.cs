@@ -1,5 +1,7 @@
 ﻿using Autofac;
+using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Interfaces;
+using SchedulerBot.Database.Repositories;
 
 namespace SchedulerBot.DependencyInjection.Modules
 {
@@ -14,10 +16,13 @@ namespace SchedulerBot.DependencyInjection.Modules
 		{
 			base.Load(builder);
 
-			base.Load(builder);
+			builder
+				.RegisterType<UnitOfWork>()
+				.As<IUnitOfWork>()
+				.InstancePerLifetimeScope();
 
 			builder
-				.RegisterAssemblyTypes(typeof(IUnitOfWork).Assembly)
+				.RegisterAssemblyTypes(typeof(BaseRepository<>).Assembly)
 				.AsImplementedInterfaces()
 				.InstancePerLifetimeScope();
 		}
