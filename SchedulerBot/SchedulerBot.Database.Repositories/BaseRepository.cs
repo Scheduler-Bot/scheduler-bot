@@ -9,14 +9,14 @@ using SchedulerBot.Database.Interfaces;
 namespace SchedulerBot.Database.Repositories
 {
 	/// <inheritdoc />
-	public class BaseRepository<T> : IRepository<T> where T : class
+	public abstract class BaseRepository<T> : IRepository<T> where T : class
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="BaseRepository{T}"/> class.
 		/// </summary>
 		/// <param name="dbContext">The database context.</param>
 		/// <exception cref="ArgumentNullException">dbContext</exception>
-		public BaseRepository(DbContext dbContext)
+		protected BaseRepository(DbContext dbContext)
 		{
 			DbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
 			DbSet = DbContext.Set<T>();
