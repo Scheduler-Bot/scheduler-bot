@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace SchedulerBot.Database.Interfaces
 {
@@ -9,12 +8,6 @@ namespace SchedulerBot.Database.Interfaces
 	/// <typeparam name="T">Entity type.</typeparam>
 	public interface IRepository<T> where T : class
 	{
-		/// <summary>
-		/// Gets all entities.
-		/// </summary>
-		/// <returns>All entities.</returns>
-		IQueryable<T> GetAll();
-
 		/// <summary>
 		/// Creates the specified entity.
 		/// </summary>

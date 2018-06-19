@@ -34,12 +34,6 @@ namespace SchedulerBot.Database.Repositories
 		protected DbSet<T> DbSet { get; }
 
 		/// <inheritdoc />
-		public virtual IQueryable<T> GetAll()
-		{
-			return DbSet;
-		}
-
-		/// <inheritdoc />
 		public virtual async Task<T> AddAsync(T entity)
 		{
 			EntityEntry<T> entityEntry = await DbContext.AddAsync(entity);
