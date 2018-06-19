@@ -1,7 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
-using Microsoft.EntityFrameworkCore;
 using SchedulerBot.Database.Interfaces;
 using SchedulerBot.Database.Interfaces.Repositories;
 
@@ -10,7 +9,7 @@ namespace SchedulerBot.Database.Core
 	/// <inheritdoc/>
 	public class UnitOfWork : IUnitOfWork
 	{
-		private readonly DbContext dbContext;
+		private readonly SchedulerBotContext dbContext;
 		private readonly ILifetimeScope lifetimeScope;
 
 		/// <summary>
@@ -18,7 +17,7 @@ namespace SchedulerBot.Database.Core
 		/// </summary>
 		/// <param name="dbContext">The database context.</param>
 		/// <param name="lifetimeScope">The lifetime scope.</param>
-		public UnitOfWork(DbContext dbContext, ILifetimeScope lifetimeScope)
+		public UnitOfWork(SchedulerBotContext dbContext, ILifetimeScope lifetimeScope)
 		{
 			this.dbContext = dbContext;
 			this.lifetimeScope = lifetimeScope;
