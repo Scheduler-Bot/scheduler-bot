@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Globalization;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
@@ -21,7 +22,7 @@ namespace SchedulerBot.Database.Repositories
 		/// <inheritdoc/>
 		public async Task<ServiceUrl> GetByAddressAsync(string address)
 		{
-			ServiceUrl serviceUrl = await DbSet.FirstOrDefaultAsync(url => url.Address == address);
+			ServiceUrl serviceUrl = await DbSet.FirstOrDefaultAsync(url => url.Address.ToUpper(CultureInfo.InvariantCulture) == address.ToUpper(CultureInfo.InvariantCulture));
 			return serviceUrl;
 		}
 	}

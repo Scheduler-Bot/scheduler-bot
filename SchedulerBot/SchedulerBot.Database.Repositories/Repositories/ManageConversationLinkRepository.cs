@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Globalization;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
@@ -21,7 +22,7 @@ namespace SchedulerBot.Database.Repositories
 		/// <inheritdoc />
 		public async Task<ManageConversationLink> GetByTextAsync(string text)
 		{
-			ManageConversationLink result = await DbSet.FirstOrDefaultAsync(link => link.Text == text);
+			ManageConversationLink result = await DbSet.FirstOrDefaultAsync(link => link.Text.ToUpper(CultureInfo.InvariantCulture) == text.ToUpper(CultureInfo.InvariantCulture));
 			return result;
 		}
 	}

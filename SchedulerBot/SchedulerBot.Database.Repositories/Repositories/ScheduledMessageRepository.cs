@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +47,7 @@ namespace SchedulerBot.Database.Repositories
 				.FirstOrDefaultAsync(message =>
 					message.Id == messageId &&
 					message.State == ScheduledMessageState.Active &&
-					message.Details.ConversationId == conversationId);
+					message.Details.ConversationId.ToUpper(CultureInfo.InvariantCulture) == conversationId.ToUpper(CultureInfo.InvariantCulture));
 
 			return result;
 		}

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -43,8 +44,8 @@ namespace SchedulerBot.Database.Repositories
 		{
 			return scheduledMessageDetails
 				.Where(details =>
-					details.ChannelId == channelId &&
-					details.ConversationId == conversationId);
+					details.ChannelId.ToUpper(CultureInfo.InvariantCulture) == channelId.ToUpper(CultureInfo.InvariantCulture) &&
+					details.ConversationId.ToUpper(CultureInfo.InvariantCulture) == conversationId.ToUpper(CultureInfo.InvariantCulture));
 		}
 	}
 }

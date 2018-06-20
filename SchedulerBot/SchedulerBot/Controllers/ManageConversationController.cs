@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -72,7 +73,7 @@ namespace SchedulerBot.Controllers
 			IActionResult actionResult;
 			ManageConversationLink manageLink = await context
 				.ManageConversationLinks
-				.FirstOrDefaultAsync(link => link.Text == manageId);
+				.FirstOrDefaultAsync(link => link.Text.ToUpper(CultureInfo.InvariantCulture) == manageId.ToUpper(CultureInfo.InvariantCulture));
 
 			if (manageLink != null)
 			{
@@ -99,8 +100,8 @@ namespace SchedulerBot.Controllers
 				.Include(messageDetails => messageDetails.ScheduledMessage)
 				.ThenInclude(message => message.Events)
 				.Where(messageDetails =>
-					messageDetails.ChannelId == manageLink.ChannelId &&
-					messageDetails.ConversationId == manageLink.ConversationId)
+					messageDetails.ChannelId.ToUpper(CultureInfo.InvariantCulture) == manageLink.ChannelId.ToUpper(CultureInfo.InvariantCulture) &&
+					messageDetails.ConversationId.ToUpper(CultureInfo.InvariantCulture) == manageLink.ConversationId.ToUpper(CultureInfo.InvariantCulture))
 				.AsEnumerable()
 				.Select(CreateScheduledMessageModel);
 		}

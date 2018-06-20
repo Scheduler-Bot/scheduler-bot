@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +32,7 @@ namespace SchedulerBot.Database.Repositories
 				.Where(@event =>
 					@event.State == ScheduledMessageEventState.Pending &&
 					@event.ScheduledMessage.State == ScheduledMessageState.Active &&
-					@event.ScheduledMessage.Details.ConversationId == conversationId)
+					@event.ScheduledMessage.Details.ConversationId.ToUpper(CultureInfo.InvariantCulture) == conversationId.ToUpper(CultureInfo.InvariantCulture))
 				.OrderBy(@event => @event.NextOccurrence)
 				.FirstOrDefaultAsync();
 
