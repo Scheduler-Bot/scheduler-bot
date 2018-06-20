@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using SchedulerBot.Database.Interfaces;
@@ -9,8 +10,20 @@ namespace SchedulerBot.Database.Core
 	/// <inheritdoc/>
 	public class UnitOfWork : IUnitOfWork
 	{
+		#region Private Fields
+
 		private readonly SchedulerBotContext dbContext;
 		private readonly ILifetimeScope lifetimeScope;
+		private readonly Lazy<IManageConversationLinkRepository> lazyManageConversationLinks;
+		private readonly Lazy<IScheduledMessageDetailsRepository> lazyScheduledMessageDetails;
+		private readonly Lazy<IScheduledMessageDetailsServiceUrlRepository> lazyScheduledMessageDetailsServiceUrls;
+		private readonly Lazy<IScheduledMessageEventRepository> lazyScheduledMessageEvents;
+		private readonly Lazy<IScheduledMessageRepository> lazyScheduledMessages;
+		private readonly Lazy<IServiceUrlRepository> lazyServiceUrls;
+
+		#endregion
+
+		#region Constructor
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="UnitOfWork"/> class.
@@ -22,35 +35,37 @@ namespace SchedulerBot.Database.Core
 			this.dbContext = dbContext;
 			this.lifetimeScope = lifetimeScope;
 
-			ManageConversationLinks = GetRepository<IManageConversationLinkRepository>();
-			ScheduledMessageDetails = GetRepository<IScheduledMessageDetailsRepository>();
-			ScheduledMessageDetailsServiceUrls = GetRepository<IScheduledMessageDetailsServiceUrlRepository>();
-			ScheduledMessageEvents = GetRepository<IScheduledMessageEventRepository>();
-			ScheduledMessages = GetRepository<IScheduledMessageRepository>();
-			ServiceUrls = GetRepository<IServiceUrlRepository>();
+			lazyManageConversationLinks = InitializeLazyRepository<IManageConversationLinkRepository>();
+			lazyScheduledMessageDetails = InitializeLazyRepository<IScheduledMessageDetailsRepository>();
+			lazyScheduledMessageDetailsServiceUrls = InitializeLazyRepository<IScheduledMessageDetailsServiceUrlRepository>();
+			lazyScheduledMessageEvents = InitializeLazyRepository<IScheduledMessageEventRepository>();
+			lazyScheduledMessages = InitializeLazyRepository<IScheduledMessageRepository>();
+			lazyServiceUrls = InitializeLazyRepository<IServiceUrlRepository>();
 		}
+
+		#endregion
 
 		#region Repositories
 
 		#region MS SQL
 
 		/// <inheritdoc/>
-		public IManageConversationLinkRepository ManageConversationLinks { get; }
+		public IManageConversationLinkRepository ManageConversationLinks => lazyManageConversationLinks.Value;
 
 		/// <inheritdoc/>
-		public IScheduledMessageDetailsRepository ScheduledMessageDetails { get; }
+		public IScheduledMessageDetailsRepository ScheduledMessageDetails => lazyScheduledMessageDetails.Value;
 
 		/// <inheritdoc/>
-		public IScheduledMessageDetailsServiceUrlRepository ScheduledMessageDetailsServiceUrls { get; }
+		public IScheduledMessageDetailsServiceUrlRepository ScheduledMessageDetailsServiceUrls => lazyScheduledMessageDetailsServiceUrls.Value;
 
 		/// <inheritdoc/>
-		public IScheduledMessageEventRepository ScheduledMessageEvents { get; }
+		public IScheduledMessageEventRepository ScheduledMessageEvents => lazyScheduledMessageEvents.Value;
 
 		/// <inheritdoc/>
-		public IScheduledMessageRepository ScheduledMessages { get; }
+		public IScheduledMessageRepository ScheduledMessages => lazyScheduledMessages.Value;
 
 		/// <inheritdoc/>
-		public IServiceUrlRepository ServiceUrls { get; }
+		public IServiceUrlRepository ServiceUrls => lazyServiceUrls.Value;
 
 		#endregion MsSQL
 
@@ -62,10 +77,22 @@ namespace SchedulerBot.Database.Core
 			return dbContext.SaveChangesAsync(cancellationToken);
 		}
 
+		#region Private Methods
+
+		private Lazy<T> InitializeLazyRepository<T>() where T : class
+		{
+			Lazy<T> lazyRepository = new Lazy<T>(GetRepository<T>);
+
+			return lazyRepository;
+		}
+
 		private T GetRepository<T>() where T : class
 		{
 			T repository = lifetimeScope.Resolve<T>();
+
 			return repository;
 		}
+
+		#endregion
 	}
 }
