@@ -31,7 +31,10 @@ namespace SchedulerBot.Database.Interfaces.Repositories
 		/// </summary>
 		/// <param name="channelId">The channel identifier.</param>
 		/// <param name="conversationId">The conversation identifier.</param>
-		/// <returns></returns>
+		/// <returns>
+		/// A task that represents the asynchronous operation.
+		/// The task result contains <see cref="IList{ScheduledMessageDetails}"/> of found instances.
+		/// </returns>
 		Task<IList<ScheduledMessageDetails>> GetScheduledMessageDetailsWithEventsAsync(
 			string channelId,
 			string conversationId);

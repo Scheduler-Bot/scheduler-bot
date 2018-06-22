@@ -13,7 +13,6 @@ namespace SchedulerBot.Business.Interfaces.Services
 		/// Gets <see cref="IList{ScheduledMessageDetails}"/> for provided <paramref name="manageLink"/>.
 		/// </summary>
 		/// <param name="manageLink">The manage link.</param>
-		/// <returns></returns>
 		Task<IList<ScheduledMessageDetails>> GetByManageConversationLinkAsync(ManageConversationLink manageLink);
 	}
 }

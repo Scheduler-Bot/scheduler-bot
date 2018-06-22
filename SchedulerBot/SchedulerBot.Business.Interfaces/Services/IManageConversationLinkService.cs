@@ -13,14 +13,12 @@ namespace SchedulerBot.Business.Interfaces.Services
 		/// Validates and mark visited <see cref="ManageConversationLink"/> selected by <paramref name="manageId"/> asynchronous.
 		/// </summary>
 		/// <param name="manageId">The identifier of <see cref="ManageConversationLink"/>.</param>
-		/// <returns></returns>
 		Task<CommandExecutionResult> ValidateAndMarkVisitedAsync(string manageId);
 
 		/// <summary>
 		/// Gets a <see cref="ManageConversationLink"/> by <paramref name="text"/> asynchronous.
 		/// </summary>
 		/// <param name="text">The text of <see cref="ManageConversationLink"/>.</param>
-		/// <returns></returns>
 		Task<ManageConversationLink> GetByTextAsync(string text);
 	}
 }
