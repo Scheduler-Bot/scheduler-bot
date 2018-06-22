@@ -1,4 +1,4 @@
-﻿namespace SchedulerBot.Business.Interfaces
+﻿namespace SchedulerBot.Business.Interfaces.Commands
 {
 	/// <summary>
 	/// Defines an interface for selecting a command by its name.

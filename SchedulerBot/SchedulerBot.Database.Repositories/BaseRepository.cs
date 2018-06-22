@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -26,6 +24,7 @@ namespace SchedulerBot.Database.Repositories
 		/// <summary>
 		/// Gets the database context.
 		/// </summary>
+		// ReSharper disable once MemberCanBePrivate.Global
 		protected SchedulerBotContext DbContext { get; }
 
 		/// <summary>
@@ -55,29 +54,6 @@ namespace SchedulerBot.Database.Repositories
 			EntityEntry<T> entityEntry = DbContext.Remove(entity);
 
 			return entityEntry.Entity;
-		}
-
-		/// <summary>
-		/// Rolls back the changes in context.
-		/// </summary>
-		protected void RollBackChangesInContext()
-		{
-			List<EntityEntry> changedEntries = DbContext.ChangeTracker.Entries().Where(x => x.State != EntityState.Unchanged).ToList();
-			foreach (EntityEntry entry in changedEntries.Where(x => x.State == EntityState.Modified))
-			{
-				entry.CurrentValues.SetValues(entry.OriginalValues);
-				entry.State = EntityState.Unchanged;
-			}
-
-			foreach (EntityEntry entry in changedEntries.Where(x => x.State == EntityState.Added))
-			{
-				entry.State = EntityState.Detached;
-			}
-
-			foreach (EntityEntry entry in changedEntries.Where(x => x.State == EntityState.Deleted))
-			{
-				entry.State = EntityState.Unchanged;
-			}
 		}
 	}
 }

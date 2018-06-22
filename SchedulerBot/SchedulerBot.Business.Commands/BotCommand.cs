@@ -3,6 +3,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Entities;
 using SchedulerBot.Business.Interfaces;
+using SchedulerBot.Business.Interfaces.Commands;
 using SchedulerBot.Database.Interfaces;
 
 namespace SchedulerBot.Business.Commands

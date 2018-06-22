@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using SchedulerBot.Business.Interfaces;
+using SchedulerBot.Business.Interfaces.Commands;
 
 namespace SchedulerBot.Business.Commands.Utils
 {

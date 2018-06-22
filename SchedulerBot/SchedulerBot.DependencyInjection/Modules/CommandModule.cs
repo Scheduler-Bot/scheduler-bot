@@ -1,6 +1,6 @@
 ﻿using Autofac;
 using SchedulerBot.Business.Commands;
-using SchedulerBot.Business.Interfaces;
+using SchedulerBot.Business.Interfaces.Commands;
 
 namespace SchedulerBot.DependencyInjection.Modules
 {
