@@ -16,7 +16,10 @@ namespace SchedulerBot.Database.Interfaces.Repositories
 		/// </summary>
 		/// <param name="conversationId">The conversation identifier.</param>
 		/// <param name="state">The state.</param>
-		/// <returns></returns>
+		/// <returns>
+		/// A task that represents the asynchronous operation.
+		/// The task result contains the collection of found <see cref="ScheduledMessage"/> instances.
+		/// </returns>
 		Task<IList<ScheduledMessage>> GetByConversationIdAndStateAsync(
 			string conversationId,
 			ScheduledMessageState state);
@@ -26,7 +29,10 @@ namespace SchedulerBot.Database.Interfaces.Repositories
 		/// </summary>
 		/// <param name="conversationId">The conversation identifier.</param>
 		/// <param name="messageId">The message identifier.</param>
-		/// <returns></returns>
+		/// <returns>
+		/// A task that represents the asynchronous operation.
+		/// The task result contains the found <see cref="ScheduledMessage"/> instance.
+		/// </returns>
 		Task<ScheduledMessage> GetActiveByIdAndConversationIdAsync(
 			string conversationId,
 			Guid messageId);
@@ -35,7 +41,10 @@ namespace SchedulerBot.Database.Interfaces.Repositories
 		/// Gets the <see cref="ScheduledMessage"/> in active state by <paramref name="messageId"/> with events asynchronous.
 		/// </summary>
 		/// <param name="messageId">The message identifier.</param>
-		/// <returns></returns>
+		/// <returns>
+		/// A task that represents the asynchronous operation.
+		/// The task result contains the found <see cref="ScheduledMessage"/> instance.
+		/// </returns>
 		Task<ScheduledMessage> GetActiveByIdWithEventsAsync(Guid messageId);
 	}
 }

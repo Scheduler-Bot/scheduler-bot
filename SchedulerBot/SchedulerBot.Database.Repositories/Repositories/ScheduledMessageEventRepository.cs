@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
 using SchedulerBot.Database.Interfaces.Repositories;
@@ -12,7 +14,11 @@ namespace SchedulerBot.Database.Repositories
 	/// <inheritdoc cref="IScheduledMessageEventRepository"/>
 	public class ScheduledMessageEventRepository : BaseRepository<ScheduledMessageEvent>, IScheduledMessageEventRepository
 	{
-		public ScheduledMessageEventRepository(DbContext dbContext)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ScheduledMessageEventRepository"/> class.
+		/// </summary>
+		/// <param name="dbContext">The database context.</param>
+		public ScheduledMessageEventRepository(SchedulerBotContext dbContext)
 			: base(dbContext)
 		{
 		}
@@ -26,9 +32,10 @@ namespace SchedulerBot.Database.Repositories
 				.Where(@event =>
 					@event.State == ScheduledMessageEventState.Pending &&
 					@event.ScheduledMessage.State == ScheduledMessageState.Active &&
-					@event.ScheduledMessage.Details.ConversationId.Equals(conversationId, StringComparison.Ordinal))
+					@event.ScheduledMessage.Details.ConversationId.ToUpper(CultureInfo.InvariantCulture) == conversationId.ToUpper(CultureInfo.InvariantCulture))
 				.OrderBy(@event => @event.NextOccurrence)
 				.FirstOrDefaultAsync();
+
 			return result;
 		}
 

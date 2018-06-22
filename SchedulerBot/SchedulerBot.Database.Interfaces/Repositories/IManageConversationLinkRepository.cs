@@ -12,7 +12,10 @@ namespace SchedulerBot.Database.Interfaces.Repositories
 		/// Gets the <see cref="ManageConversationLink"/> by <paramref name="text"/>.
 		/// </summary>
 		/// <param name="text">The text.</param>
-		/// <returns></returns>
+		/// <returns>
+		/// A task that represents the asynchronous operation.
+		/// The task result contains the found <see cref="ManageConversationLink"/> instance.
+		/// </returns>
 		Task<ManageConversationLink> GetByTextAsync(string text);
 	}
 }

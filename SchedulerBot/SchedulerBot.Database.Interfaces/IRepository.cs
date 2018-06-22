@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace SchedulerBot.Database.Interfaces
 {
@@ -10,41 +9,26 @@ namespace SchedulerBot.Database.Interfaces
 	public interface IRepository<T> where T : class
 	{
 		/// <summary>
-		/// Gets all entities.
-		/// </summary>
-		/// <returns></returns>
-		IQueryable<T> GetAll();
-
-		/// <summary>
-		/// Gets the entity by an identifier.
-		/// </summary>
-		/// <param name="id">The identifier.</param>
-		/// <returns></returns>
-		T GetById(long id);
-
-		/// <summary>
 		/// Creates the specified entity.
 		/// </summary>
 		/// <param name="entity">The entity.</param>
+		/// <returns>
+		/// A task that represents the asynchronous Add operation. The task result contains the added entity.
+		/// </returns>
 		Task<T> AddAsync(T entity);
 
 		/// <summary>
 		/// Updates the specified entity.
 		/// </summary>
 		/// <param name="entity">The entity.</param>
-		void Update(T entity);
-
-		/// <summary>
-		/// Deletes entity with the specified identifier.
-		/// </summary>
-		/// <param name="id">The identifier.</param>
-		/// <returns></returns>
-		bool Delete(long id);
+		/// <returns>The updated entity.</returns>
+		T Update(T entity);
 
 		/// <summary>
 		/// Deletes the specified entity.
 		/// </summary>
 		/// <param name="entity">The entity.</param>
-		void Delete(T entity);
+		/// <returns>The deleted entity.</returns>
+		T Delete(T entity);
 	}
 }

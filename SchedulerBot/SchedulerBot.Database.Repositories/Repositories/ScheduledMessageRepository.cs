@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
 using SchedulerBot.Database.Interfaces.Repositories;
@@ -12,7 +14,11 @@ namespace SchedulerBot.Database.Repositories
 	/// <inheritdoc cref="IScheduledMessageRepository"/>
 	public class ScheduledMessageRepository : BaseRepository<ScheduledMessage>, IScheduledMessageRepository
 	{
-		public ScheduledMessageRepository(DbContext dbContext)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ScheduledMessageRepository"/> class.
+		/// </summary>
+		/// <param name="dbContext">The database context.</param>
+		public ScheduledMessageRepository(SchedulerBotContext dbContext)
 			: base(dbContext)
 		{
 		}
@@ -24,8 +30,7 @@ namespace SchedulerBot.Database.Repositories
 		{
 			List<ScheduledMessage> result = await DbSet
 				.Where(scheduledMessage =>
-					scheduledMessage.State == state
-					&& scheduledMessage.Details.ConversationId.Equals(conversationId, StringComparison.Ordinal))
+					scheduledMessage.State == state && scheduledMessage.Details.ConversationId == conversationId)
 				.ToListAsync();
 
 			return result;
@@ -42,7 +47,7 @@ namespace SchedulerBot.Database.Repositories
 				.FirstOrDefaultAsync(message =>
 					message.Id == messageId &&
 					message.State == ScheduledMessageState.Active &&
-					message.Details.ConversationId.Equals(conversationId, StringComparison.Ordinal));
+					message.Details.ConversationId.ToUpper(CultureInfo.InvariantCulture) == conversationId.ToUpper(CultureInfo.InvariantCulture));
 
 			return result;
 		}
