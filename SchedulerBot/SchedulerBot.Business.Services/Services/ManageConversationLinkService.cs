@@ -8,6 +8,7 @@ using SchedulerBot.Database.Interfaces;
 
 namespace SchedulerBot.Business.Services
 {
+	/// <inheritdoc cref="IManageConversationLinkService"/>
 	public class ManageConversationLinkService : BaseService, IManageConversationLinkService
 	{
 		public ManageConversationLinkService(IUnitOfWork unitOfWork, ILogger logger)
@@ -15,7 +16,8 @@ namespace SchedulerBot.Business.Services
 		{
 		}
 
-		public async Task<CommandExecutionResult> ValidateAndMarkVisited(string manageId)
+		/// <inheritdoc />
+		public async Task<CommandExecutionResult> ValidateAndMarkVisitedAsync(string manageId)
 		{
 			ManageConversationLink manageLink = await UnitOfWork.ManageConversationLinks.GetByTextAsync(manageId);
 
@@ -34,6 +36,13 @@ namespace SchedulerBot.Business.Services
 				$"No managing information has been found for the id '{manageId}'.Either the link does not exist or is has expired";
 			Logger.LogInformation(errorMessage);
 			return CommandExecutionResult.Error(errorMessage);
+		}
+
+		/// <inheritdoc />
+		public async Task<ManageConversationLink> GetByTextAsync(string text)
+		{
+			ManageConversationLink manageConversationLink = await UnitOfWork.ManageConversationLinks.GetByTextAsync(text);
+			return manageConversationLink;
 		}
 	}
 }

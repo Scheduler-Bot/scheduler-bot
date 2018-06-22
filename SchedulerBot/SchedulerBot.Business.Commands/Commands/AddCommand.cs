@@ -176,7 +176,7 @@ namespace SchedulerBot.Business.Commands
 
 			// If there are messages from the same conversation, update their service URLs.
 			IList<ScheduledMessageDetails> detailsFromSameConversation =
-				await UnitOfWork.ScheduledMessageDetails.GetScheduledMessageDetails(
+				await UnitOfWork.ScheduledMessageDetails.GetScheduledMessageDetailsAsync(
 					channelId,
 					conversationId,
 					false);
@@ -200,7 +200,7 @@ namespace SchedulerBot.Business.Commands
 		{
 			// If there are messages from the same conversation, update their service URLs.
 			IList<ScheduledMessageDetails> detailsFromSameConversation = 
-				await UnitOfWork.ScheduledMessageDetails.GetScheduledMessageDetails(
+				await UnitOfWork.ScheduledMessageDetails.GetScheduledMessageDetailsAsync(
 					channelId,
 					conversationId,
 					true);
