@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Interfaces.Repositories;
@@ -22,7 +23,7 @@ namespace SchedulerBot.Database.Repositories
 		}
 
 		/// <inheritdoc />
-		public async Task<IList<ScheduledMessageDetails>> GetScheduledMessageDetails(
+		public async Task<IList<ScheduledMessageDetails>> GetScheduledMessageDetailsAsync(
 			string channelId,
 			string conversationId,
 			bool includeServiceUrls)
@@ -36,6 +37,19 @@ namespace SchedulerBot.Database.Repositories
 
 			return await result.ToListAsync();
 		}
+
+		/// <inheritdoc />
+		public async Task<IList<ScheduledMessageDetails>> GetScheduledMessageDetailsWithEventsAsync(string channelId, string conversationId)
+		{
+			var scheduledMessageDetails = DbSet
+				.Include(messageDetails => messageDetails.ScheduledMessage)
+				.ThenInclude(message => message.Events);
+
+			IQueryable<ScheduledMessageDetails> result = FilterByConversation(scheduledMessageDetails, channelId, conversationId);
+
+			return await result.ToListAsync();
+		}
+		
 
 		private static IQueryable<ScheduledMessageDetails> FilterByConversation(
 			IQueryable<ScheduledMessageDetails> scheduledMessageDetails,

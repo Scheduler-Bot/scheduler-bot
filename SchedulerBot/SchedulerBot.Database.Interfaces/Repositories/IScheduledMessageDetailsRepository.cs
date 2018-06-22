@@ -21,9 +21,19 @@ namespace SchedulerBot.Database.Interfaces.Repositories
 		/// A task that represents the asynchronous operation.
 		/// The task result contains the collection of found <see cref="ScheduledMessageDetails"/> instances.
 		/// </returns>
-		Task<IList<ScheduledMessageDetails>> GetScheduledMessageDetails(
+		Task<IList<ScheduledMessageDetails>> GetScheduledMessageDetailsAsync(
 			string channelId,
 			string conversationId,
 			bool includeServiceUrls);
+
+		/// <summary>
+		/// Gets the scheduled message details with joined events asynchronous.
+		/// </summary>
+		/// <param name="channelId">The channel identifier.</param>
+		/// <param name="conversationId">The conversation identifier.</param>
+		/// <returns></returns>
+		Task<IList<ScheduledMessageDetails>> GetScheduledMessageDetailsWithEventsAsync(
+			string channelId,
+			string conversationId);
 	}
 }
