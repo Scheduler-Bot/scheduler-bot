@@ -82,7 +82,7 @@ namespace SchedulerBot.Business.Commands
 				else
 				{
 					result = ExecutionResult<string>.Error(
-						ExecutionErrorCodes.SchedulerCronCannotRecognize,
+						ExecutionErrorCode.SchedulerCronCannotRecognize,
 						$"Cannot recognize schedule \"{textSchedule}\"");
 					Logger.LogWarning(result.ErrorMessage);
 				}
@@ -90,7 +90,7 @@ namespace SchedulerBot.Business.Commands
 			else
 			{
 				result = ExecutionResult<string>.Error(
-					ExecutionErrorCodes.InputCommandInvalidArguments,
+					ExecutionErrorCode.InputCommandInvalidArguments,
 					"Command arguments are in incorrect format. Use the following pattern: add 'your text' 'your schedule'");
 				Logger.LogWarning("Cannot parse the command arguments");
 			}

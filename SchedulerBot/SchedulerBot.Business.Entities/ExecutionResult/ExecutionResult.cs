@@ -11,7 +11,7 @@
 		protected ExecutionResult()
 		{
 			ErrorMessage = null;
-			ErrorCode = ExecutionErrorCodes.None;
+			ErrorCode = ExecutionErrorCode.None;
 		}
 
 		/// <summary>
@@ -19,7 +19,7 @@
 		/// </summary>
 		/// <param name="errorCode">The error code.</param>
 		/// <param name="errorErrorMessage">The error message.</param>
-		private ExecutionResult(ExecutionErrorCodes errorCode, string errorErrorMessage)
+		private ExecutionResult(ExecutionErrorCode errorCode, string errorErrorMessage)
 		{
 			ErrorMessage = errorErrorMessage;
 			ErrorCode = errorCode;
@@ -28,7 +28,7 @@
 		/// <summary>
 		/// Gets a value indicating whether the execution is successful.
 		/// </summary>
-		public bool IsSuccess => ErrorCode == ExecutionErrorCodes.None;
+		public bool IsSuccess => ErrorCode == ExecutionErrorCode.None;
 
 		/// <summary>
 		/// Gets the error message related with the execution result.
@@ -38,7 +38,7 @@
 		/// <summary>
 		/// Gets the ErrorCode value which is representing execution result.
 		/// </summary>
-		public ExecutionErrorCodes ErrorCode { get; protected set; }
+		public ExecutionErrorCode ErrorCode { get; protected set; }
 
 		/// <summary>
 		/// Creates the unsuccessful execution result.
@@ -48,7 +48,7 @@
 		/// <returns>
 		/// A <see cref="ExecutionResult" /> instance with <see cref="ExecutionResult.IsSuccess" /> set to <c>false</c>.
 		/// </returns>
-		public static ExecutionResult Error(ExecutionErrorCodes errorCode, string errorMessage)
+		public static ExecutionResult Error(ExecutionErrorCode errorCode, string errorMessage)
 		{
 			return new ExecutionResult(errorCode, errorMessage);
 		}
@@ -86,7 +86,7 @@
 		/// </summary>
 		/// <param name="errorCode">The error code.</param>
 		/// <param name="errorErrorMessage">The error message.</param>
-		private ExecutionResult(ExecutionErrorCodes errorCode, string errorErrorMessage)
+		private ExecutionResult(ExecutionErrorCode errorCode, string errorErrorMessage)
 		{
 			ErrorMessage = errorErrorMessage;
 			ErrorCode = errorCode;
@@ -118,7 +118,7 @@
 		/// <returns>
 		/// A <see cref="ExecutionResult{T}" /> instance with <see cref="ExecutionResult.IsSuccess" /> set to <c>false</c>.
 		/// </returns>
-		public static new ExecutionResult<T> Error(ExecutionErrorCodes errorCode, string errorMessage)
+		public static new ExecutionResult<T> Error(ExecutionErrorCode errorCode, string errorMessage)
 		{
 			return new ExecutionResult<T>(errorCode, errorMessage);
 		}

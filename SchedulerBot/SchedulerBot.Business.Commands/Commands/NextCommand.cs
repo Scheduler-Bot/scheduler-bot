@@ -116,7 +116,7 @@ namespace SchedulerBot.Business.Commands
 						{
 							Logger.LogError("Cannot parse count '{0}'", countArgument);
 							result = ExecutionResult<string>.Error(
-								ExecutionErrorCodes.InputCommandInvalidArguments,
+								ExecutionErrorCode.InputCommandInvalidArguments,
 								$"Cannot retrieve the requested number of events from the argument '{countArgument}'");
 						}
 					}
@@ -135,7 +135,7 @@ namespace SchedulerBot.Business.Commands
 			{
 				Logger.LogError("Cannot parse message id '{0}'", messageIdArgument);
 				result = ExecutionResult<string>.Error(
-					ExecutionErrorCodes.InputCommandInvalidArguments,
+					ExecutionErrorCode.InputCommandInvalidArguments,
 					$"Cannot parse the message id '{messageIdArgument}'");
 			}
 
@@ -189,7 +189,7 @@ namespace SchedulerBot.Business.Commands
 			{
 				Logger.LogError("Requested count '{0}' is invalid", count);
 				executionResult = ExecutionResult<string>.Error(
-					ExecutionErrorCodes.InputCommandInvalidArguments,
+					ExecutionErrorCode.InputCommandInvalidArguments,
 					$"The requested message count must be between 1 and {maxMessageCount}");
 			}
 

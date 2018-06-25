@@ -46,7 +46,7 @@ namespace SchedulerBot.Business.Commands
 			{
 				Logger.LogError("No arguments provided");
 				executionResult = ExecutionResult<string>.Error(
-					ExecutionErrorCodes.InputCommandInvalidArguments,
+					ExecutionErrorCode.InputCommandInvalidArguments,
 					"You must provide an argument for this command");
 			}
 

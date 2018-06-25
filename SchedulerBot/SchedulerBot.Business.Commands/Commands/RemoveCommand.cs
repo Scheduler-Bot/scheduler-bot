@@ -67,7 +67,7 @@ namespace SchedulerBot.Business.Commands
 				else
 				{
 					result = ExecutionResult<string>.Error(
-						ExecutionErrorCodes.SchedulerMessageCannotBeFound,
+						ExecutionErrorCode.SchedulerMessageCannotBeFound,
 						$"Scheduled message with id '{messageId}' cannot be found");
 					Logger.LogWarning(result.ErrorMessage);
 				}
@@ -75,7 +75,7 @@ namespace SchedulerBot.Business.Commands
 			else
 			{
 				result = ExecutionResult<string>.Error(
-					ExecutionErrorCodes.InputCommandInvalidArguments,
+					ExecutionErrorCode.InputCommandInvalidArguments,
 					$"Cannot parse the command arguments '{arguments}'");
 				Logger.LogWarning(result.ErrorMessage);
 			}

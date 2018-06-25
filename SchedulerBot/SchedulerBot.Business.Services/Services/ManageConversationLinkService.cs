@@ -35,7 +35,7 @@ namespace SchedulerBot.Business.Services
 			string errorMessage =
 				$"No managing information has been found for the id '{manageId}'.Either the link does not exist or is has expired";
 			Logger.LogInformation(errorMessage);
-			return ExecutionResult.Error(ExecutionErrorCodes.ManageConversationLinkCannotBeFound, errorMessage);
+			return ExecutionResult.Error(ExecutionErrorCode.ManageConversationLinkCannotBeFound, errorMessage);
 		}
 
 		/// <inheritdoc />

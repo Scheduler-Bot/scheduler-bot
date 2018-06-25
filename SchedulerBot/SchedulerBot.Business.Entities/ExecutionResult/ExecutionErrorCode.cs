@@ -3,7 +3,7 @@
 	/// <summary>
 	/// Execution Error Codes. This enum used inside <see cref="ExecutionResult"/>.
 	/// </summary>
-	public enum ExecutionErrorCodes
+	public enum ExecutionErrorCode
 	{
 		None = 0,
 
