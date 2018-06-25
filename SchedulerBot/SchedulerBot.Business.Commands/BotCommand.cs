@@ -3,6 +3,8 @@ using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Entities;
 using SchedulerBot.Business.Interfaces;
+using SchedulerBot.Business.Interfaces.Commands;
+using SchedulerBot.Database.Interfaces;
 
 namespace SchedulerBot.Business.Commands
 {
@@ -18,10 +20,12 @@ namespace SchedulerBot.Business.Commands
 		/// Initializes a new instance of the <see cref="BotCommand"/> class.
 		/// </summary>
 		/// <param name="name">The name.</param>
+		/// <param name="unitOfWork">The unit of work.</param>
 		/// <param name="logger">The logger.</param>
-		protected BotCommand(string name, ILogger logger)
+		protected BotCommand(string name, IUnitOfWork unitOfWork,  ILogger logger)
 		{
 			Name = name;
+			UnitOfWork = unitOfWork;
 			Logger = logger;
 		}
 
@@ -35,6 +39,11 @@ namespace SchedulerBot.Business.Commands
 		#endregion
 
 		#region Protected Properties
+
+		/// <summary>
+		/// Gets the Unit of Work to work with a Database.
+		/// </summary>
+		protected IUnitOfWork UnitOfWork { get; }
 
 		/// <summary>
 		/// Gets the logger.

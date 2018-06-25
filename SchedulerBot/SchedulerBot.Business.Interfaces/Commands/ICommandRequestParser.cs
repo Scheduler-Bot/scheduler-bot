@@ -1,7 +1,7 @@
 ﻿using Microsoft.Bot.Schema;
 using SchedulerBot.Business.Entities;
 
-namespace SchedulerBot.Business.Interfaces
+namespace SchedulerBot.Business.Interfaces.Commands
 {
 	/// <summary>
 	/// Defines a mechanism of parsing a user request to a concrete command and arguments.

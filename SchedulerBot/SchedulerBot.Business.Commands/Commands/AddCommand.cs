@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Commands.Utils;
 using SchedulerBot.Business.Entities;
 using SchedulerBot.Business.Utils;
-using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
+using SchedulerBot.Database.Interfaces;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
 namespace SchedulerBot.Business.Commands
@@ -25,7 +23,6 @@ namespace SchedulerBot.Business.Commands
 	{
 		#region Private Fields
 
-		private readonly SchedulerBotContext context;
 		private readonly IScheduleParser scheduleParser;
 		private readonly IScheduleDescriptionFormatter scheduleDescriptionFormatter;
 
@@ -34,19 +31,18 @@ namespace SchedulerBot.Business.Commands
 		#region Constructor
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="AddCommand"/> class.
+		/// Initializes a new instance of the <see cref="AddCommand" /> class.
 		/// </summary>
-		/// <param name="context">The context.</param>
 		/// <param name="scheduleParser">The schedule parser.</param>
 		/// <param name="scheduleDescriptionFormatter">The schedule description formatter.</param>
+		/// <param name="unitOfWork">The unit of work.</param>
 		/// <param name="logger">The logger.</param>
 		public AddCommand(
-			SchedulerBotContext context,
 			IScheduleParser scheduleParser,
 			IScheduleDescriptionFormatter scheduleDescriptionFormatter,
-			ILogger<AddCommand> logger) : base("add", logger)
+			IUnitOfWork unitOfWork,
+			ILogger<AddCommand> logger): base("add", unitOfWork, logger)
 		{
-			this.context = context;
 			this.scheduleParser = scheduleParser;
 			this.scheduleDescriptionFormatter = scheduleDescriptionFormatter;
 		}
@@ -71,10 +67,10 @@ namespace SchedulerBot.Business.Commands
 				{
 					Logger.LogInformation("Creating a new scheduled message");
 
-					ScheduledMessage scheduledMessage = CreateScheduledMessageAsync(activity, text, schedule);
-					scheduledMessage = (await context.ScheduledMessages.AddAsync(scheduledMessage)).Entity;
+					ScheduledMessage scheduledMessage = await CreateScheduledMessageAsync(activity, text, schedule);
+					scheduledMessage = await UnitOfWork.ScheduledMessages.AddAsync(scheduledMessage);
 
-					await context.SaveChangesAsync();
+					await UnitOfWork.SaveChangesAsync();
 
 					string scheduleDescription = scheduleDescriptionFormatter.Format(schedule, activity.Locale);
 					string createdMessageId = scheduledMessage.Id.ToString();
@@ -102,22 +98,25 @@ namespace SchedulerBot.Business.Commands
 
 		#region Private Methods
 
-		private ScheduledMessage CreateScheduledMessageAsync(Activity activity, string text, ISchedule schedule)
+		private async Task<ScheduledMessage> CreateScheduledMessageAsync(Activity activity, string text, ISchedule schedule)
 		{
+			ScheduledMessageEvent scheduledMessageEvent = CreateMessageEvent(schedule);
+			ScheduledMessageDetails scheduledMessageDetails = await CreateMessageDetailsAsync(activity);
+
 			return new ScheduledMessage
 			{
 				Text = text,
 				Schedule = schedule.Text,
 				State = ScheduledMessageState.Active,
-				Details = CreateMessageDetails(activity),
+				Details = scheduledMessageDetails,
 				Events = new List<ScheduledMessageEvent>
 				{
-					CreateMessageEvent(schedule)
+					scheduledMessageEvent
 				}
 			};
 		}
 
-		private ScheduledMessageDetails CreateMessageDetails(Activity activity)
+		private async Task<ScheduledMessageDetails> CreateMessageDetailsAsync(Activity activity)
 		{
 			ScheduledMessageDetails scheduledMessageDetails = new ScheduledMessageDetails
 			{
@@ -131,12 +130,14 @@ namespace SchedulerBot.Business.Commands
 				TimeZoneOffset = activity.LocalTimestamp?.Offset
 			};
 
+			ServiceUrl serviceUrl = await GetOrCreateServiceUrlAsync(activity);
+
 			scheduledMessageDetails.DetailsServiceUrls = new List<ScheduledMessageDetailsServiceUrl>
 			{
 				new ScheduledMessageDetailsServiceUrl
 				{
 					Details = scheduledMessageDetails,
-					ServiceUrl = GetOrCreateServiceUrl(activity),
+					ServiceUrl = serviceUrl,
 					CreatedOn = DateTime.UtcNow
 				}
 			};
@@ -154,33 +155,32 @@ namespace SchedulerBot.Business.Commands
 			};
 		}
 
-		private ServiceUrl GetOrCreateServiceUrl(Activity activity)
+		private async Task<ServiceUrl> GetOrCreateServiceUrlAsync(Activity activity)
 		{
-			ServiceUrl serviceUrl = context.ServiceUrls.FirstOrDefault(url => url.Address == activity.ServiceUrl);
+			ServiceUrl serviceUrl = await UnitOfWork.ServiceUrls.GetByAddressAsync(activity.ServiceUrl);
 
 			return serviceUrl == null
-				? CreateNewServiceUrl(activity.ServiceUrl, activity.ChannelId, activity.Conversation.Id)
-				: UpdateExistingServiceUrl(serviceUrl, activity.ChannelId, activity.Conversation.Id);
+				? await CreateNewServiceUrlAsync(activity.ServiceUrl, activity.ChannelId, activity.Conversation.Id)
+				: await UpdateExistingServiceUrlAsync(serviceUrl, activity.ChannelId, activity.Conversation.Id);
 		}
 
-		private ServiceUrl CreateNewServiceUrl(string serviceUrlAddress, string channelId, string conversationId)
+		private async Task<ServiceUrl> CreateNewServiceUrlAsync(string serviceUrlAddress, string channelId, string conversationId)
 		{
-			ServiceUrl serviceUrl = context
+			ServiceUrl serviceUrl = await UnitOfWork
 				.ServiceUrls
-				.Add(new ServiceUrl
+				.AddAsync(new ServiceUrl
 				{
 					Address = serviceUrlAddress,
 					CreatedOn = DateTime.UtcNow
-				})
-				.Entity;
+				});
 
 			// If there are messages from the same conversation, update their service URLs.
-			IQueryable<ScheduledMessageDetails> detailsFromSameConversation = GetConversationDetails(
-				context,
-				channelId,
-				conversationId,
-				includeServiceUrls: false);
-
+			IList<ScheduledMessageDetails> detailsFromSameConversation =
+				await UnitOfWork.ScheduledMessageDetails.GetScheduledMessageDetailsAsync(
+					channelId,
+					conversationId,
+					false);
+	
 			foreach (ScheduledMessageDetails messageDetails in detailsFromSameConversation)
 			{
 				messageDetails
@@ -196,14 +196,14 @@ namespace SchedulerBot.Business.Commands
 			return serviceUrl;
 		}
 
-		private ServiceUrl UpdateExistingServiceUrl(ServiceUrl serviceUrl, string channelId, string conversationId)
+		private async Task<ServiceUrl> UpdateExistingServiceUrlAsync(ServiceUrl serviceUrl, string channelId, string conversationId)
 		{
 			// If there are messages from the same conversation, update their service URLs.
-			IQueryable<ScheduledMessageDetails> detailsFromSameConversation = GetConversationDetails(
-				context,
-				channelId,
-				conversationId,
-				includeServiceUrls: true);
+			IList<ScheduledMessageDetails> detailsFromSameConversation = 
+				await UnitOfWork.ScheduledMessageDetails.GetScheduledMessageDetailsAsync(
+					channelId,
+					conversationId,
+					true);
 
 			foreach (ScheduledMessageDetails messageDetails in detailsFromSameConversation)
 			{
@@ -226,33 +226,6 @@ namespace SchedulerBot.Business.Commands
 			}
 
 			return serviceUrl;
-		}
-
-		private static IQueryable<ScheduledMessageDetails> GetConversationDetails(
-			SchedulerBotContext context,
-			string channelId,
-			string conversationId,
-			bool includeServiceUrls)
-		{
-			IIncludableQueryable<ScheduledMessageDetails, ICollection<ScheduledMessageDetailsServiceUrl>> scheduledMessageDetails =
-				context
-					.ScheduledMessageDetails
-					.Include(details => details.DetailsServiceUrls);
-
-			return includeServiceUrls
-				? FilterByConversation(scheduledMessageDetails.ThenInclude(detailsServiceUrl => detailsServiceUrl.ServiceUrl), channelId, conversationId)
-				: FilterByConversation(scheduledMessageDetails, channelId, conversationId);
-		}
-
-		private static IQueryable<ScheduledMessageDetails> FilterByConversation(
-			IQueryable<ScheduledMessageDetails> scheduledMessageDetails,
-			string channelId,
-			string conversationId)
-		{
-			return scheduledMessageDetails
-				.Where(details =>
-					details.ChannelId == channelId &&
-					details.ConversationId == conversationId);
 		}
 
 		#endregion

@@ -4,10 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Authentication;
-using SchedulerBot.Database.Core;
+using SchedulerBot.Business.Interfaces.Services;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
@@ -30,7 +29,9 @@ namespace SchedulerBot.Controllers
 
 		#region Private Fields
 
-		private readonly SchedulerBotContext context;
+		private readonly IManageConversationLinkService manageConversationLinkService;
+		private readonly IScheduledMessageDetailsService scheduledMessageDetailsService;
+
 		private readonly IScheduleParser scheduleParser;
 		private readonly ILogger<ManageConversationController> logger;
 
@@ -39,17 +40,20 @@ namespace SchedulerBot.Controllers
 		#region Constructor
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ManageConversationController"/> class.
+		/// Initializes a new instance of the <see cref="ManageConversationController" /> class.
 		/// </summary>
-		/// <param name="context">The context.</param>
+		/// <param name="manageConversationLinkService">The manage conversation link service.</param>
+		/// <param name="scheduledMessageDetailsService">The scheduled message details service.</param>
 		/// <param name="scheduleParser">The schedule parser.</param>
 		/// <param name="logger">The logger.</param>
 		public ManageConversationController(
-			SchedulerBotContext context,
+			IManageConversationLinkService manageConversationLinkService,
+			IScheduledMessageDetailsService scheduledMessageDetailsService,
 			IScheduleParser scheduleParser,
 			ILogger<ManageConversationController> logger)
 		{
-			this.context = context;
+			this.manageConversationLinkService = manageConversationLinkService;
+			this.scheduledMessageDetailsService = scheduledMessageDetailsService;
 			this.scheduleParser = scheduleParser;
 			this.logger = logger;
 		}
@@ -70,14 +74,12 @@ namespace SchedulerBot.Controllers
 			logger.LogInformation("Attempting to gather managing information for the id '{0}'", manageId);
 
 			IActionResult actionResult;
-			ManageConversationLink manageLink = await context
-				.ManageConversationLinks
-				.FirstOrDefaultAsync(link => link.Text == manageId);
+			ManageConversationLink manageLink = await manageConversationLinkService.GetByTextAsync(manageId);
 
 			if (manageLink != null)
 			{
 				logger.LogInformation("Returning managing information for the id '{0}'", manageId);
-				actionResult = Ok(GetConversationScheduledMessageModels(manageLink).ToList());
+				actionResult = Ok(GetConversationScheduledMessageModelsAsync(manageLink));
 			}
 			else
 			{
@@ -92,17 +94,15 @@ namespace SchedulerBot.Controllers
 
 		#region Private Methods
 
-		private IEnumerable<ScheduledMessageModel> GetConversationScheduledMessageModels(ManageConversationLink manageLink)
+		private async Task<IList<ScheduledMessageModel>> GetConversationScheduledMessageModelsAsync(ManageConversationLink manageLink)
 		{
-			return context
-				.ScheduledMessageDetails
-				.Include(messageDetails => messageDetails.ScheduledMessage)
-				.ThenInclude(message => message.Events)
-				.Where(messageDetails =>
-					messageDetails.ChannelId == manageLink.ChannelId &&
-					messageDetails.ConversationId == manageLink.ConversationId)
-				.AsEnumerable()
-				.Select(CreateScheduledMessageModel);
+			IList<ScheduledMessageDetails> scheduledMessageDetails =
+				await scheduledMessageDetailsService.GetByManageConversationLinkAsync(manageLink);
+
+			List<ScheduledMessageModel> scheduledMessageModels
+				= scheduledMessageDetails.Select(CreateScheduledMessageModel).ToList();
+
+			return scheduledMessageModels;
 		}
 
 		private ScheduledMessageModel CreateScheduledMessageModel(ScheduledMessageDetails scheduledMessageDetails)

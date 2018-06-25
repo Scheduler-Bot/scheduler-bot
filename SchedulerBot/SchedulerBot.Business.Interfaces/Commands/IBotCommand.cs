@@ -2,7 +2,7 @@
 using Microsoft.Bot.Schema;
 using SchedulerBot.Business.Entities;
 
-namespace SchedulerBot.Business.Interfaces
+namespace SchedulerBot.Business.Interfaces.Commands
 {
 	/// <summary>
 	/// Defines a command used for the interaction between the user and the bot.

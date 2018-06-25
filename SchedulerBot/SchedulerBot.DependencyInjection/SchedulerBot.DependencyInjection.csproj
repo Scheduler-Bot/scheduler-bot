@@ -11,11 +11,14 @@
   <ItemGroup>
     <ProjectReference Include="..\SchedulerBot.Business.Commands\SchedulerBot.Business.Commands.csproj" />
     <ProjectReference Include="..\SchedulerBot.Business.Services\SchedulerBot.Business.Services.csproj" />
+    <ProjectReference Include="..\SchedulerBot.Database.Core\SchedulerBot.Database.Core.csproj" />
+    <ProjectReference Include="..\SchedulerBot.Database.Repositories\SchedulerBot.Database.Repositories.csproj" />
     <ProjectReference Include="..\SchedulerBot.Infrastructure.Application\SchedulerBot.Infrastructure.Application.csproj" />
     <ProjectReference Include="..\SchedulerBot.Infrastructure.Authentication\SchedulerBot.Infrastructure.Authentication.csproj" />
     <ProjectReference Include="..\SchedulerBot.Infrastructure.BotConnector\SchedulerBot.Infrastructure.BotConnector.csproj" />
     <ProjectReference Include="..\SchedulerBot.Infrastructure.Schedule\SchedulerBot.Infrastructure.Schedule.csproj" />
     <ProjectReference Include="..\SchedulerBot.Infrastructure.Utils\SchedulerBot.Infrastructure.Utils.csproj" />
+    <ProjectReference Include="..\SchedulerBot.Processors\SchedulerBot.Processors.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,34 +1,33 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Rest.Serialization;
 using Newtonsoft.Json;
-using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
+using SchedulerBot.Database.Interfaces;
 using SchedulerBot.Infrastructure.Interfaces.BotConnector;
 using SchedulerBot.Infrastructure.Interfaces.Configuration;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
-namespace SchedulerBot.Business.Services
+namespace SchedulerBot.Processors
 {
 	/// <summary>
 	/// A service supposed to send out the scheduled messages to their recipients.
 	/// </summary>
 	/// <seealso cref="IHostedService" />
 	/// <seealso cref="IDisposable" />
-	public sealed class ScheduledMessageProcessorService : IHostedService, IDisposable
+	public sealed class ScheduledMessageProcessor : IHostedService, IDisposable
 	{
 		#region Private Fields
 
 		private readonly IServiceScopeFactory scopeFactory;
-		private readonly ILogger<ScheduledMessageProcessorService> logger;
+		private readonly ILogger<ScheduledMessageProcessor> logger;
 		private readonly IMessageProcessor messageProcessor;
 		private readonly IScheduleParser scheduleParser;
 		private readonly TimeSpan pollingInterval;
@@ -40,18 +39,18 @@ namespace SchedulerBot.Business.Services
 		#region Constructor
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ScheduledMessageProcessorService"/> class.
+		/// Initializes a new instance of the <see cref="ScheduledMessageProcessor"/> class.
 		/// </summary>
 		/// <param name="scheduleParser">The schedule parser.</param>
 		/// <param name="scopeFactory">The scope factory.</param>
 		/// <param name="configuration">The configuration.</param>
 		/// <param name="logger">The logger.</param>
 		/// <param name="messageProcessor">The message processor.</param>
-		public ScheduledMessageProcessorService(
+		public ScheduledMessageProcessor(
 			IScheduleParser scheduleParser,
 			IServiceScopeFactory scopeFactory,
 			IApplicationConfiguration configuration,
-			ILogger<ScheduledMessageProcessorService> logger,
+			ILogger<ScheduledMessageProcessor> logger,
 			IMessageProcessor messageProcessor)
 		{
 			this.scheduleParser = scheduleParser;
@@ -122,10 +121,12 @@ namespace SchedulerBot.Business.Services
 
 			using (IServiceScope scope = scopeFactory.CreateScope())
 			{
-				SchedulerBotContext context = scope.ServiceProvider.GetRequiredService<SchedulerBotContext>();
+				IUnitOfWork unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
 
 				// TODO: there can be used parallel foreach
-				foreach (ScheduledMessageEvent scheduledMessageEvent in GetPendingEvents(context))
+				IList<ScheduledMessageEvent> scheduledMessageEvents =
+					await unitOfWork.ScheduledMessageEvents.GetAllPendingWithScheduledMessages(DateTime.UtcNow);
+				foreach (ScheduledMessageEvent scheduledMessageEvent in scheduledMessageEvents)
 				{
 					try
 					{
@@ -154,23 +155,10 @@ namespace SchedulerBot.Business.Services
 					}
 				}
 
-				await context.SaveChangesAsync(serviceCancellationToken);
+				await unitOfWork.SaveChangesAsync(serviceCancellationToken);
 			}
 
 			logger.LogInformation("Finished processing scheduled messages queue");
-		}
-
-		private static IQueryable<ScheduledMessageEvent> GetPendingEvents(SchedulerBotContext context)
-		{
-			DateTime currentTime = DateTime.UtcNow;
-
-			return context
-				.ScheduledMessageEvents
-				.Where(@event => @event.State == ScheduledMessageEventState.Pending && @event.NextOccurrence < currentTime)
-				.Include(@event => @event.ScheduledMessage)
-				.ThenInclude(message => message.Details)
-				.ThenInclude(details => details.DetailsServiceUrls)
-				.ThenInclude(detailsServiceUrl => detailsServiceUrl.ServiceUrl);
 		}
 
 		private async Task WaitAsync()

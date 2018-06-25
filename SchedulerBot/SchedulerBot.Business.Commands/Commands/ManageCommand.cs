@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Entities;
-using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
+using SchedulerBot.Database.Interfaces;
 using SchedulerBot.Infrastructure.Interfaces.Application;
 using SchedulerBot.Infrastructure.Interfaces.Configuration;
 using SchedulerBot.Infrastructure.Interfaces.Utils;
@@ -20,7 +20,6 @@ namespace SchedulerBot.Business.Commands
 	{
 		#region Private Fields
 
-		private readonly SchedulerBotContext context;
 		private readonly IWebUtility webUtility;
 		private readonly IApplicationContext applicationContext;
 		private readonly TimeSpan linkExpirationPeriod;
@@ -31,21 +30,20 @@ namespace SchedulerBot.Business.Commands
 		#region Constructor
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ManageCommand"/> class.
+		/// Initializes a new instance of the <see cref="ManageCommand" /> class.
 		/// </summary>
-		/// <param name="context">The context.</param>
 		/// <param name="webUtility">The web utility.</param>
 		/// <param name="applicationContext">The application context.</param>
 		/// <param name="configuration">The configuration.</param>
+		/// <param name="unitOfWork">The unit of work.</param>
 		/// <param name="logger">The logger.</param>
 		public ManageCommand(
-			SchedulerBotContext context,
 			IWebUtility webUtility,
 			IApplicationContext applicationContext,
 			IManageCommandConfiguration configuration,
-			ILogger<ManageCommand> logger) : base("manage", logger)
+			IUnitOfWork unitOfWork,
+			ILogger<ManageCommand> logger) : base("manage", unitOfWork, logger)
 		{
-			this.context = context;
 			this.webUtility = webUtility;
 			this.applicationContext = applicationContext;
 
@@ -68,8 +66,8 @@ namespace SchedulerBot.Business.Commands
 			string linkId = webUtility.GenerateRandomUrlCompatibleString(linkIdLength);
 			ManageConversationLink manageConversationLink = CreateManageConversationLink(activity, linkId);
 
-			await context.ManageConversationLinks.AddAsync(manageConversationLink);
-			await context.SaveChangesAsync();
+			await UnitOfWork.ManageConversationLinks.AddAsync(manageConversationLink);
+			await UnitOfWork.SaveChangesAsync();
 
 			Logger.LogInformation(
 				"Created the manage link '{0}' for channel '{1}' and conversation '{2}'",

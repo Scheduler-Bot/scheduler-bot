@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Entities;
 using SchedulerBot.Business.Utils;
-using SchedulerBot.Database.Core;
 using SchedulerBot.Database.Entities;
 using SchedulerBot.Database.Entities.Enums;
+using SchedulerBot.Database.Interfaces;
 using SchedulerBot.Infrastructure.Interfaces.Schedule;
 
 namespace SchedulerBot.Business.Commands
@@ -21,28 +21,26 @@ namespace SchedulerBot.Business.Commands
 	{
 		#region Private Fields
 
-		private readonly SchedulerBotContext context;
 		private readonly IScheduleParser scheduleParser;
 		private readonly IScheduleDescriptionFormatter scheduleDescriptionFormatter;
 
 		#endregion
 
-		#region Constuctor
+		#region Constructor
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ListCommand"/> class.
+		/// Initializes a new instance of the <see cref="ListCommand" /> class.
 		/// </summary>
-		/// <param name="context">The context.</param>
 		/// <param name="scheduleParser">The schedule parser.</param>
 		/// <param name="scheduleDescriptionFormatter">The schedule description formatter.</param>
+		/// <param name="unitOfWork">The unit of work.</param>
 		/// <param name="logger">The logger.</param>
 		public ListCommand(
-			SchedulerBotContext context,
 			IScheduleParser scheduleParser,
 			IScheduleDescriptionFormatter scheduleDescriptionFormatter,
-			ILogger<ListCommand> logger) : base("list", logger)
+			IUnitOfWork unitOfWork,
+			ILogger<ListCommand> logger) : base("list", unitOfWork, logger)
 		{
-			this.context = context;
 			this.scheduleParser = scheduleParser;
 			this.scheduleDescriptionFormatter = scheduleDescriptionFormatter;
 		}
@@ -52,7 +50,7 @@ namespace SchedulerBot.Business.Commands
 		#region Overrides
 
 		/// <inheritdoc />
-		protected override Task<CommandExecutionResult> ExecuteCoreAsync(Activity activity, string arguments)
+		protected override async Task<CommandExecutionResult> ExecuteCoreAsync(Activity activity, string arguments)
 		{
 			int messageCount = 0;
 			string conversationId = activity.Conversation.Id;
@@ -60,7 +58,8 @@ namespace SchedulerBot.Business.Commands
 
 			Logger.LogInformation("Searching for the scheduled messages for the conversation with id '{0}'", conversationId);
 
-			foreach (ScheduledMessage message in GetConversationMessages(conversationId))
+			IList<ScheduledMessage> conversationMessages = await GetConversationMessagesAsync(conversationId);
+			foreach (ScheduledMessage message in conversationMessages)
 			{
 				AppendMessageDescription(message, stringBuilder, activity.Locale, activity.LocalTimestamp?.Offset);
 				messageCount++;
@@ -79,19 +78,16 @@ namespace SchedulerBot.Business.Commands
 				Logger.LogInformation("No schedule messages found for the conversation '{1}'", conversationId);
 			}
 
-			return Task.FromResult(result);
+			return result;
 		}
 
 		#endregion
 
 		#region Private Methods
 
-		private IQueryable<ScheduledMessage> GetConversationMessages(string conversationId)
+		private async Task<IList<ScheduledMessage>> GetConversationMessagesAsync(string conversationId)
 		{
-			return context.ScheduledMessageDetails
-				.Where(details => details.ConversationId.Equals(conversationId, StringComparison.Ordinal)
-				                  && details.ScheduledMessage.State == ScheduledMessageState.Active)
-				.Select(details => details.ScheduledMessage);
+			return await UnitOfWork.ScheduledMessages.GetByConversationIdAndStateAsync(conversationId, ScheduledMessageState.Active);
 		}
 
 		private void AppendMessageDescription(ScheduledMessage message, StringBuilder stringBuilder, string locale, TimeSpan? timeZoneOffset)

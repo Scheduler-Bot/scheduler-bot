@@ -1,10 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using SchedulerBot.Database.Core;
-using SchedulerBot.Database.Entities;
+using SchedulerBot.Business.Entities;
+using SchedulerBot.Business.Interfaces.Services;
 using SchedulerBot.Infrastructure.Interfaces.Authentication;
 using SchedulerBot.Models;
 
@@ -20,7 +18,7 @@ namespace SchedulerBot.Controllers
 	{
 		#region Private Fields
 
-		private readonly SchedulerBotContext context;
+		private readonly IManageConversationLinkService manageConversationLinkService;
 		private readonly IJwtTokenGenerator tokenGenerator;
 		private readonly ILogger<ManageConversationController> logger;
 
@@ -29,17 +27,17 @@ namespace SchedulerBot.Controllers
 		#region Constructor
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="AuthenticationController"/> class.
+		/// Initializes a new instance of the <see cref="AuthenticationController" /> class.
 		/// </summary>
-		/// <param name="context">The context.</param>
+		/// <param name="manageConversationLinkService">The manage conversation link service.</param>
 		/// <param name="tokenGenerator">The JWT token generator.</param>
 		/// <param name="logger">The logger.</param>
 		public AuthenticationController(
-			SchedulerBotContext context,
+			IManageConversationLinkService manageConversationLinkService,
 			IJwtTokenGenerator tokenGenerator,
 			ILogger<ManageConversationController> logger)
 		{
-			this.context = context;
+			this.manageConversationLinkService = manageConversationLinkService;
 			this.tokenGenerator = tokenGenerator;
 			this.logger = logger;
 		}
@@ -61,18 +59,10 @@ namespace SchedulerBot.Controllers
 			logger.LogInformation("Attempting to gather managing information for the id '{0}'", manageId);
 
 			IActionResult actionResult;
-			ManageConversationLink manageLink = await context
-				.ManageConversationLinks
-				.FirstOrDefaultAsync(link => link.Text == manageId);
+			CommandExecutionResult executionResult = await manageConversationLinkService.ValidateAndMarkVisitedAsync(manageId);
 
-			if (manageLink != null && !manageLink.IsVisited && manageLink.ExpiresOn > DateTime.UtcNow)
+			if (executionResult.IsSuccess)
 			{
-				logger.LogInformation("Marking manage conversation id '{0}' as visited", manageId);
-
-				manageLink.IsVisited = true;
-
-				await context.SaveChangesAsync();
-
 				logger.LogInformation("Generating temporary access token for conversation id '{0}'", manageId);
 
 				string token = tokenGenerator.GenerateToken($"temp-manage-user-{manageId}");
@@ -84,7 +74,6 @@ namespace SchedulerBot.Controllers
 			}
 			else
 			{
-				logger.LogInformation("No managing information has been found for the id '{0}'. Either the link does not exist or is has expired", manageId);
 				actionResult = NotFound();
 			}
 
