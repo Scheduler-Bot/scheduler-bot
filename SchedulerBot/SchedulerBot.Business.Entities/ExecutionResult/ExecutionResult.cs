@@ -6,23 +6,21 @@
 	public class ExecutionResult
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ExecutionResult"/> class.
-		/// </summary>
-		protected ExecutionResult()
-		{
-			ErrorMessage = null;
-			ErrorCode = ExecutionErrorCode.None;
-		}
-
-		/// <summary>
 		/// Initializes a new instance of the <see cref="ExecutionResult{T}"/> class.
 		/// </summary>
 		/// <param name="errorCode">The error code.</param>
 		/// <param name="errorErrorMessage">The error message.</param>
-		private ExecutionResult(ExecutionErrorCode errorCode, string errorErrorMessage)
+		protected ExecutionResult(ExecutionErrorCode errorCode, string errorErrorMessage)
 		{
 			ErrorMessage = errorErrorMessage;
 			ErrorCode = errorCode;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ExecutionResult"/> class.
+		/// </summary>
+		protected ExecutionResult(): this(ExecutionErrorCode.None, null)
+		{
 		}
 
 		/// <summary>
@@ -33,7 +31,7 @@
 		/// <summary>
 		/// Gets the error message related with the execution result.
 		/// </summary>
-		public string ErrorMessage { get; protected set; }
+		public string ErrorMessage { get; }
 
 		/// <summary>
 		/// Gets the ErrorCode value which is representing execution result.
@@ -77,7 +75,6 @@
 		/// <param name="entity">The entity.</param>
 		private ExecutionResult(T entity)
 		{
-			ErrorMessage = null;
 			Entity = entity;
 		}
 
@@ -87,8 +84,8 @@
 		/// <param name="errorCode">The error code.</param>
 		/// <param name="errorErrorMessage">The error message.</param>
 		private ExecutionResult(ExecutionErrorCode errorCode, string errorErrorMessage)
+			: base(errorCode, errorErrorMessage)
 		{
-			ErrorMessage = errorErrorMessage;
 			ErrorCode = errorCode;
 			Entity = default(T);
 		}
@@ -118,7 +115,7 @@
 		/// <returns>
 		/// A <see cref="ExecutionResult{T}" /> instance with <see cref="ExecutionResult.IsSuccess" /> set to <c>false</c>.
 		/// </returns>
-		public static new ExecutionResult<T> Error(ExecutionErrorCode errorCode, string errorMessage)
+		public new static ExecutionResult<T> Error(ExecutionErrorCode errorCode, string errorMessage)
 		{
 			return new ExecutionResult<T>(errorCode, errorMessage);
 		}
