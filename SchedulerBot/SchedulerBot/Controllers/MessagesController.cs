@@ -75,7 +75,11 @@ namespace SchedulerBot.Controllers
 
 					if (command != null)
 					{
-						replyText = (await command.ExecuteAsync(activity, parsedCommandRequest.Arguments)).Message;
+						ExecutionResult<string> executionResult =
+							await command.ExecuteAsync(activity, parsedCommandRequest.Arguments);
+						replyText = executionResult.IsSuccess
+							? executionResult.Entity
+							: executionResult.ErrorMessage;
 					}
 				}
 				

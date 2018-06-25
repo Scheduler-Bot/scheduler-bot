@@ -20,6 +20,6 @@ namespace SchedulerBot.Business.Interfaces.Commands
 		/// <param name="activity">The activity.</param>
 		/// <param name="arguments">The command arguments.</param>
 		/// <returns>The result of the command execution.</returns>
-		Task<CommandExecutionResult> ExecuteAsync(Activity activity, string arguments);
+		Task<ExecutionResult<string>> ExecuteAsync(Activity activity, string arguments);
 	}
 }

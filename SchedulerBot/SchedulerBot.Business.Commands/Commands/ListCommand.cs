@@ -50,7 +50,7 @@ namespace SchedulerBot.Business.Commands
 		#region Overrides
 
 		/// <inheritdoc />
-		protected override async Task<CommandExecutionResult> ExecuteCoreAsync(Activity activity, string arguments)
+		protected override async Task<ExecutionResult<string>> ExecuteCoreAsync(Activity activity, string arguments)
 		{
 			int messageCount = 0;
 			string conversationId = activity.Conversation.Id;
@@ -65,7 +65,7 @@ namespace SchedulerBot.Business.Commands
 				messageCount++;
 			}
 
-			CommandExecutionResult result;
+			ExecutionResult<string> result;
 
 			if (messageCount > 0)
 			{
@@ -74,7 +74,7 @@ namespace SchedulerBot.Business.Commands
 			}
 			else
 			{
-				result = CommandExecutionResult.Success("No scheduled events for this conversation");
+				result = "No scheduled events for this conversation";
 				Logger.LogInformation("No schedule messages found for the conversation '{1}'", conversationId);
 			}
 

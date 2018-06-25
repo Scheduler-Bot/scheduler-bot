@@ -2,7 +2,6 @@
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using SchedulerBot.Business.Entities;
-using SchedulerBot.Business.Interfaces;
 using SchedulerBot.Business.Interfaces.Commands;
 using SchedulerBot.Database.Interfaces;
 
@@ -55,11 +54,11 @@ namespace SchedulerBot.Business.Commands
 		#region Public Methods
 
 		/// <inheritdoc />
-		public async Task<CommandExecutionResult> ExecuteAsync(Activity activity, string arguments)
+		public async Task<ExecutionResult<string>> ExecuteAsync(Activity activity, string arguments)
 		{
 			Logger.LogInformation("Executing '{0}' command with arguments '{1}'", Name, arguments);
 
-			CommandExecutionResult executionResult = await ExecuteCoreAsync(activity, arguments);
+			ExecutionResult<string> executionResult = await ExecuteCoreAsync(activity, arguments);
 
 			Logger.LogInformation("Finished executing '{0}' command", Name);
 
@@ -76,7 +75,7 @@ namespace SchedulerBot.Business.Commands
 		/// <param name="activity">The activity.</param>
 		/// <param name="arguments">The arguments.</param>
 		/// <returns>The result of the command execution.</returns>
-		protected abstract Task<CommandExecutionResult> ExecuteCoreAsync(Activity activity, string arguments);
+		protected abstract Task<ExecutionResult<string>> ExecuteCoreAsync(Activity activity, string arguments);
 
 		#endregion
 	}

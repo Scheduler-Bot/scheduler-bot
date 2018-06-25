@@ -56,7 +56,7 @@ namespace SchedulerBot.Business.Commands
 		#region Overrides
 
 		/// <inheritdoc />
-		protected override async Task<CommandExecutionResult> ExecuteCoreAsync(Activity activity, string arguments)
+		protected override async Task<ExecutionResult<string>> ExecuteCoreAsync(Activity activity, string arguments)
 		{
 			Logger.LogInformation(
 				"Creating a manage link for channel '{0}' and conversation '{1}'",
@@ -81,7 +81,7 @@ namespace SchedulerBot.Business.Commands
 				"manage",
 				linkId);
 
-			return CommandExecutionResult.Success(manageUrl);
+			return manageUrl;
 		}
 
 		#endregion

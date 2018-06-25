@@ -17,7 +17,7 @@ namespace SchedulerBot.Business.Services
 		}
 
 		/// <inheritdoc />
-		public async Task<CommandExecutionResult> ValidateAndMarkVisitedAsync(string manageId)
+		public async Task<ExecutionResult> ValidateAndMarkVisitedAsync(string manageId)
 		{
 			ManageConversationLink manageLink = await UnitOfWork.ManageConversationLinks.GetByTextAsync(manageId);
 
@@ -29,13 +29,13 @@ namespace SchedulerBot.Business.Services
 
 				await UnitOfWork.SaveChangesAsync();
 
-				return CommandExecutionResult.Success();
+				return ExecutionResult.Success();
 			}
 
 			string errorMessage =
 				$"No managing information has been found for the id '{manageId}'.Either the link does not exist or is has expired";
 			Logger.LogInformation(errorMessage);
-			return CommandExecutionResult.Error(errorMessage);
+			return ExecutionResult.Error(ExecutionErrorCodes.ManageConversationLinkCannotBeFound, errorMessage);
 		}
 
 		/// <inheritdoc />
