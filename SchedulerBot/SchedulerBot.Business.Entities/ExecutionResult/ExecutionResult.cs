@@ -93,7 +93,7 @@ namespace SchedulerBot.Business.Entities
 		/// </returns>
 		private string GetDescription(ExecutionErrorCode executionErrorCode)
 		{
-			string executionErrorCodeName = executionErrorCode.ToString();
+			string executionErrorCodeName = executionErrorCode.ToString("G");
 
 			// Splits executionErrorCodeName the by upper case letters.
 			// Solution was found by link https://stackoverflow.com/a/37532157/710014.
