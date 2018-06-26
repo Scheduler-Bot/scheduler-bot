@@ -88,38 +88,22 @@ namespace SchedulerBot.Business.Entities
 		/// </summary>
 		/// <param name="executionErrorCode">The execution error code.</param>
 		/// <returns>
-		/// If enum value marked by <see cref="DescriptionAttribute"/> then the resulted value will be obtained from it.
-		/// In other case result will be a string split by Upper case letters.
+		/// The result will be a string split by Upper case letters.
 		/// E.g. for InputCommandInvalidArguments result will be 'Input Command Invalid Arguments'
 		/// </returns>
 		private string GetDescription(ExecutionErrorCode executionErrorCode)
 		{
 			string executionErrorCodeName = executionErrorCode.ToString();
-			FieldInfo fieldInfo = executionErrorCode.GetType().GetField(executionErrorCodeName);
 
-			DescriptionAttribute[] descriptionAttributes =
-				(DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
-
-			string description = descriptionAttributes.Length > 0
-				? descriptionAttributes[0].Description
-				: SplitByUpperCase(executionErrorCodeName);
-
-			return description;
-		}
-
-		/// <summary>
-		/// Splits input <param name="value"/> the by upper case letters.
-		/// Solution was found by link <see href="https://stackoverflow.com/a/37532157/710014"/>.
-		/// </summary>
-		/// <param name="value">The string which should be spitted.</param>
-		private string SplitByUpperCase(string value)
-		{
-			string[] words = Regex.Matches(value, "(^[a-z]+|[A-Z]+(?![a-z])|[A-Z][a-z]+)")
+			// Splits executionErrorCodeName the by upper case letters.
+			// Solution was found by link https://stackoverflow.com/a/37532157/710014.
+			string[] words = Regex.Matches(executionErrorCodeName, "(^[a-z]+|[A-Z]+(?![a-z])|[A-Z][a-z]+)")
 				.Where(match => match != null)
 				.Select(match => match.Value)
 				.ToArray();
-			string result = string.Join(" ", words);
-			return result;
+			string description = string.Join(" ", words);
+
+			return description;
 		}
 
 		#endregion Private Methods
