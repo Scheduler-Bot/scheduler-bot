@@ -45,7 +45,6 @@ namespace SchedulerBot.Business.Entities
 		/// </summary>
 		public bool IsSuccess => ErrorCode == ExecutionErrorCode.None;
 
-
 		/// <summary>
 		/// Performs an implicit conversion from <see cref="ExecutionErrorCode"/> to <see cref="ExecutionResult"/>.
 		/// </summary>
@@ -95,14 +94,15 @@ namespace SchedulerBot.Business.Entities
 		/// </returns>
 		private string GetDescription(ExecutionErrorCode executionErrorCode)
 		{
-			FieldInfo fieldInfo = executionErrorCode.GetType().GetField(executionErrorCode.ToString());
+			string executionErrorCodeName = executionErrorCode.ToString();
+			FieldInfo fieldInfo = executionErrorCode.GetType().GetField(executionErrorCodeName);
 
 			DescriptionAttribute[] descriptionAttributes =
 				(DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
 
 			string description = descriptionAttributes.Length > 0
 				? descriptionAttributes[0].Description
-				: SplitByUpperCase(executionErrorCode.ToString());
+				: SplitByUpperCase(executionErrorCodeName);
 
 			return description;
 		}
