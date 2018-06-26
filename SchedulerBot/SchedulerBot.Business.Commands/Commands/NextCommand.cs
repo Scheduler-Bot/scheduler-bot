@@ -57,11 +57,11 @@ namespace SchedulerBot.Business.Commands
 		#region Overrides
 
 		/// <inheritdoc />
-		protected override async Task<CommandExecutionResult> ExecuteCoreAsync(Activity activity, string arguments)
+		protected override async Task<ExecutionResult<string>> ExecuteCoreAsync(Activity activity, string arguments)
 		{
 			CultureInfo clientCulture = CultureUtils.GetCultureInfoOrDefault(activity.Locale);
 
-			CommandExecutionResult result = string.IsNullOrWhiteSpace(arguments)
+			ExecutionResult<string> result = string.IsNullOrWhiteSpace(arguments)
 				? await ExecuteWithNoArgumentsAsync(activity, clientCulture)
 				: await ExecuteWithArguments(activity, arguments, clientCulture);
 
@@ -72,28 +72,28 @@ namespace SchedulerBot.Business.Commands
 
 		#region Private Methods
 
-		private async Task<CommandExecutionResult> ExecuteWithNoArgumentsAsync(Activity activity, CultureInfo clientCulture)
+		private async Task<ExecutionResult<string>> ExecuteWithNoArgumentsAsync(Activity activity, CultureInfo clientCulture)
 		{
 			Logger.LogInformation("No arguments provided");
 
 			ScheduledMessageEvent nextEvent = 
 				await UnitOfWork.ScheduledMessageEvents.GetNextMessageEventAsync(activity.Conversation.Id);
 
-			CommandExecutionResult executionResult = nextEvent != null
+			ExecutionResult<string> executionResult = nextEvent != null
 				? ExecuteWithMessageAndCount(nextEvent.ScheduledMessage, defaultMessageCount, clientCulture)
 				: GetNoScheduledMessagesResult();
 
 			return executionResult;
 		}
 
-		private async Task<CommandExecutionResult> ExecuteWithArguments(
+		private async Task<ExecutionResult<string>> ExecuteWithArguments(
 			Activity activity,
 			string arguments,
 			CultureInfo clientCulture)
 		{
 			Logger.LogInformation("Provided arguments: {0}", arguments);
 
-			CommandExecutionResult result;
+			ExecutionResult<string> result;
 			string[] splitArguments = ArgumentHelper.ParseArguments(arguments);
 			string messageIdArgument = splitArguments.ElementAtOrDefault(0);
 
@@ -115,7 +115,9 @@ namespace SchedulerBot.Business.Commands
 						else
 						{
 							Logger.LogError("Cannot parse count '{0}'", countArgument);
-							result = CommandExecutionResult.Error($"Cannot retrieve the requested number of events from the argument '{countArgument}'");
+							result = ExecutionResult<string>.Error(
+								ExecutionErrorCode.InputCommandInvalidArguments,
+								$"Cannot retrieve the requested number of events from the argument '{countArgument}'");
 						}
 					}
 					else
@@ -132,13 +134,15 @@ namespace SchedulerBot.Business.Commands
 			else
 			{
 				Logger.LogError("Cannot parse message id '{0}'", messageIdArgument);
-				result = CommandExecutionResult.Error($"Cannot parse the message id '{messageIdArgument}'");
+				result = ExecutionResult<string>.Error(
+					ExecutionErrorCode.InputCommandInvalidArguments,
+					$"Cannot parse the message id '{messageIdArgument}'");
 			}
 
 			return result;
 		}
 
-		private CommandExecutionResult ExecuteWithMessage(ScheduledMessage message, CultureInfo clientCulture)
+		private ExecutionResult<string> ExecuteWithMessage(ScheduledMessage message, CultureInfo clientCulture)
 		{
 			Logger.LogInformation("Executing with message id '{0}' default message count", message.Id);
 
@@ -147,18 +151,18 @@ namespace SchedulerBot.Business.Commands
 				.Where(@event => @event.State == ScheduledMessageEventState.Pending)
 				.OrderBy(@event => @event.NextOccurrence)
 				.FirstOrDefault();
-			CommandExecutionResult executionResult = nextEvent != null
+			ExecutionResult<string> executionResult = nextEvent != null
 				? ExecuteWithMessageAndCount(nextEvent.ScheduledMessage, defaultMessageCount, clientCulture)
 				: GetNoScheduledMessagesResult();
 
 			return executionResult;
 		}
 
-		private CommandExecutionResult ExecuteWithMessageAndCount(ScheduledMessage message, int count, CultureInfo clientCulture)
+		private ExecutionResult<string> ExecuteWithMessageAndCount(ScheduledMessage message, int count, CultureInfo clientCulture)
 		{
 			Logger.LogInformation("Executing with message id '{0}' and count '{1}'", message.Id, count);
 
-			CommandExecutionResult executionResult;
+			ExecutionResult<string> executionResult;
 
 			if (IsRequestedCountValid(count))
 			{
@@ -184,7 +188,9 @@ namespace SchedulerBot.Business.Commands
 			else
 			{
 				Logger.LogError("Requested count '{0}' is invalid", count);
-				executionResult = CommandExecutionResult.Error($"The requested message count must be between 1 and {maxMessageCount}");
+				executionResult = ExecutionResult<string>.Error(
+					ExecutionErrorCode.InputCommandInvalidArguments,
+					$"The requested message count must be between 1 and {maxMessageCount}");
 			}
 
 			return executionResult;
@@ -220,9 +226,9 @@ namespace SchedulerBot.Business.Commands
 			return stringBuilder.ToString().Trim();
 		}
 
-		private static CommandExecutionResult GetNoScheduledMessagesResult()
+		private static ExecutionResult<string> GetNoScheduledMessagesResult()
 		{
-			return CommandExecutionResult.Success("No scheduled events for this conversation");
+			return "No scheduled events for this conversation";
 		}
 
 		#endregion

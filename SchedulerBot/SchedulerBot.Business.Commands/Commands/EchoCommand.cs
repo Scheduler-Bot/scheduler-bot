@@ -30,9 +30,9 @@ namespace SchedulerBot.Business.Commands
 		}
 
 		/// <inheritdoc />
-		protected override Task<CommandExecutionResult> ExecuteCoreAsync(Activity activity, string arguments)
+		protected override Task<ExecutionResult<string>> ExecuteCoreAsync(Activity activity, string arguments)
 		{
-			CommandExecutionResult executionResult;
+			ExecutionResult<string> executionResult;
 
 			string[] splitArguments = ArgumentHelper.ParseArguments(arguments);
 			string echoText = splitArguments.FirstOrDefault();
@@ -40,12 +40,14 @@ namespace SchedulerBot.Business.Commands
 			if (echoText != null)
 			{
 				Logger.LogInformation("Preparing to echo with '{0}'", echoText);
-				executionResult = CommandExecutionResult.Success(echoText);
+				executionResult = echoText;
 			}
 			else
 			{
 				Logger.LogError("No arguments provided");
-				executionResult = CommandExecutionResult.Error("You must provide an argument for this command");
+				executionResult = ExecutionResult<string>.Error(
+					ExecutionErrorCode.InputCommandInvalidArguments,
+					"You must provide an argument for this command");
 			}
 
 			return Task.FromResult(executionResult);

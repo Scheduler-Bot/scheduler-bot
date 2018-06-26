@@ -52,9 +52,9 @@ namespace SchedulerBot.Business.Commands
 		#region Overrides
 
 		/// <inheritdoc />
-		protected override async Task<CommandExecutionResult> ExecuteCoreAsync(Activity activity, string arguments)
+		protected override async Task<ExecutionResult<string>> ExecuteCoreAsync(Activity activity, string arguments)
 		{
-			CommandExecutionResult result;
+			ExecutionResult<string> result;
 			string[] splitArguments = ArgumentHelper.ParseArguments(arguments);
 			string text = splitArguments.ElementAtOrDefault(0);
 			string textSchedule = splitArguments.ElementAtOrDefault(1);
@@ -81,13 +81,17 @@ namespace SchedulerBot.Business.Commands
 				}
 				else
 				{
-					result = CommandExecutionResult.Error($"Cannot recognize schedule \"{textSchedule}\"");
-					Logger.LogWarning(result.Message);
+					result = ExecutionResult<string>.Error(
+						ExecutionErrorCode.SchedulerCronCannotRecognize,
+						$"Cannot recognize schedule \"{textSchedule}\"");
+					Logger.LogWarning(result.ErrorMessage);
 				}
 			}
 			else
 			{
-				result = CommandExecutionResult.Error("Command arguments are in incorrect format. Use the following pattern: add 'your text' 'your schedule'");
+				result = ExecutionResult<string>.Error(
+					ExecutionErrorCode.InputCommandInvalidArguments,
+					"Command arguments are in incorrect format. Use the following pattern: add 'your text' 'your schedule'");
 				Logger.LogWarning("Cannot parse the command arguments");
 			}
 

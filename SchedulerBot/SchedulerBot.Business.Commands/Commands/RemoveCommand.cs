@@ -30,9 +30,9 @@ namespace SchedulerBot.Business.Commands
 		}
 
 		/// <inheritdoc />
-		protected override async Task<CommandExecutionResult> ExecuteCoreAsync(Activity activity, string arguments)
+		protected override async Task<ExecutionResult<string>> ExecuteCoreAsync(Activity activity, string arguments)
 		{
-			CommandExecutionResult result = null;
+			ExecutionResult<string> result = null;
 			string[] splitArguments = ArgumentHelper.ParseArguments(arguments);
 			string messageIdText = splitArguments.ElementAtOrDefault(0);
 
@@ -66,15 +66,21 @@ namespace SchedulerBot.Business.Commands
 				}
 				else
 				{
-					Logger.LogWarning("Scheduled message with id '{0}' cannot be found", messageId);
+					result = ExecutionResult<string>.Error(
+						ExecutionErrorCode.SchedulerMessageCannotBeFound,
+						$"Scheduled message with id '{messageId}' cannot be found");
+					Logger.LogWarning(result.ErrorMessage);
 				}
 			}
 			else
 			{
-				Logger.LogWarning("Cannot parse the command arguments '{0}'", arguments);
+				result = ExecutionResult<string>.Error(
+					ExecutionErrorCode.InputCommandInvalidArguments,
+					$"Cannot parse the command arguments '{arguments}'");
+				Logger.LogWarning(result.ErrorMessage);
 			}
 
-			return result ?? CommandExecutionResult.Error("Cannot remove such an event");
+			return result;
 		}
 	}
 }

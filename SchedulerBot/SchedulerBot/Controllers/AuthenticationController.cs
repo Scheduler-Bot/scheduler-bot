@@ -59,7 +59,7 @@ namespace SchedulerBot.Controllers
 			logger.LogInformation("Attempting to gather managing information for the id '{0}'", manageId);
 
 			IActionResult actionResult;
-			CommandExecutionResult executionResult = await manageConversationLinkService.ValidateAndMarkVisitedAsync(manageId);
+			ExecutionResult executionResult = await manageConversationLinkService.ValidateAndMarkVisitedAsync(manageId);
 
 			if (executionResult.IsSuccess)
 			{
