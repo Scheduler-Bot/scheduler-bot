@@ -80,15 +80,17 @@ namespace SchedulerBot.Database.Core
 		/// <inheritdoc />
 		public override int SaveChanges(bool acceptAllChangesOnSuccess)
 		{
-			SetCreationTime();
+			SetCreatedOnValue();
 
 			return base.SaveChanges(acceptAllChangesOnSuccess);
 		}
 
 		/// <inheritdoc />
-		public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken))
+		public override Task<int> SaveChangesAsync(
+			bool acceptAllChangesOnSuccess,
+			CancellationToken cancellationToken = default(CancellationToken))
 		{
-			SetCreationTime();
+			SetCreatedOnValue();
 
 			return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
 		}
@@ -97,7 +99,7 @@ namespace SchedulerBot.Database.Core
 
 		#region Private Methods
 
-		private void SetCreationTime()
+		private void SetCreatedOnValue()
 		{
 			IEnumerable<ICreatedOn> addedEntities = ChangeTracker
 				.Entries<ICreatedOn>()
