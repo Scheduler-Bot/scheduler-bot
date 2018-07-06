@@ -141,8 +141,7 @@ namespace SchedulerBot.Business.Commands
 				new ScheduledMessageDetailsServiceUrl
 				{
 					Details = scheduledMessageDetails,
-					ServiceUrl = serviceUrl,
-					CreatedOn = DateTime.UtcNow
+					ServiceUrl = serviceUrl
 				}
 			};
 
@@ -153,7 +152,6 @@ namespace SchedulerBot.Business.Commands
 		{
 			return new ScheduledMessageEvent
 			{
-				CreatedOn = DateTime.UtcNow,
 				NextOccurrence = schedule.GetNextOccurrence(),
 				State = ScheduledMessageEventState.Pending
 			};
@@ -174,8 +172,7 @@ namespace SchedulerBot.Business.Commands
 				.ServiceUrls
 				.AddAsync(new ServiceUrl
 				{
-					Address = serviceUrlAddress,
-					CreatedOn = DateTime.UtcNow
+					Address = serviceUrlAddress
 				});
 
 			// If there are messages from the same conversation, update their service URLs.
@@ -192,8 +189,7 @@ namespace SchedulerBot.Business.Commands
 					.Add(new ScheduledMessageDetailsServiceUrl
 					{
 						Details = messageDetails,
-						ServiceUrl = serviceUrl,
-						CreatedOn = DateTime.UtcNow
+						ServiceUrl = serviceUrl
 					});
 			}
 
@@ -223,8 +219,7 @@ namespace SchedulerBot.Business.Commands
 						.Add(new ScheduledMessageDetailsServiceUrl
 						{
 							Details = messageDetails,
-							ServiceUrl = serviceUrl,
-							CreatedOn = DateTime.UtcNow
+							ServiceUrl = serviceUrl
 						});
 				}
 			}

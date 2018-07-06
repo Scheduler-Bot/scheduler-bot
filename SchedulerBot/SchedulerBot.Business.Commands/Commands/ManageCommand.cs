@@ -90,15 +90,13 @@ namespace SchedulerBot.Business.Commands
 
 		private ManageConversationLink CreateManageConversationLink(Activity activity, string linkId)
 		{
-			DateTime linkCreationTime = DateTime.UtcNow;
-			DateTime linkExpirationTime = linkCreationTime + linkExpirationPeriod;
+			DateTime linkExpirationTime = DateTime.UtcNow + linkExpirationPeriod;
 
 			return new ManageConversationLink
 			{
 				ChannelId = activity.ChannelId,
 				ConversationId = activity.Conversation.Id,
 				Text = linkId,
-				CreatedOn = linkCreationTime,
 				ExpiresOn = linkExpirationTime
 			};
 		}

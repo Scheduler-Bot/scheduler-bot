@@ -181,7 +181,6 @@ namespace SchedulerBot.Processors
 
 			scheduledMessage.Events.Add(new ScheduledMessageEvent
 			{
-				CreatedOn = DateTime.UtcNow,
 				NextOccurrence = schedule.GetNextOccurrence(),
 				State = ScheduledMessageEventState.Pending
 			});
