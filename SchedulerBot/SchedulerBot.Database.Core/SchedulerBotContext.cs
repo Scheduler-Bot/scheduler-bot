@@ -1,6 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using SchedulerBot.Database.Core.Configurations;
 using SchedulerBot.Database.Entities;
+using SchedulerBot.Database.Entities.Interfaces;
 
 namespace SchedulerBot.Database.Core
 {
@@ -10,6 +16,8 @@ namespace SchedulerBot.Database.Core
 	/// <seealso cref="DbContext" />
 	public class SchedulerBotContext : DbContext
 	{
+		#region Constructor
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SchedulerBotContext"/> class.
 		/// </summary>
@@ -17,6 +25,10 @@ namespace SchedulerBot.Database.Core
 		public SchedulerBotContext(DbContextOptions options) : base(options)
 		{
 		}
+
+		#endregion
+
+		#region DbSets
 
 		/// <summary>
 		/// Gets or sets the manage conversation links.
@@ -48,6 +60,10 @@ namespace SchedulerBot.Database.Core
 		/// </summary>
 		public DbSet<ServiceUrl> ServiceUrls { get; set; }
 
+		#endregion
+
+		#region Overrides
+
 		/// <inheritdoc />
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -60,5 +76,43 @@ namespace SchedulerBot.Database.Core
 			modelBuilder.ApplyConfiguration(new ScheduledMessageDetailsServiceUrlConfiguration());
 			modelBuilder.ApplyConfiguration(new ServiceUrlConfiguration());
 		}
+
+		/// <inheritdoc />
+		public override int SaveChanges(bool acceptAllChangesOnSuccess)
+		{
+			SetCreatedOnValue();
+
+			return base.SaveChanges(acceptAllChangesOnSuccess);
+		}
+
+		/// <inheritdoc />
+		public override Task<int> SaveChangesAsync(
+			bool acceptAllChangesOnSuccess,
+			CancellationToken cancellationToken = default(CancellationToken))
+		{
+			SetCreatedOnValue();
+
+			return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+		}
+
+		#endregion
+
+		#region Private Methods
+
+		private void SetCreatedOnValue()
+		{
+			IEnumerable<ICreatedOn> addedEntities = ChangeTracker
+				.Entries<ICreatedOn>()
+				.Where(entry => entry.State == EntityState.Added)
+				.Select(entry => entry.Entity);
+			DateTime currentTime = DateTime.UtcNow;
+
+			foreach (ICreatedOn addedEntity in addedEntities)
+			{
+				addedEntity.CreatedOn = currentTime;
+			}
+		}
+
+		#endregion
 	}
 }
