@@ -3,7 +3,7 @@
 		"windowsAuthentication": false,
 		"anonymousAuthentication": true,
 		"iisExpress": {
-			"applicationUrl": "http://localhost:59213/",
+			"applicationUrl": "http://localhost:59214/",
 			"sslPort": 0
 		}
 	},
@@ -19,8 +19,16 @@
 			"commandName": "IISExpress",
 			"launchBrowser": true,
 			"environmentVariables": {
-				"ASPNETCORE_ENVIRONMENT": "Production",
-				"KEYVAULT_ENDPOINT": "https://scheduler-bot-key-vault.vault.azure.net/"
+				"KEYVAULT_ENDPOINT": "https://scheduler-bot-key-vault.vault.azure.net/",
+				"ASPNETCORE_ENVIRONMENT": "Production"
+			}
+		},
+		"SchedulerBot": {
+			"commandName": "Project",
+			"launchBrowser": true,
+			"applicationUrl": "http://localhost:5000",
+			"environmentVariables": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
 			}
 		}
 	}

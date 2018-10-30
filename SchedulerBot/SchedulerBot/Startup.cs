@@ -59,7 +59,6 @@ namespace SchedulerBot
 		{
 			app.UseDefaultFiles();
 			app.UseStaticFiles();
-			app.UseExceptionHandler();
 			app.UseMiddleware<ApplicationContextMiddleware>();
 			app.UseAuthentication();
 			app.UseMvc();
@@ -69,6 +68,12 @@ namespace SchedulerBot
 			if (!isDevelopment)
 			{
 				app.UseDeveloperExceptionPage();
+				app.UseExceptionHandler();
+			}
+			else
+			{
+				app.UseStatusCodePages("text/plain", "Status code page, status code: {0}");
+				//app.UseDeveloperExceptionPage();
 			}
 
 			app.UseSpa(builder =>
