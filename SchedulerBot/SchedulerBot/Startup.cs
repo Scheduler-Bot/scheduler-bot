@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Microsoft.Bot.Builder.Integration.AspNet.Core;
+using Microsoft.Bot.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Bot.Connector;
@@ -36,11 +38,20 @@ namespace SchedulerBot
 		public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
 			services.AddDbContext();
-			services.AddAuthentication()
-				.AddBotAuthentication(configuration)
-				.AddManageConversationAuthentication(configuration);
-			services.AddMvc(options => options.Filters.Add<TrustServiceUrlAttribute>());
+//			services.AddAuthentication()
+//				.AddBotAuthentication(configuration)
+//				.AddManageConversationAuthentication(configuration);
+//			services.AddMvc(options => options.Filters.Add<TrustServiceUrlAttribute>());
 			services.AddSpaStaticFiles(options => options.RootPath = "wwwroot");
+
+			services.AddBot<Bots.SchedulerBot>(options =>
+			{
+				var secretKey = configuration.GetSection("botFileSecret")?.Value;
+				var botFilePath = configuration.GetSection("botFilePath")?.Value;
+
+				// Loads .bot configuration file and adds a singleton that your Bot can access through dependency injection.
+				var botConfig = BotConfiguration.Load(botFilePath ?? @".\BotConfiguration.bot", secretKey);
+			});
 
 			ServiceProviderBuilder serviceProviderBuilder = new ServiceProviderBuilder();
 			IServiceProvider serviceProvider = serviceProviderBuilder.Build(services);
