@@ -67,13 +67,11 @@ namespace SchedulerBot
 
 			if (!isDevelopment)
 			{
-				app.UseDeveloperExceptionPage();
-				app.UseExceptionHandler();
+				app.UseStatusCodePages("text/plain", "Status code page, status code: {0}");
 			}
 			else
 			{
-				app.UseStatusCodePages("text/plain", "Status code page, status code: {0}");
-				//app.UseDeveloperExceptionPage();
+				app.UseDeveloperExceptionPage();
 			}
 
 			app.UseSpa(builder =>
