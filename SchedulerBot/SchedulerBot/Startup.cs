@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Configuration;
+using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Bot.Connector;
+using Microsoft.Extensions.Logging;
 using SchedulerBot.DependencyInjection;
 using SchedulerBot.Extensions;
 using SchedulerBot.Infrastructure.Interfaces.Configuration;
@@ -20,14 +22,19 @@ namespace SchedulerBot
 	public class Startup
 	{
 		private readonly IConfiguration configuration;
+		private readonly bool isDevelopment;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Startup"/> class.
 		/// </summary>
 		/// <param name="configuration">The configuration.</param>
-		public Startup(IConfiguration configuration)
+		/// <param name="env"></param>
+		public Startup(
+			IConfiguration configuration,
+			IHostingEnvironment env)
 		{
 			this.configuration = configuration;
+			isDevelopment = env.IsDevelopment();
 		}
 
 		/// <summary>
@@ -46,11 +53,31 @@ namespace SchedulerBot
 
 			services.AddBot<Bots.SchedulerBot>(options =>
 			{
-				var secretKey = configuration.GetSection("botFileSecret")?.Value;
-				var botFilePath = configuration.GetSection("botFilePath")?.Value;
+				string botFilePath = configuration.GetSection("BotCoreSettings::BotFilePath").Value;
+				string secretKey = configuration.GetSection("BotCoreSettings::SecretKey")?.Value;
 
 				// Loads .bot configuration file and adds a singleton that your Bot can access through dependency injection.
-				var botConfig = BotConfiguration.Load(botFilePath ?? @".\BotConfiguration.bot", secretKey);
+				BotConfiguration botConfig = BotConfiguration.Load(botFilePath, secretKey);
+
+				// Retrieve current endpoint.
+				string environment = isDevelopment ? "development" : "production";
+				ConnectedService service = botConfig.Services.FirstOrDefault(s => s.Type == "endpoint" && s.Name == environment);
+				if (!(service is EndpointService endpointService))
+				{
+					throw new InvalidOperationException($"The .bot file does not contain an endpoint with name '{environment}'.");
+				}
+
+				options.CredentialProvider = new SimpleCredentialProvider(endpointService.AppId, endpointService.AppPassword);
+
+				// Creates a logger for the application to use.
+				ILogger logger = _loggerFactory.CreateLogger<EchoWithCounterBot>();
+
+				// Catches any errors that occur during a conversation turn and logs them.
+				options.OnTurnError = async (context, exception) =>
+				{
+					logger.LogError($"Exception caught : {exception}");
+					await context.SendActivityAsync("Sorry, it looks like something went wrong.");
+				};
 			});
 
 			ServiceProviderBuilder serviceProviderBuilder = new ServiceProviderBuilder();
@@ -73,8 +100,6 @@ namespace SchedulerBot
 			app.UseMiddleware<ApplicationContextMiddleware>();
 			app.UseAuthentication();
 			app.UseMvc();
-
-			bool isDevelopment = env.IsDevelopment();
 
 			if (!isDevelopment)
 			{
